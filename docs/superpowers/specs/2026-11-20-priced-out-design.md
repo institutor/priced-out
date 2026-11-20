@@ -55,9 +55,9 @@ before the price is announced.
 ## Approaches considered
 
 Research:
-1. One survey with a price question run backwards, a trade-off (MaxDiff) question over
-   fixes, and a pledge question. **Chosen**: works with any sample size and the curve is the
-   product.
+1. One survey with two price questions per item (where it starts to feel like a stretch,
+   where you would skip it), a trade-off (MaxDiff) question over fixes, and a pledge
+   question. **Chosen**: works with any sample size and the curve is the product.
 2. Conjoint over event designs. Dropped: needs far more answers than one night gives.
 3. Two-version experiment on waiver wording. Dropped: halves an already small sample.
 
@@ -87,6 +87,24 @@ About 3 minutes, in this order. Exact wording is in `briefs/02-draft.txt`.
 
 Assistant's calls, not confirmed by the owner: the $40 figure and the price ranges.
 
+### What Flashpoint changed (its reply of 2026-11-20, in `replies/02-draft.json`)
+
+- **Price questions are number sliders, not a Van Westendorp question.** The first idea was
+  to reuse Flashpoint's Van Westendorp pricing question with two of its points. Flashpoint
+  answered that the type needs exactly four price points with fixed meanings and can't take
+  two custom ones, so each item gets two sliders from $0 to the item's maximum, with the
+  right end labelled "this much or more".
+- **No dollar sign beside the slider value.** The slider type doesn't accept a prefix, so
+  the question text says "(in dollars)" instead.
+- **Untouched sliders.** The publish brief asks Flashpoint to make sure a slider nobody
+  moved is stored as no answer, or to swap the sliders for number inputs. A stored 0 would
+  read as "would skip it even if it were free".
+- **Three price blocks rotate** per respondent, so no item is always asked first.
+- **MaxDiff design is Flashpoint's**: about 4 to 5 screens of 4 fixes each for 6 fixes.
+- **Follow-up is AI-moderated**, at most two follow-up questions, told not to ask for
+  anything identifying. Its transcripts are never published.
+- Every question after the first can be skipped.
+
 ### Fixed vocabulary
 
 Items (id, label, slider max, step):
@@ -111,7 +129,7 @@ Pledge: amount in {0, 1, 2, 3, 5, 10}; threshold in {0, 5, 10, 20, "most"}, wher
 One page, six parts, in the order a treasurer would use them.
 
 1. **Price check.** Pick an item, set a price and a club size. Before the result shows, the
-   visitor guesses the share who would skip. Then: the share priced out with a 95% interval
+   visitor guesses how many would skip. Then: the share priced out with a 95% interval
    and the sample size, the share who would pay but feel stretched, the same in people
    ("about 19 of your 60"), and a curve of both shares across the price range with the
    chosen price and the visitor's guess marked.
