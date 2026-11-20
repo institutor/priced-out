@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Priced Out</title>
+  <meta name="description" content="How many students does a club's price quietly leave out? A calculator built from a survey of Columbia and Barnard students.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans:wght@500;700;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="banner"></div>
+
+  <header class="masthead">
+    <p class="wordmark">Priced Out</p>
+    <p class="masthead-note">Students who can't afford a club's price rarely say so. They say they're busy. This shows how many that is, at your price.</p>
+  </header>
+
+  <main id="app">
+    <section id="price-check" aria-label="Price check"></section>
+
+    <section id="access" aria-labelledby="access-title">
+      <h2 id="access-title">What it would take</h2>
+      <div class="section-body"></div>
+    </section>
+
+    <section id="fixes" aria-labelledby="fixes-title">
+      <h2 id="fixes-title">The fix students said they'd use</h2>
+      <div class="section-body"></div>
+    </section>
+
+    <section id="pledges" aria-labelledby="pledges-title">
+      <h2 id="pledges-title">Would members cover it themselves?</h2>
+      <div class="section-body"></div>
+    </section>
+
+    <section id="receipt" aria-labelledby="receipt-title">
+      <h2 id="receipt-title">The receipt for a year in your club</h2>
+      <div class="section-body"></div>
+    </section>
+
+    <section id="said" aria-labelledby="said-title">
+      <h2 id="said-title">What they said instead</h2>
+      <div class="section-body"></div>
+    </section>
+
+    <section id="method" aria-labelledby="method-title">
+      <h2 id="method-title">How we know, and what we don't</h2>
+      <div class="section-body"></div>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <div class="colophon-rule">
+      <p>Built for the Flashpoint AI and Columbia AI Club hackathon, November 2026. The survey was designed, fielded and exported with Flashpoint. The code was written with Claude Code.</p>
+    </div>
+  </footer>
+
+  <noscript><p class="noscript">This page needs JavaScript to read the survey data and draw the calculator.</p></noscript>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
