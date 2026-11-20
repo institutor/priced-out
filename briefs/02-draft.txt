@@ -1,0 +1,50 @@
+Create a new survey as a DRAFT. Do not publish it and do not send it to anyone yet.
+
+Purpose: a student research project at Columbia University. I want to measure the price at which students quietly drop out of club activities, and which ways of reducing the cost feel least awkward. Respondents are Columbia and Barnard undergraduates who will open an anonymous public link on their phones. Target length: about 3 minutes.
+
+Settings:
+- Anonymous. Do not collect names, emails or any contact details.
+- It will be shared by a public link, not by email invitations.
+- Only question 1 is required. Every other question can be skipped.
+- Internal name: Priced Out. Title shown to respondents: "What do club events really cost you? (3 minutes, anonymous)"
+- Intro text: "This is a student research project for a Columbia hackathon. It takes about 3 minutes. It is anonymous: no names or emails are collected, you can skip any question, and results are only ever shown as totals."
+
+Questions, in this order:
+
+1. Single choice, required. "What year are you?" Options: First-year; Sophomore; Junior; Senior; Graduate student; I am not a Columbia or Barnard student. End the survey for anyone who picks the last option.
+
+2. Single choice. "Have you ever helped plan a paid event or set dues for a student club?" Options: Yes; No.
+
+3. Price questions. Intro: "Think of a student club you like and would want to do these things with." For each of three items, ask two price questions:
+   (a) "At what price would this start to feel like a stretch for you?"
+   (b) "At what price would you skip it and give a different reason for not going?"
+   Items and price ranges: one semester of club dues ($0 to $100, steps of $5); a ticket to the club's formal ($0 to $150, steps of $5); a weekend trip with the club ($0 to $400, steps of $10). The top of each range should read "this much or more".
+   If you have a Van Westendorp or other price sensitivity question type that accepts my own wording with only these two price points, use it and tell me. Otherwise use sliders or a dollar entry. Randomise the order of the three items if that is simple.
+
+4. Number from 0 to 100. "Out of 100 Columbia students, how many do you think would skip a $40 club formal because of the price?"
+
+5. Single choice. "Have you ever skipped a club event, or decided not to join a club, mainly because of the cost?" Options: Never; Once or twice; Several times; Prefer not to say.
+
+6. Multiple choice, shown only if the answer to question 5 is "Once or twice" or "Several times". "What did you say at the time? Pick all that apply." Options: I said it cost too much; I said I was busy; I said I had work or an exam; I said I had other plans; I said I was not interested; I said nothing and just did not go; Something else (write in).
+
+7. MaxDiff, with as few screens as gives a usable result (5 at most). "Suppose a club event costs more than you can comfortably pay. Which of these would make you MOST likely to still go, and which LEAST likely?" Items:
+   - Sliding scale: you privately pick your price from a few levels
+   - Waiver on request: you message the treasurer for a discount code
+   - Open waiver code: a discount code is sent to every member, no questions asked
+   - Pay what you can: you enter any amount, even $0
+   - Paid-forward tickets: other members chip in extra, and anyone can claim a covered ticket
+   - Discount draw: every buyer gets a random discount, so nobody can tell who needed one
+
+8. Single choice. "Would you add a little to your own ticket so that a member who cannot afford it could come?" Options: No; Yes, $1; Yes, $2; Yes, $3; Yes, $5; Yes, $10 or more.
+   Then, shown only if the answer is not "No": "Would it depend on other members doing the same?" Options: No, I would do it anyway; Only if at least 5 others did; Only if at least 10 others did; Only if at least 20 others did; Only if most of the club did.
+
+9. Optional follow-up at the end. If an AI-moderated interview question works inside an anonymous public-link survey, use one with at most 2 follow-up prompts: "Tell me about the last time the cost of something kept you from joining in. What happened?" If it does not work there, use an optional open-text question with the same wording.
+
+End text: "Thank you. Your answers are anonymous and will only be shown as totals."
+
+When you are done, run your validation and publish-readiness checks, then reply with:
+- the survey id
+- every question exactly as you built it, with its type
+- anything you changed or could not do, especially for questions 3, 7 and 9
+- whether results can be exported as CSV with one row per respondent, including the MaxDiff choices
+- whether an anonymous public link will be available as soon as it is published
