@@ -10,6 +10,9 @@
     "viem": "^2.58.0"
   },
   "scripts": {
-    "test": "node --test \"test/*.test.mjs\""
+    "test": "node --test \"test/*.test.mjs\"",
+    "dev": "node scripts/serve.mjs",
+    "sample": "node scripts/make-sample.mjs",
+    "build-data": "node scripts/build-data.mjs"
   }
 }

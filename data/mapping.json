@@ -1,0 +1,79 @@
+{
+  "_note": "Maps Flashpoint's CSV export onto the survey's fields. The column names below are placeholders written before the first real export existed: after exporting, replace each with the real column header (a unique part of the header is enough). Answer texts must match what the survey shows respondents.",
+  "exclude": [],
+  "columns": {
+    "year": "Year",
+    "officer": "Officer",
+    "prices": {
+      "dues": {
+        "stretch": "Dues stretch",
+        "skip": "Dues skip"
+      },
+      "formal": {
+        "stretch": "Formal stretch",
+        "skip": "Formal skip"
+      },
+      "trip": {
+        "stretch": "Trip stretch",
+        "skip": "Trip skip"
+      }
+    },
+    "guess": "Guess",
+    "skipped": "Skipped",
+    "said": "Said",
+    "pledgeAmount": "Pledge amount",
+    "pledgeThreshold": "Pledge threshold",
+    "maxdiff": {
+      "tasks": 5,
+      "shown": "MD{n} shown",
+      "best": "MD{n} best",
+      "worst": "MD{n} worst"
+    }
+  },
+  "answers": {
+    "separator": ";",
+    "screenOut": "I am not a Columbia or Barnard student",
+    "officer": {
+      "Yes": true,
+      "No": false
+    },
+    "skipped": {
+      "Never": "never",
+      "Once or twice": "once",
+      "Several times": "several",
+      "Prefer not to say": "preferNot"
+    },
+    "said": {
+      "I said it cost too much": "truth",
+      "I said I was busy": "busy",
+      "I said I had work or an exam": "exam",
+      "I said I had other plans": "plans",
+      "I said I was not interested": "uninterested",
+      "I said nothing and just did not go": "silent",
+      "Something else": "other"
+    },
+    "fixes": {
+      "Sliding scale": "sliding",
+      "Waiver on request": "request",
+      "Open waiver code": "open",
+      "Pay what you can": "pwyc",
+      "Paid-forward tickets": "forward",
+      "Discount draw": "draw"
+    },
+    "pledgeAmount": {
+      "No": 0,
+      "Yes, $1": 1,
+      "Yes, $2": 2,
+      "Yes, $3": 3,
+      "Yes, $5": 5,
+      "Yes, $10 or more": 10
+    },
+    "pledgeThreshold": {
+      "No, I would do it anyway": 0,
+      "Only if at least 5 others did": 5,
+      "Only if at least 10 others did": 10,
+      "Only if at least 20 others did": 20,
+      "Only if most of the club did": "most"
+    }
+  }
+}
