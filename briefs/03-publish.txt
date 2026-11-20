@@ -1,0 +1,13 @@
+This is about survey 0a4c06d5-1ea1-43dd-89d7-2458c955b58a (Priced Out), which you drafted earlier in this conversation. Three things, in this order.
+
+1. The six price sliders (DUES_A, DUES_B, FORMAL_A, FORMAL_B, TRIP_A, TRIP_B). A slider the respondent never touches must be stored as no answer, never as 0 or any other default value, because a 0 would be read as "would skip it even if it were free". Check how they behave. If a slider shows a preselected value, or stores a value when it is not moved, change it so that it starts empty. If that is not possible, replace each slider with a plain number input with a $ prefix, the same minimum, maximum and step, and the help text "If your answer is the top of the range or more, enter the top of the range." Tell me which of these you did.
+
+2. Each of the six price questions must state the item and the full question from my original brief, not an abbreviation, and end with " (in dollars)". For example: "One semester of club dues: at what price would you skip it and give a different reason for not going? (in dollars)".
+
+3. Then publish the survey. I have read the two findings and I approve both: no quotas, because it is an open anonymous link, and Defender off. If you still need a separate confirmation from me, tell me exactly what to reply.
+
+After that, reply with:
+- whether the survey is live, and its public link
+- the exact column headers the CSV export will contain for this survey, in order, including every MaxDiff column (and whether the export records which items were shown on each MaxDiff screen), and how the multi-select question Q6 is laid out
+- how the answers to S1, Q2, Q5, Q8 and Q8B appear in the export (option text or a code)
+- how I can check the number of responses so far

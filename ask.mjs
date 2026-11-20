@@ -28,6 +28,17 @@ if (fs.existsSync(replyFile)) {
   console.log(`replies/${name}.json already exists, so this brief was already sent. Nothing was sent or paid.`);
   process.exit(1);
 }
+// A reply can take several minutes. The lock stops a second click from
+// sending, and paying for, the same brief while the first is still running.
+const lockFile = new URL(`replies/${name}.sending`, here);
+fs.mkdirSync(new URL("replies/", here), { recursive: true });
+try {
+  fs.writeFileSync(lockFile, new Date().toISOString(), { flag: "wx" });
+} catch {
+  console.log(`This brief is already being sent (replies/${name}.sending exists). Wait for it to finish. Nothing was sent or paid.`);
+  process.exit(1);
+}
+const unlock = () => fs.rmSync(lockFile, { force: true });
 
 function findKey(value, key) {
   if (value === null || typeof value !== "object") return undefined;
@@ -62,19 +73,19 @@ const args = { brief: fs.readFileSync(briefFile, "utf8").trim() };
 if (state.conversation_id) args.conversation_id = state.conversation_id;
 if (state.survey_id) args.survey_id = state.survey_id;
 
-fs.mkdirSync(new URL("replies/", here), { recursive: true });
-
 let result;
 try {
   result = await callTool(await connect(), "tool_survey", args);
 } catch (err) {
   fs.writeFileSync(errorFile, `${receipts.join("\n")}\n${err?.stack ?? err}\n`);
+  unlock();
   printError(`Failed: ${err?.message ?? err}`);
   process.exit(1);
 }
 
 // Save the reply first, so nothing below can lose it.
 fs.writeFileSync(replyFile, JSON.stringify({ sent: args, receipts, result }, null, 2));
+unlock();
 
 const asText = typeof result === "string" ? result : JSON.stringify(result);
 const conversation_id = findKey(result, "conversation_id") ?? findInText(asText, "conversation_id") ?? state.conversation_id;
