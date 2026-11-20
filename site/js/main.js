@@ -6,6 +6,7 @@ import * as priceCheck from "./ui/priceCheck.js";
 import * as access from "./ui/access.js";
 import * as fixes from "./ui/fixes.js";
 import * as pledges from "./ui/pledges.js";
+import * as receipt from "./ui/receipt.js";
 
 const bodyOf = (id) => document.querySelector(`#${id} .section-body`);
 
@@ -28,6 +29,7 @@ async function start() {
   access.mount(bodyOf("access"), dataset, state);
   fixes.mount(bodyOf("fixes"), dataset, state);
   pledges.mount(bodyOf("pledges"), dataset, state);
+  receipt.mount(bodyOf("receipt"), dataset, state);
 }
 
 start();
