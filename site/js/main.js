@@ -3,6 +3,9 @@ import { createState } from "./state.js";
 import { el } from "./ui/dom.js";
 import * as banner from "./ui/banner.js";
 import * as priceCheck from "./ui/priceCheck.js";
+import * as access from "./ui/access.js";
+
+const bodyOf = (id) => document.querySelector(`#${id} .section-body`);
 
 async function start() {
   let dataset;
@@ -20,6 +23,7 @@ async function start() {
   const state = createState({ itemId: "formal", price: 45, size: 60, revealed: false, guess: null });
   banner.mount(document.getElementById("banner"), dataset);
   priceCheck.mount(document.getElementById("price-check"), dataset, state);
+  access.mount(bodyOf("access"), dataset, state);
 }
 
 start();
