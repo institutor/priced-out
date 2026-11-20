@@ -34,7 +34,7 @@
 
 ### Task 1: Stats helpers
 
-**Files:** Create `site/js/lib/stats.js`, `test/stats.test.mjs`. Modify `package.json` (add `"test": "node --test test/"`).
+**Files:** Create `site/js/lib/stats.js`, `test/stats.test.mjs`. Modify `package.json` (add `"test": "node --test \"test/*.test.mjs\""`).
 
 **Interfaces — Produces:**
 - `wilson(successes: number, n: number, z = 1.96): {low: number, high: number}`; `n === 0` returns `{low: 0, high: 1}`.
