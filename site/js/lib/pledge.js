@@ -34,18 +34,23 @@ export function cascade(pledges, payers) {
     return { count, total };
   };
 
+  // People are whole. Each round is rounded before the next threshold is
+  // tested, so "5 give no matter what" is the same 5 that "at least 5 others"
+  // is waiting for.
+  const scaled = (count) => Math.round((payers * count) / answered);
+
   let current = tally(0);
-  let pledgers = (payers * current.count) / answered;
-  const steps = [Math.round(pledgers)];
+  let pledgers = scaled(current.count);
+  const steps = [pledgers];
   for (let round = 0; round < groups.size; round++) {
     const next = tally(pledgers);
-    const nextPledgers = (payers * next.count) / answered;
+    const nextPledgers = scaled(next.count);
     if (nextPledgers <= pledgers) break;
     current = next;
     pledgers = nextPledgers;
-    steps.push(Math.round(pledgers));
+    steps.push(pledgers);
   }
-  return { answered, steps, pledgers: Math.round(pledgers), pool: (payers * current.total) / answered };
+  return { answered, steps, pledgers, pool: (payers * current.total) / answered };
 }
 
 export function seatsCovered(pool, price) {

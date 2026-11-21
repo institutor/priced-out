@@ -56,3 +56,12 @@ test("seatsCovered rounds down and survives a zero price", () => {
   assert.equal(seatsCovered(100, 0), 0);
   assert.equal(seatsCovered(0, 30), 0);
 });
+
+test("thresholds are met by whole people, the same number the page shows", () => {
+  // 3 of 10 give regardless. In a club of 16 that is 4.8 people, shown as 5,
+  // so the "at least 5 others" group must count it as 5 too.
+  const pledges = [...repeat([2, 0], 3), ...repeat([2, 5], 7)];
+  const result = cascade(pledges, 16);
+  assert.deepEqual(result.steps, [5, 16]);
+  assert.equal(result.pledgers, 16);
+});
