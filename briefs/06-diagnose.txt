@@ -1,0 +1,11 @@
+This is about survey 0a4c06d5-1ea1-43dd-89d7-2458c955b58a (Priced Out). I am NOT confirming the publish you asked about in your last reply. Do not publish the survey in this turn.
+
+A synthetic panel was run through this survey with the panel tool: panel_id 01a1fb81-fae0-7bb2-bf49-2431da9b8cad, run_id 01a1fb81-fafb-7a01-9f31-efc24db16151, 120 personas, calibration_version uncalibrated. It reported 120 responses submitted with status_breakdown TERMINATED: 120, and it looks as if each persona answered only S1. The personas are all Columbia or Barnard undergraduates, so none of them should have picked the S1 option that ends the survey.
+
+1. Find out why every response was terminated. Scope the analytics to that panel_id and run_id and tell me how many answers were recorded for each question (S1, Q2, DUES_A, DUES_B, FORMAL_A, FORMAL_B, TRIP_A, TRIP_B, Q4, Q5, Q6, Q7, Q8, Q8B, Q9), and what was answered at S1. Then walk a respondent path for someone who answers "First-year" at S1 and tell me where it ends.
+
+2. If the cause is in the survey's structure (for example the terminate block TERM1 sitting in the default path after S1, so that everyone reaches it), fix it so that only the last S1 option ends the survey and everyone else goes on through Q2 to the END screen. Run the logic check again and walk the same path again to confirm it now reaches END. If the cause is that the survey is unpublished, or something else a synthetic panel needs, do not change anything: tell me exactly what is needed.
+
+3. Tell me how to get the respondent-level answers of one synthetic panel run out as CSV through this tool: what to ask for, whether you return the CSV text or a download link in your reply, and the exact column headers that export will have for this survey, in order, including every MaxDiff column and how the multi-select question Q6 is laid out.
+
+Keep the reply short: the cause, what you changed, and the answers to 3.
