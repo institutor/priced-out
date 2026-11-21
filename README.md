@@ -88,7 +88,7 @@ A **Contents** tab in the corner of the screen jumps between the parts of the pa
 
 To check the working instead of the page:
 
-- `npm test` runs the 178 tests on the rules behind every number ([Run it](#run-it)).
+- `npm test` runs the 180 tests on the rules behind every number ([Run it](#run-it)).
 - `node scripts/evaluate.mjs` runs the page's rules on 2,000 made-up clubs whose true
   answer is known ([Checked against a known answer](#checked-against-a-known-answer)).
 - [`briefs/`](briefs) and [`replies/`](replies) hold everything sent to and received from
@@ -373,7 +373,7 @@ build need no key.
 - A tie is never reported as a winner. Where two fixes share the top score, both are
   named and the page does not pick one.
 
-The rules live in `site/js/lib/` and are covered by the tests in `test/` (178 tests).
+The rules live in `site/js/lib/` and are covered by the tests in `test/` (180 tests).
 
 ## Privacy
 

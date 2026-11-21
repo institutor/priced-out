@@ -43,7 +43,7 @@ from $0 up. Below that:
 - a printable receipt for a year in the club
 - a note for the board and a message for members
 
-The site is static, with 178 tests. Run on 2,000 made-up clubs with known answers, its 95%
+The site is static, with 180 tests. Run on 2,000 made-up clubs with known answers, its 95%
 interval held the truth in 94% to 97%.
 
 ## How Flashpoint was used
