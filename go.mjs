@@ -1,10 +1,11 @@
 // Runs the remaining Flashpoint steps in order, so they cannot be run out of
 // order by hand.
 //
-// Where things stand: the survey agent has removed the page that cut every
-// synthetic respondent off, but the corrected survey (v2) is saved and not yet
-// live. Flashpoint asks for a bare "confirm" before each thing it publishes,
-// sometimes twice.
+// These steps have all been run: every reply is in replies/, so running this
+// again sends nothing. It is kept as the record of how the corrected survey
+// (v2, without the page that cut every synthetic respondent off) went live and
+// was run. Flashpoint asks for a bare "confirm" before each thing it
+// publishes, sometimes twice.
 //   1. briefs/17-confirm.txt   push v2 live                              $0.50
 //      briefs/18- and 19-      only while the reply asks to confirm again $0.50 each
 //   2. panel run               the saved synthetic panel, once more       $0.10

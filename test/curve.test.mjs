@@ -22,7 +22,7 @@ test("a stretch price above the skip price is treated as the skip price", () => 
   assert.equal(stateAt([90, 70], formal, 70), "out");
 });
 
-test("answers at the slider max mean 'this much or more'", () => {
+test("answers at the top of the range mean 'this much or more'", () => {
   assert.equal(stateAt([40, 150], formal, 145), "stretched");
   assert.equal(stateAt([150, 150], formal, 145), "fine");
 });

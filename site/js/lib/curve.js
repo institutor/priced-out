@@ -5,7 +5,8 @@
 // would skip it and give a different reason. An item is {id, label, max, step}.
 import { wilson } from "./stats.js";
 
-// An answer at the top of the slider means "this much or more", so it can
+// An answer at the top of the price range means "this much or more" (the
+// survey tells respondents to enter the top for anything above it), so it can
 // never be reached inside the range. A stretch price that is missing or above
 // the skip price is treated as the skip price.
 function thresholds(pair, item) {
@@ -69,7 +70,7 @@ export function sharesAt(rows, item, price) {
   };
 }
 
-// Every price a visitor can pick: 0 up to one step below the slider max.
+// Every price a visitor can pick: 0 up to one step below the top of the range.
 export function priceGrid(item) {
   const grid = [];
   for (let price = 0; price < item.max; price += item.step) grid.push(price);

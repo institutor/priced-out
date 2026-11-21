@@ -38,7 +38,8 @@ function readNumber(row, column) {
 
 // The two prices for one item.
 // - A skip price of 0 is read as no answer. Skipping something that is free
-//   is not about price, and a slider nobody touched can be stored the same way.
+//   is not about price. (The survey first used sliders, and one nobody touched
+//   was stored as 0. It now uses number inputs that start empty.)
 // - A price above the top of the scale is read as the top, which already
 //   means "this much or more".
 function readPrices(row, pair, item, report) {
