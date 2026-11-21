@@ -14,7 +14,7 @@ Engineering & Product track.
 **Try it: https://institutor.github.io/priced-out/** · [Write-up](docs/submission/write-up.md) ·
 [The survey](https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a)
 
-![The title page: a row of twelve seats, the last four rubbed out, over the words Priced Out, with a banner saying the numbers come from simulated students](docs/screenshot.jpg)
+![The title page: a row of twelve seats, the last four rubbed out under the note “busy that night”, over the words Priced Out, with a banner saying the numbers come from simulated students](docs/screenshot.jpg)
 
 ![The price check: a formal ticket at $45 in a club of 60, drawn as a room of seats, 19 of them empty](docs/screenshot-answer.jpg)
 
