@@ -15,6 +15,8 @@ import * as pledges from "./ui/pledges.js";
 import * as receipt from "./ui/receipt.js";
 import * as said from "./ui/said.js";
 import * as yours from "./ui/yours.js";
+import * as why from "./ui/why.js";
+import * as made from "./ui/made.js";
 import * as method from "./ui/method.js";
 
 const bodyOf = (id) => document.querySelector(`#${id} .section-body`);
@@ -142,6 +144,8 @@ async function start() {
       said.mount(bodyOf("said"), dataset, state);
     }
     yours.mount(bodyOf("yours"), dataset, { read, reset, said: reported });
+    why.mount(bodyOf("why"));
+    made.mount(bodyOf("made"));
     method.mount(bodyOf("method"), dataset, state);
     retitle(dataset.meta);
     dress();

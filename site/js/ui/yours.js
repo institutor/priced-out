@@ -5,15 +5,12 @@
 import { el } from "./dom.js";
 import { button, ink, path, seedOf } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
+import { SURVEY, inRepo, outside } from "./links.js";
 
-export const SURVEY = "https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a";
-export const REPO = "https://github.com/institutor/priced-out";
 const EXAMPLE = "data/example-club.csv";
 // An export of this survey is a few hundred bytes a row. Anything this big is
 // some other file, and reading it would only freeze the page.
 const TOO_BIG = 4 * 1024 * 1024;
-
-const outside = (href, text) => el("a", { href, target: "_blank", rel: "noopener", text });
 
 // A step's number, with a loop of pen round it.
 function numeral(n) {
@@ -124,7 +121,7 @@ export function mount(root, dataset, { read, reset, said = "" } = {}) {
         el("p", { text: "Flashpoint exports every response as one CSV file. Under 20 answers the page marks every number as a pilot, and it shows no figure for fewer than 5." }),
         el("p", { class: "aside" },
           "Today the live survey sits in one Flashpoint account, so only its owner can run that export. A copy of the survey for each club is the next thing to build. ",
-          outside(`${REPO}/blob/main/briefs/02-draft.txt`, "The brief that built it"),
+          outside(inRepo("briefs/02-draft.txt"), "The brief that built it"),
           " is in the repository.",
         ),
       ),

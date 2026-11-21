@@ -56,6 +56,20 @@ const STROKES = {
     sketch.line(16, 28.5, 33, 28.5, { seed: seed + 3, rough: 0.5, passes: 1 }),
     sketch.line(16, 35, 27, 35, { seed: seed + 4, rough: 0.5, passes: 1 }),
   ],
+  // An empty chair: the member who is not there.
+  chair: (seed) => [
+    sketch.line(14, 6, 14, 43, { seed, rough: 0.7, passes: 2 }),
+    sketch.polyline([[14, 27], [35, 27], [35, 43]], { seed: seed + 1, rough: 0.7, passes: 1 }),
+    sketch.line(14, 12, 24, 12, { seed: seed + 2, rough: 0.5, passes: 1 }),
+    sketch.line(14, 18.5, 24, 18.5, { seed: seed + 3, rough: 0.5, passes: 1 }),
+    sketch.line(24, 9.5, 24, 21, { seed: seed + 4, rough: 0.5, passes: 1 }),
+  ],
+  // A pencil: how the survey was made.
+  pencil: (seed) => [
+    sketch.polygon([[7.5, 41], [11, 30], [32, 9], [39, 16], [18, 37]], { seed, rough: 0.8 }),
+    sketch.line(11.5, 30.5, 17.5, 36.5, { seed: seed + 1, rough: 0.4, passes: 1 }),
+    sketch.line(28, 13, 35, 20, { seed: seed + 2, rough: 0.4, passes: 1 }),
+  ],
   // A magnifying glass: how we know.
   glass: (seed) => [
     sketch.ellipse(20, 20, 12, 12, { seed, rough: 0.7, steps: 14 }),

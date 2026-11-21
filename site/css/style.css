@@ -437,6 +437,15 @@ h2 {
   margin: clamp(0.9rem, 2.5vh, 1.5rem) 0 0;
 }
 
+/* Where else the page goes, for anyone who came for the reasons and not
+   the calculator. */
+.cover-more {
+  max-width: 40ch;
+  margin: clamp(0.7rem, 2vh, 1.1rem) 0 0;
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+
 /* Until the lettering has been measured the title page waits, so the plain
    heading is not seen jumping into the drawn one. If the script never runs,
    the plain heading shows after a moment. */
@@ -515,6 +524,7 @@ h2 {
 }
 
 .cover.play .cover-note,
+.cover.play .cover-more,
 .cover.play .cover-go > a {
   animation: ink-in 0.5s ease-out both;
   animation-delay: var(--wait, 0ms);
@@ -1463,6 +1473,109 @@ input:focus-visible + .tick {
   max-width: none;
 }
 
+/* Why this exists: a note with a pen line down its margin, the one from the
+   title page standing beside it, and what published work says. */
+
+.why-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem 3rem;
+  align-items: end;
+  max-width: 54rem;
+  margin-bottom: 3.25rem;
+}
+
+.story {
+  margin: 0;
+  padding: 0.3rem 0 0.3rem 1.7rem;
+  font-size: 1.3rem;
+  line-height: 1.5;
+}
+
+.story p {
+  max-width: 56ch;
+}
+
+.story footer {
+  color: var(--ink-soft);
+  font-size: 1rem;
+}
+
+.story-rule {
+  stroke: var(--mark-2);
+  stroke-width: 2.4;
+}
+
+.bystander {
+  width: 6.25rem;
+  height: auto;
+}
+
+.bystander path {
+  stroke-width: 2.5;
+}
+
+.bystander .ground {
+  stroke: var(--ink-soft);
+  stroke-width: 1.6;
+  opacity: 0.55;
+}
+
+.cite {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+/* How the survey was made: the account on the left, and a slip with every
+   paid call on it, on the pink paper. */
+
+.made-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 27rem);
+}
+
+.method-list.made-list {
+  columns: 1;
+  max-width: var(--measure);
+}
+
+.receipt.calls {
+  max-width: 27rem;
+}
+
+.slip.pink {
+  fill: var(--pink);
+}
+
+.receipt.calls .serial {
+  color: var(--sheet-ink);
+}
+
+.call-list {
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+}
+
+.call {
+  display: grid;
+  grid-template-columns: 3.9rem minmax(0, 1fr) auto;
+  gap: 0 0.6rem;
+  align-items: baseline;
+}
+
+.call-no {
+  opacity: 0.72;
+  white-space: nowrap;
+}
+
+.call-cost {
+  font-weight: 700;
+}
+
 /* Method and footer ----------------------------------------------------- */
 
 .method-list {
@@ -1636,6 +1749,15 @@ input:focus-visible + .tick {
   margin-bottom: 0.9rem;
 }
 
+.colophon-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.6rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+}
+
 .mark {
   width: 4.6rem;
   height: auto;
@@ -1672,6 +1794,21 @@ input:focus-visible + .tick {
   .pledge-layout,
   .receipt-layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The one beside the note goes under it, at the right. */
+  .why-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bystander {
+    width: 4.5rem;
+    justify-self: end;
+    margin-right: 1rem;
+  }
+
+  .story {
+    font-size: 1.15rem;
   }
 }
 

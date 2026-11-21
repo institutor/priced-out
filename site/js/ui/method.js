@@ -2,6 +2,7 @@
 import { el } from "./dom.js";
 import { bullet } from "./doodles.js";
 import { voice } from "../lib/voice.js";
+import { outside } from "./links.js";
 
 const SMALL_NUMBERS = ["Small numbers.", "Every share comes with a 95% interval, and nothing is shown for fewer than 5 answers."];
 const ENDS = ["The ends of the scale.", "An answer at the top of a price range means that much or more. It never counts as priced out here, and prices on this page stop one step below the top. A skip price of $0 is read as no answer: skipping something that is free is not about the price."];
@@ -35,11 +36,12 @@ const SIMULATED_POINTS = [
   ["Who answered.", "Nobody. Flashpoint generated AI personas meant to resemble Columbia and Barnard undergraduates, and a language model answered the survey as each one of them."],
   ["What was made up.", "Each persona's background, spending money and feelings about prices were invented by the generator. Flashpoint matched the panel's split by gender to the US adult population and invented age, race, education and income. It marks the panel uncalibrated: it has not been checked against real answers."],
   ["What that makes these numbers.", "A demonstration of the calculator, and a guess at the shape real answers might take. They are not evidence about what real students would do, and no price should be set from them."],
+  ["How far off a stand-in can be.", () => ["When Pew Research Center built AI respondents to mirror the real members of its panel, they were off by 12 percentage points on average across nearly 300 questions. ", outside("https://www.pewresearch.org/data-labs/2026/09/30/can-ai-stand-in-for-human-survey-takers-not-really/", "Pew Research Center, 2026"), "."]],
   ["How to get real numbers.", () => ["The same survey is ready to send. A club that puts it in front of its own members can load their answers into this page in place of the simulated ones. ", el("a", { href: "#yours", text: "The next part shows how" }), "."]],
   ["What was left out.", "The survey also asks whether someone has skipped a club event over cost and what they said at the time. An invented person's excuse is not evidence, so those answers are not shown."],
   SMALL_NUMBERS,
   ENDS,
-  ["What Flashpoint did.", "The survey, the trade-off question behind the ranking of fixes, the panel of simulated students, their answers and the export."],
+  ["What Flashpoint did.", () => ["The survey, the trade-off question behind the ranking of fixes, the panel of simulated students, their answers and the export. ", el("a", { href: "#made", text: "How that went" }), " is further down."]],
   SITE,
   NOT_FOR,
 ];

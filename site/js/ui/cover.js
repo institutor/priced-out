@@ -96,6 +96,7 @@ export async function mount(root) {
   const title = root.querySelector(".title");
   const note = root.querySelector(".cover-note");
   const go = root.querySelector(".cover-go");
+  const more = root.querySelector(".cover-more");
   if (!title) return;
 
   await lettersReady();
@@ -110,6 +111,7 @@ export async function mount(root) {
     const link = go.querySelector("a");
     if (link) inkButton(link, "cover");
   }
+  if (more) wait(more, AT.go + 250);
 
   // Once the drawing is done it is simply there ("drawn" in place of
   // "play"), and its lines keep a slight wobble, like frames of a hand-drawn
