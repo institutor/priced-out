@@ -11,6 +11,9 @@ it.
 Built by one person for the Flashpoint AI x Columbia AI Club hackathon (November 2026),
 Engineering & Product track.
 
+**Try it: https://institutor.github.io/priced-out/** · [Write-up](docs/submission/write-up.md) ·
+[The survey](https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a)
+
 ![The price check: a formal ticket at $45 in a club of 60, with a banner saying the numbers come from simulated students](docs/screenshot.jpg)
 
 ## Read this first: the numbers are simulated

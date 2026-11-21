@@ -98,6 +98,6 @@ see whether what people say they would use is what they use.
 
 ## Links
 
+- Site: https://institutor.github.io/priced-out/
 - Code: https://github.com/institutor/priced-out
 - Survey: https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a
-- Site: PENDING, published when the repository is made public
