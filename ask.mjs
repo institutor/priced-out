@@ -1,6 +1,7 @@
 // Send one brief to the Flashpoint survey agent and save the reply to a file.
 //   node ask.mjs <name>         sends briefs/<name>.txt (each call costs $0.50)
 //   node ask.mjs <name> --new   same, but starts a new conversation
+// A brief may contain {{name}} for an id kept in replies/state.json.
 // The reply is saved to replies/<name>.json. The conversation id and survey id
 // are kept in replies/state.json and passed along on the next call.
 import fs from "node:fs";
@@ -69,7 +70,19 @@ if (!fresh && fs.existsSync(stateFile)) {
   state = JSON.parse(fs.readFileSync(stateFile, "utf8"));
 }
 
-const args = { brief: fs.readFileSync(briefFile, "utf8").trim() };
+// A brief can refer to an id kept in replies/state.json as {{name}}, for
+// example {{panel_run_id}}. Nothing is sent if one of them is missing.
+let brief = fs.readFileSync(briefFile, "utf8").trim();
+for (const [whole, key] of brief.matchAll(/\{\{(\w+)\}\}/g)) {
+  if (typeof state[key] !== "string") {
+    unlock();
+    console.log(`The brief needs ${whole}, which is not in replies/state.json. Nothing was sent or paid.`);
+    process.exit(1);
+  }
+  brief = brief.replaceAll(whole, state[key]);
+}
+
+const args = { brief };
 if (state.conversation_id) args.conversation_id = state.conversation_id;
 if (state.survey_id) args.survey_id = state.survey_id;
 
