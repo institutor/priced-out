@@ -142,12 +142,19 @@ key.
   range, and prices on the site stop one step below the top.
 - A blank answer is missing, never zero. A student who gave no skip price for an item is
   left out of that item.
+- A skip price of $0 is read as no answer. Skipping something that is free is not about
+  the price, and a slider nobody touched can be stored the same way. The build prints how
+  many it set aside.
+- The figures on the receipt are all worked out over the same students: those who gave a
+  price for every line that is ticked.
 - Shares carry 95% Wilson intervals. Fix scores are best-minus-worst counts over times
   shown, with a bootstrap interval.
 - Nothing is shown for fewer than 5 students. Fewer than 20 answers overall puts an
   "early results" banner on every screen.
 - People are whole: "13 of your 60" is the share times the club size, rounded, and the
-  dollar figures are worked out from those whole people.
+  dollar figures and pledge rounds are worked out from those whole people.
+- Someone who opened the survey and answered nothing after the first question is not
+  counted as a respondent.
 
 The rules live in `site/js/lib/` and are covered by the tests in `test/`.
 
@@ -155,9 +162,10 @@ The rules live in `site/js/lib/` and are covered by the tests in `test/`.
 
 - The survey is an anonymous public link. It asks for no name, no email, and nothing about
   income or financial aid.
-- The published dataset holds one shuffled row per student with only their price answers
-  and pledge answer. Year in school, the officer question and anything typed are counted
-  into totals or dropped before the file is written.
+- The published dataset holds one row per student with only their price answers and pledge
+  answer, sorted by content so the order says nothing about who answered when. Year in
+  school, the officer question and anything typed are counted into totals or dropped before
+  the file is written.
 - Raw exports stay in `data/raw/`, which is git-ignored.
 
 ## Limits

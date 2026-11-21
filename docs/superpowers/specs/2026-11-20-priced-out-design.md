@@ -158,6 +158,11 @@ One page, six parts, in the order a treasurer would use them.
   stretch price is treated the same way. A missing skip price leaves the respondent out of
   that item.
 - A blank answer is missing, never zero.
+- A skip price of $0 is read as no answer: skipping something free is not about price, and
+  an untouched slider can be stored the same way. (Added after review, 2026-11-20.)
+- Figures shown side by side on the receipt use the same respondents: those who gave a
+  price for every ticked line. (Added after review.)
+- A respondent is someone who answered at least one question after the screener.
 - Intervals for shares are 95% Wilson intervals. MaxDiff scores are best-minus-worst counts
   over times shown, with a 95% bootstrap interval over respondents.
 - Any figure based on fewer than 5 respondents is not shown.
@@ -167,7 +172,7 @@ One page, six parts, in the order a treasurer would use them.
 
 `site/data/dataset.json`, built by a script. It holds a `meta` block (kind `sample` or
 `real`, n, dates, source), the item list, one row per respondent with only the price pairs
-and the pledge answer (shuffled, no year, no officer flag, no free text), and aggregates for
+and the pledge answer (sorted by content, no year, no officer flag, no free text), and aggregates for
 the fixes, what people said, the skipped question and the guesses. An optional `synthetic`
 block has the same rows for Flashpoint's synthetic respondents.
 
