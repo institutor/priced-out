@@ -1,3 +1,0 @@
-confirm
-
-I confirm: publish survey 0a4c06d5-1ea1-43dd-89d7-2458c955b58a now. I approve no quotas and Defender off. Then reply with the public link, confirmation that it is live, and anything from my previous message that you have not answered yet (the CSV export column headers, how coded answers appear in the export, and how to check the number of responses).

@@ -1,0 +1,5 @@
+confirm
+
+This is the confirmation you asked for two replies ago: publish survey 0a4c06d5-1ea1-43dd-89d7-2458c955b58a (Priced Out) now. I approve both findings: no quotas, and Defender off. I understand it goes live immediately and that responses are recorded from then on.
+
+After publishing, reply in two lines: whether the survey is live, and its public link. Nothing else.
