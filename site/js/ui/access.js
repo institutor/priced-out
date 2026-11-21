@@ -3,7 +3,8 @@
 // side, with who comes and what the club takes in.
 import { el, sentence } from "./dom.js";
 import { circled, marked, wipe } from "./ink.js";
-import { sharesAt, maxPriceFor, accessTier, waysToPrice } from "../lib/curve.js";
+import { sharesAt, maxPriceFor, accessTier, waysToPrice, roomForTwo } from "../lib/curve.js";
+import { roomSaid } from "../lib/plan.js";
 import { money, people, phrase } from "../lib/format.js";
 import { voice } from "../lib/voice.js";
 
@@ -81,6 +82,8 @@ export function mount(root, dataset, state) {
       const change = two.taken - now.taken;
       const money_ = change > 0 ? `take in ${money(change)} more` : "cost the club nothing it was getting";
       reading.push(`Two prices bring ${more} more and ${money_}, as long as those who can pay the full price still do.`);
+      const spare = roomSaid(roomForTwo(ways), price);
+      if (spare) reading.push(spare);
     }
 
     const intro = `here is what each way of pricing it would do in a club of ${size}.`;

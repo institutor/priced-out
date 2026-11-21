@@ -3,7 +3,7 @@
 // above it, by the same rules. The note says whose answers it rests on twice,
 // under its title and in its last line, so a copy of it cannot pass for a
 // finding about real students when it is not one.
-import { sharesAt, maxPriceFor, waysToPrice } from "./curve.js";
+import { sharesAt, maxPriceFor, waysToPrice, roomForTwo } from "./curve.js";
 import { cascade, seatsCovered } from "./pledge.js";
 import { money, pct, people, phrase } from "./format.js";
 import { voice } from "./voice.js";
@@ -54,6 +54,26 @@ function nineInTen(rows, item, price) {
   return `${money(gentle)} or less. At ${money(price)} you are ${money(price - gentle)} over it.`;
 }
 
+// How much the two-price sums can be wrong by, in one sentence. `spare` is
+// what roomForTwo gives.
+export function roomSaid(spare, price) {
+  if (!spare || spare.payers === 0) return null;
+  const { room, payers, each, accessPrice } = spare;
+  if (accessPrice === 0) return `Each one who takes the free place instead costs the club ${money(each)}.`;
+  const full = payers === 1 ? `the one member who would pay ${money(price)}` : `the ${payers} who would pay ${money(price)}`;
+  const low = `the ${money(accessPrice)} price`;
+  if (room === 0) {
+    const one = payers === 1 ? `If ${full}` : `If one of ${full}`;
+    return `There is nothing to spare. ${one} took ${low} instead, the club would take in less than it does now.`;
+  }
+  if (room >= payers) {
+    const all = payers === 1 ? full : `all of ${full}`;
+    return `Even if ${all} took ${low} instead, the club would take in no less than it does now.`;
+  }
+  const some = room === 1 ? "Only one" : `Up to ${room}`;
+  return `${some} of ${full} could take ${low} instead before the club takes in less than it does now.`;
+}
+
 function twoPricesOrOne(rows, item, price, size) {
   const ways = waysToPrice(rows, item, price, size);
   if (!ways) return null;
@@ -66,6 +86,8 @@ function twoPricesOrOne(rows, item, price, size) {
     const second = two.accessPrice === 0 ? "a free place" : `a ${money(two.accessPrice)} price`;
     const takes = change > 0 ? `takes in about ${money(change)} more` : "costs the club nothing it was getting";
     said.push(`Keeping ${money(price)} and adding ${second} for those who need it brings about ${two.there - now.there} more and ${takes}, as long as those who can pay the full price still do.`);
+    const spare = roomSaid(roomForTwo(ways), price);
+    if (spare) said.push(spare);
   }
   if (lower) {
     const change = lower.taken - now.taken;

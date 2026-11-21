@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { stateAt, sharesAt, priceGrid, curve, maxPriceFor, outOfAny, accessTier, answeredAll, waysToPrice } from "../site/js/lib/curve.js";
+import { stateAt, sharesAt, priceGrid, curve, maxPriceFor, outOfAny, accessTier, answeredAll, waysToPrice, roomForTwo } from "../site/js/lib/curve.js";
 
 const formal = { id: "formal", label: "A ticket to the club formal", max: 150, step: 5 };
 const dues = { id: "dues", label: "One semester of club dues", max: 100, step: 5 };
@@ -130,4 +130,39 @@ test("waysToPrice counts a free access price as bringing people and no money", (
 
 test("waysToPrice is null when nobody answered", () => {
   assert.equal(waysToPrice([], formal, 60, 8), null);
+});
+
+test("roomForTwo counts how many full payers can take the lower price before the club loses money", () => {
+  // 41 pay $45 now. A $20 price brings 16 back, which is $320 more. Each
+  // payer who takes the $20 price instead gives up $25 of that.
+  const ways = [
+    { kind: "now", price: 45, there: 41, taken: 1845 },
+    { kind: "two", price: 45, accessPrice: 20, there: 57, taken: 2165 },
+  ];
+  assert.deepEqual(roomForTwo(ways), { room: 12, payers: 41, each: 25, accessPrice: 20 });
+  assert.ok(2165 - 12 * 25 >= 1845);
+  assert.ok(2165 - 13 * 25 < 1845);
+});
+
+test("roomForTwo counts a switch that leaves the money exactly the same as allowed", () => {
+  // Two pay $60. Both taking the $15 price leaves 8 x $15 = $120, the same as now.
+  assert.deepEqual(roomForTwo(waysToPrice(four, formal, 60, 8)), { room: 2, payers: 2, each: 45, accessPrice: 15 });
+});
+
+test("roomForTwo is never more than the number who pay now", () => {
+  const ways = [
+    { kind: "now", price: 45, there: 10, taken: 450 },
+    { kind: "two", price: 45, accessPrice: 40, there: 30, taken: 1250 },
+  ];
+  assert.equal(roomForTwo(ways).room, 10);
+});
+
+test("roomForTwo leaves no room when the lower price is free", () => {
+  const rows = [{ formal: [0, 5] }, { formal: [50, 100] }, { formal: [50, 100] }, { formal: [50, 100] }];
+  assert.deepEqual(roomForTwo(waysToPrice(rows, formal, 50, 4)), { room: 0, payers: 3, each: 50, accessPrice: 0 });
+});
+
+test("roomForTwo is null when there is no second price to offer", () => {
+  assert.equal(roomForTwo(waysToPrice(four, formal, 15, 8)), null);
+  assert.equal(roomForTwo(null), null);
 });

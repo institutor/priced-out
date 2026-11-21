@@ -155,3 +155,16 @@ export function waysToPrice(rows, item, price, size, { gentle = 0.1, access = 0.
   }
   return ways;
 }
+
+// Two prices only pay for themselves if those who can pay the full price
+// still do. This is how many of them could take the lower price instead
+// before the club takes in less than it does at the one price now. Each one
+// who does gives up the difference between the two prices.
+export function roomForTwo(ways) {
+  const two = ways?.find((way) => way.kind === "two");
+  if (!two) return null;
+  const [now] = ways;
+  const each = two.price - two.accessPrice;
+  const room = Math.min(now.there, Math.floor((two.taken - now.taken) / each));
+  return { room, payers: now.there, each, accessPrice: two.accessPrice };
+}
