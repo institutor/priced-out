@@ -1,0 +1,13 @@
+This is about survey 0a4c06d5-1ea1-43dd-89d7-2458c955b58a (Priced Out), which is now live.
+
+After it was published, the same synthetic panel was run through it again: panel_id {{panel_id}}, run_id {{panel_run_id}}. All 120 responses are TERMINATED again. So the draft status was not the cause, or not the only one.
+
+1. Find the real cause from the data. Look at the responses of that run directly and say where they ended and why: which page, which rule or check, and whether any answer at all was recorded.
+
+2. Change the survey so that a synthetic panel completes it. If you find a cause in the survey, fix that. In any case make this change: delete the terminate block TERM1 and the rule on S1 that ends the survey, and keep "I am not a Columbia or Barnard student" as an ordinary S1 option that goes on to Q2 like the others. I will drop those respondents from the data myself. After the change, no path through the survey may end anywhere except the END screen. Keep every question, its wording, its label and the rotation of the price blocks exactly as they are. Run the logic check and walk a path to confirm.
+
+3. The survey must be live when you are done. If the change has to be published, start the publish with the same approvals as before (no quotas, Defender off) and ask me to confirm. I will reply confirm.
+
+4. Tell me plainly whether the synthetic panel runner follows skip logic, display logic and terminate blocks, or walks the pages in order.
+
+Keep the reply short: the cause, what you changed, whether it is live, and the answer to 4.
