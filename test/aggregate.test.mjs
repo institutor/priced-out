@@ -41,12 +41,14 @@ test("a blank skip price drops the item; a blank stretch price is filled from sk
   assert.equal(dataset.rows[0].trip, null);
 });
 
-test("row order does not follow respondent order", () => {
-  const respondents = Array.from({ length: 30 }, (_, index) => make({ prices: { ...base.prices, dues: [0, index] } }));
-  const dataset = buildDataset(respondents, meta);
-  const order = dataset.rows.map((row) => row.dues[1]);
-  assert.notDeepEqual(order, respondents.map((r) => r.prices.dues[1]));
-  assert.deepEqual([...order].sort((a, b) => a - b), respondents.map((r) => r.prices.dues[1]));
+test("row order says nothing about the order respondents came in", () => {
+  const prices = [35, 5, 90, 20, 60, 15, 45, 80, 10, 55];
+  const respondents = prices.map((skip) => make({ prices: { ...base.prices, dues: [5, skip] } }));
+  const forwards = buildDataset(respondents, meta).rows;
+  const backwards = buildDataset([...respondents].reverse(), meta).rows;
+  assert.deepEqual(forwards, backwards);
+  assert.notDeepEqual(forwards.map((row) => row.dues[1]), prices);
+  assert.deepEqual(forwards.map((row) => row.dues[1]).sort((a, b) => a - b), [...prices].sort((a, b) => a - b));
 });
 
 test("officer split of the guesses is hidden under the minimum cell size", () => {
@@ -76,9 +78,15 @@ test("what people said is hidden when too few skipped for cost", () => {
 });
 
 test("skipped counts add up and leave out blanks", () => {
-  const respondents = [make(), make({ skipped: "once" }), make({ skipped: "several" }), make({ skipped: "preferNot" }), make({ skipped: null })];
+  const respondents = [make(), make(), make({ skipped: "once" }), make({ skipped: "several" }), make({ skipped: "preferNot" }), make({ skipped: null })];
   const { skipped } = buildDataset(respondents, meta);
-  assert.deepEqual(skipped, { n: 4, never: 1, once: 1, several: 1, preferNot: 1 });
+  assert.deepEqual(skipped, { n: 5, never: 2, once: 1, several: 1, preferNot: 1 });
+});
+
+test("skipped counts are left out when too few answered", () => {
+  const respondents = [make(), make({ skipped: "once" }), make({ skipped: "several" }), make({ skipped: null })];
+  const { skipped } = buildDataset(respondents, meta);
+  assert.deepEqual(skipped, { n: 3, never: null, once: null, several: null, preferNot: null });
 });
 
 test("fixes carry scores, intervals and labels", () => {

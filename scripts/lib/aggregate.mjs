@@ -1,12 +1,12 @@
 // Turns normalised respondents into the one file the site reads.
 //
 // What leaves this function is public. Rows keep only the price pairs and the
-// pledge answer, in shuffled order: no year, no officer flag, no free text.
+// pledge answer: no year, no officer flag, no free text. They are sorted by
+// their own content, so their order says nothing about who answered when.
 // Anything based on fewer than MIN_CELL respondents is left out here, so it
 // cannot leak through the page source either.
 import { quantile } from "../../site/js/lib/stats.js";
 import { ITEMS, FIXES, SAID, MIN_CELL, PILOT_N, GUESS } from "./vocab.mjs";
-import { mulberry32, shuffle } from "./rng.mjs";
 import { scoreMaxDiff, bootstrapMaxDiff } from "./maxdiff.mjs";
 
 const isMissing = (value) => value === null || value === undefined;
@@ -23,6 +23,15 @@ function publicRow(respondent) {
   }
   row.pledge = Array.isArray(respondent.pledge) ? [respondent.pledge[0], respondent.pledge[1]] : null;
   return row;
+}
+
+// A shuffle with a fixed seed can be undone by anyone who knows the seed.
+// Sorting the rows as text needs no seed and gives the same file every time.
+function publicRows(respondents) {
+  return respondents
+    .map((respondent) => JSON.stringify(publicRow(respondent)))
+    .sort()
+    .map((text) => JSON.parse(text));
 }
 
 function summarise(values) {
@@ -50,6 +59,7 @@ function skippedSummary(respondents) {
     counts[respondent.skipped] += 1;
     counts.n += 1;
   }
+  if (counts.n < MIN_CELL) return { n: counts.n, never: null, once: null, several: null, preferNot: null };
   return counts;
 }
 
@@ -83,8 +93,8 @@ function fixesSummary(respondents, seed) {
 }
 
 export function buildDataset(respondents, meta, options = {}) {
+  // The seed only makes the MaxDiff bootstrap intervals repeatable.
   const seed = options.seed ?? 1;
-  const random = mulberry32(seed);
   const { fixes, fixesN } = fixesSummary(respondents, seed);
 
   let synthetic = null;
@@ -92,7 +102,7 @@ export function buildDataset(respondents, meta, options = {}) {
     synthetic = {
       label: options.synthetic.label,
       n: options.synthetic.respondents.length,
-      rows: shuffle(options.synthetic.respondents.map(publicRow), random),
+      rows: publicRows(options.synthetic.respondents),
     };
   }
 
@@ -100,7 +110,7 @@ export function buildDataset(respondents, meta, options = {}) {
     meta: { ...meta, n: respondents.length },
     rules: { minCell: MIN_CELL, pilotN: PILOT_N },
     items: ITEMS,
-    rows: shuffle(respondents.map(publicRow), random),
+    rows: publicRows(respondents),
     fixes,
     fixesN,
     skipped: skippedSummary(respondents),
