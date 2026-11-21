@@ -877,4 +877,21 @@ td:first-child {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  /* On paper the slip is finished: no tick boxes, no lines that were taken
+     off, and prices that read as print, not as boxes to type in. */
+  .receipt-line.off,
+  .receipt-line input[type="checkbox"] {
+    display: none;
+  }
+
+  .receipt-line input[type="number"] {
+    border-bottom: 0;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
+  .receipt-line .lost {
+    padding-left: 0;
+  }
 }

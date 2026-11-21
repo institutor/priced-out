@@ -12,7 +12,14 @@ import { maxPriceOf } from "./priceCheck.js";
 const START_PRICE = { dues: 30, formal: 45, trip: 180 };
 
 export function mount(root, dataset, state) {
-  const { items, rows, rules } = dataset;
+  const { items, rows, rules, meta } = dataset;
+
+  // The slip says where its numbers come from, because a printed copy or a
+  // screenshot leaves the banner at the top of the page behind.
+  let source = "Sample data: these numbers are generated, not real responses.";
+  if (meta.kind === "real") {
+    source = `From an anonymous survey of ${meta.n} Columbia and Barnard students.`;
+  }
 
   // The slip is built once and then updated in place, so the box being typed
   // in keeps the cursor.
@@ -105,6 +112,7 @@ export function mount(root, dataset, state) {
         el("div", { class: "total" }, el("span", { text: "A year in this club" }), total),
         el("div", { class: "total" }, el("span", { text: "Priced out of at least one line" }), anyLine),
         note,
+        el("p", { class: "receipt-note", text: source }),
         el("hr"),
         el("p", { class: "sign-off", text: "The copy the treasurer never gets." }),
       ),
