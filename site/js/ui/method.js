@@ -19,11 +19,23 @@ const CHECKED = ["Checked against a known answer.", ({ evaluation }) => {
     " is with the steps for running it on your own club.",
   ];
 }];
+// What a survey of people cannot settle, however many answer. Both pulls are
+// named, because they run in opposite directions.
+const HYPOTHETICAL = "https://doi.org/10.1007/s10640-004-3332-z";
+const pulls = () => [
+  "Studies that compare the two find people tend to say they would pay more than they then pay (",
+  outside(HYPOTHETICAL, "Murphy and others, 2005"),
+  "). And a member who knows the answers will set the price has a reason to name a lower one. The check on both is who turns up.",
+];
+const SAYING = ["Saying is not doing.", () => [
+  "People were asked at what price they would skip something. What they do can differ, in either direction. ",
+  pulls(),
+]];
 const NOT_FOR = ["What it is not for.", "Finding the highest price people will put up with, or deciding why one particular member said they were busy."];
 
 const POINTS = [
   ["Who answered.", "Students who were sent a link and chose to open it. That is not a random sample of the campus, so read every number as what these students said."],
-  ["Saying is not doing.", "People were asked at what price they would skip something. What they actually do can differ, in either direction."],
+  SAYING,
   SMALL_NUMBERS,
   CHECKED,
   ENDS,
@@ -36,7 +48,7 @@ const POINTS = [
 // shows what that looks like.
 const CLUB_POINTS = [
   ["Who answered.", "Members who were sent the link and chose to open it. That may not be every member, and the ones a price keeps away may be the ones who did not open it. Read every number as what these members said."],
-  ["Saying is not doing.", "People were asked at what price they would skip something. What they actually do can differ, in either direction."],
+  SAYING,
   SMALL_NUMBERS,
   CHECKED,
   ENDS,
@@ -52,6 +64,7 @@ const SIMULATED_POINTS = [
   ["What that makes these numbers.", "A demonstration of the calculator, and a guess at the shape real answers might take. They are not evidence about what real students would do, and no price should be set from them."],
   ["How far off a stand-in can be.", () => ["When Pew Research Center built AI respondents to mirror the real members of its panel, they were off by 12 percentage points on average across nearly 300 questions. ", outside("https://www.pewresearch.org/data-labs/2026/09/30/can-ai-stand-in-for-human-survey-takers-not-really/", "Pew Research Center, 2026"), "."]],
   ["How to get real numbers.", () => ["The same survey is ready to send. A club that puts it in front of its own members can load their answers into this page in place of the simulated ones. ", el("a", { href: "#yours", text: "The next part shows how" }), "."]],
+  ["What real answers still won't settle.", () => ["What people will do. A survey records what they say. ", pulls()]],
   ["What was left out.", "The survey also asks whether someone has skipped a club event over cost and what they said at the time. An invented person's excuse is not evidence, so those answers are not shown."],
   SMALL_NUMBERS,
   CHECKED,

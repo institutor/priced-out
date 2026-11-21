@@ -394,7 +394,10 @@ The rules live in `site/js/lib/` and are covered by the tests in `test/` (180 te
 - The numbers are simulated. A language model's idea of a student on a tight budget is not
   a student on a tight budget.
 - With real answers, students who open a link in a group chat would still not be a random
-  sample of the campus, and what people say they would do can differ from what they do.
+  sample of the campus, and what people say they would do can differ from what they do,
+  in either direction. People tend to say they would pay more than they then pay (Murphy
+  and others, under [Sources](#sources)), and a member who knows the answers will set the
+  price has a reason to name a lower one. The check on both is who turns up.
 - A club can't yet run it fully alone. The page reads a club's export in the browser, but
   the live survey sits in my Flashpoint account, so I still have to run that export and
   send the club its file. A copy of the survey for each club is the next thing to build.
