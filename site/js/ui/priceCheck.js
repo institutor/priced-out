@@ -292,10 +292,13 @@ export function mount(root, dataset, state, { linkFor = null } = {}) {
   }
 
   state.subscribe(render);
-  narrowScreen.addEventListener("change", () => {
-    // The page can be laid out again for other answers. A price check that
-    // has been taken off the page has nothing left to draw.
+  // The page can be laid out again for other answers. A price check that has
+  // been taken off the page has nothing left to draw, so it gives its caller
+  // a way to stop it listening.
+  const onNarrow = () => {
     if (root.isConnected) render(state.get());
-  });
+  };
+  narrowScreen.addEventListener("change", onNarrow);
   render(state.get());
+  return () => narrowScreen.removeEventListener("change", onNarrow);
 }

@@ -3,7 +3,6 @@ import { el } from "./dom.js";
 
 export const SURVEY = "https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a";
 export const REPO = "https://github.com/institutor/priced-out";
-export const WRITE_UP = `${REPO}/blob/main/docs/submission/write-up.md`;
 export const SOURCES = `${REPO}#sources`;
 export const inRepo = (path) => `${REPO}/blob/main/${path}`;
 export const folder = (path) => `${REPO}/tree/main/${path}`;

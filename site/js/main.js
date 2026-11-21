@@ -107,38 +107,57 @@ async function start() {
   }
 
   const addressOf = (view) => `${window.location.pathname}${writeLink(view, START)}`;
+  const writeAddress = (address) => {
+    try {
+      window.history.replaceState(null, "", `${address}${window.location.hash}`);
+    } catch {
+      // The address stays as it was. The page works the same.
+    }
+  };
   let writing = 0;
   let state = null;
+  // What the last layout left listening outside the page, to be taken down.
+  let leave = null;
+
+  // What the answers the page opens with are called, where it offers to put
+  // them back after a file has been loaded.
+  const HOME = {
+    simulated: { name: "simulated students", back: "Put the simulated students back", returned: "The simulated students are back on the page." },
+    real: { name: "", back: "Put the published answers back", returned: "The published answers are back on the page." },
+    sample: { name: "sample data", back: "Put the sample data back", returned: "The sample data is back on the page." },
+  };
+  const home = HOME[published.meta.kind] ?? HOME.sample;
 
   // Lays the whole page out for one set of answers.
   function show(dataset, { view, reported = "" } = {}) {
     const mine = Boolean(dataset.meta.loaded);
+    window.clearTimeout(writing);
+    leave?.();
     wipe(document.getElementById("banner"));
     document.documentElement.style.removeProperty("--banner");
     const old = document.getElementById("app");
     wipe(old);
     old.replaceWith(blank.cloneNode(true));
 
-    // The address bar is always a link to the view on screen. It is written
-    // a moment after the last change: a browser only lets an address be
-    // rewritten so many times a minute, and dragging the price would use
-    // that up. A link cannot carry a club's own file, so while one is loaded
+    // While the published answers are showing, the address bar is a link to
+    // the view on screen. It is written a moment after the last change: a
+    // browser only lets an address be rewritten so many times a minute, and
+    // dragging the price would use that up. A link cannot carry a club's own
+    // file, and whoever opened one would see the published answers at the
+    // club's price. So while a file is loaded the address names no view, and
     // the page offers no link to copy.
     state = createState({ ...view, guess: null });
-    state.subscribe((next) => {
-      window.clearTimeout(writing);
-      writing = window.setTimeout(() => {
-        try {
-          window.history.replaceState(null, "", `${addressOf(next)}${window.location.hash}`);
-        } catch {
-          // The address stays as it was. The page works the same.
-        }
-      }, 400);
-    });
+    writeAddress(mine ? window.location.pathname : addressOf(view));
+    if (!mine) {
+      state.subscribe((next) => {
+        window.clearTimeout(writing);
+        writing = window.setTimeout(() => writeAddress(addressOf(next)), 400);
+      });
+    }
 
     const linkFor = mine ? null : (next) => new URL(addressOf(next), window.location.href).href;
     banner.mount(document.getElementById("banner"), dataset);
-    priceCheck.mount(document.getElementById("price-check"), dataset, state, { linkFor });
+    leave = priceCheck.mount(document.getElementById("price-check"), dataset, state, { linkFor });
     access.mount(bodyOf("access"), dataset, state);
     fixes.mount(bodyOf("fixes"), dataset, state);
     pledges.mount(bodyOf("pledges"), dataset, state);
@@ -151,7 +170,7 @@ async function start() {
     } else {
       said.mount(bodyOf("said"), dataset, state);
     }
-    yours.mount(bodyOf("yours"), dataset, { read, reset, said: reported, evaluation });
+    yours.mount(bodyOf("yours"), dataset, { read, reset, said: reported, evaluation, home });
     why.mount(bodyOf("why"));
     made.mount(bodyOf("made"));
     method.mount(bodyOf("method"), dataset, state, { evaluation });
@@ -196,7 +215,7 @@ async function start() {
   }
 
   function reset() {
-    show(published, { view: carried(), reported: "The simulated students are back on the page." });
+    show(published, { view: carried(), reported: home.returned });
     settle();
   }
 

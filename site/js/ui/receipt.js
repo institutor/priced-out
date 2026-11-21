@@ -10,10 +10,8 @@ import { tickBox } from "./doodles.js";
 import * as sketch from "../lib/sketch.js";
 import { sharesAt, outOfAny, answeredAll } from "../lib/curve.js";
 import { money, pct } from "../lib/format.js";
-import { maxPriceOf } from "./priceCheck.js";
+import { maxPriceOf, START_PRICE } from "./priceCheck.js";
 import { voice } from "../lib/voice.js";
-
-const START_PRICE = { dues: 30, formal: 45, trip: 180 };
 
 export function mount(root, dataset, state) {
   const { items, rows, rules, meta } = dataset;

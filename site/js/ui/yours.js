@@ -1,7 +1,7 @@
 // Running the page on a club's own answers: the three steps it takes, and
 // the control that reads the file. The file is read by the page itself
-// (js/ingest/club.js). It is not sent anywhere, and the page keeps only the
-// totals it draws, for as long as it stays open.
+// (js/ingest/club.js). It is not sent anywhere. The page keeps each row's
+// prices and pledge, and nothing else from it, for as long as it stays open.
 import { el } from "./dom.js";
 import { button, ink, path, seedOf } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
@@ -57,7 +57,8 @@ function step(n, title, ...body) {
 // back the answers the page opened with. `said` is what the last reading
 // reported, shown again because the page is laid out afresh after each one.
 // `evaluation` is what the check against made-up clubs found, if it loaded.
-export function mount(root, dataset, { read, reset, said = "", evaluation = null } = {}) {
+// `home` says what the answers the page opens with are called.
+export function mount(root, dataset, { read, reset, said = "", evaluation = null, home = { name: "", back: "Put the published answers back" } } = {}) {
   const { meta } = dataset;
   const loaded = meta.loaded ?? null;
 
@@ -126,7 +127,9 @@ export function mount(root, dataset, { read, reset, said = "", evaluation = null
       el("p", { text: said }),
       loaded ? el("p", { class: "now-actions" },
         el("a", { class: "text-link", href: "#price-check", text: "See the numbers" }),
-        el("button", { class: "text-button", type: "button", text: "Put the simulated students back", onclick: () => reset() }),
+        // Not while a file is being read: the reading would land afterwards
+        // and take the page back.
+        el("button", { class: "text-button", type: "button", text: home.back, onclick: () => { if (!busy) reset(); } }),
       ) : null,
     );
   }
@@ -135,7 +138,7 @@ export function mount(root, dataset, { read, reset, said = "", evaluation = null
     el("p", {
       text: loaded
         ? "The page reads one file of answers at a time. This is how a club gets its own."
-        : "Every number above comes from simulated students. The same page runs on your own members' answers. It takes three steps.",
+        : `${home.name ? `Every number above comes from ${home.name}. ` : ""}The same page runs on your own members' answers. It takes three steps.`,
     }),
     now,
     el("ol", { class: "steps" },
@@ -153,7 +156,7 @@ export function mount(root, dataset, { read, reset, said = "", evaluation = null
         ),
       ),
       step(3, "Load the file here",
-        el("p", { text: "The page reads the file on this device. It is not uploaded anywhere. Only the totals the page draws are kept, and they are gone when you close or reload it." }),
+        el("p", { text: "The page reads the file on this device. It is not uploaded anywhere. It keeps each member's prices and pledge, with nothing beside them to say whose they are, and it forgets them when you close or reload the page." }),
         el("p", { class: "load-actions" }, choose, picker),
         el("p", { class: "load-try" },
           "No file yet? ", tryExample, " to see what happens, or ",

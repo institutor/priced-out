@@ -61,6 +61,20 @@ const SIMULATED_POINTS = [
   NOT_FOR,
 ];
 
+// A file of persona rows that someone loaded themselves. What is known about
+// the published panel (who it was matched to, how it was marked) is not known
+// about this one, so none of that is said.
+const PANEL_FILE_POINTS = [
+  ["Who answered.", "Nobody. The file holds rows from a Flashpoint synthetic panel: AI personas, with a language model answering the survey as each one of them."],
+  ["What that makes these numbers.", "A guess at the shape real answers might take. They are not evidence about what real students would do, and no price should be set from them."],
+  SIMULATED_POINTS.find(([lead]) => lead === "How far off a stand-in can be."),
+  SMALL_NUMBERS,
+  CHECKED,
+  ENDS,
+  CLUB_POINTS.find(([lead]) => lead === "What this page did."),
+  NOT_FOR,
+];
+
 function formatDate(value) {
   const date = new Date(`${value}T12:00:00`);
   if (Number.isNaN(date.getTime())) return value;
@@ -99,7 +113,7 @@ export function mount(root, dataset, state, { evaluation = null } = {}) {
   const say = voice(meta);
   let points = POINTS;
   if (meta.loaded) points = CLUB_POINTS;
-  if (meta.kind === "simulated") points = SIMULATED_POINTS;
+  if (meta.kind === "simulated") points = meta.loaded ? PANEL_FILE_POINTS : SIMULATED_POINTS;
 
   const counts = items
     .map((item) => `${item.short}: ${rows.filter((row) => row[item.id] !== null).length}`)
