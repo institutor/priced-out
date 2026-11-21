@@ -273,6 +273,15 @@ h2 {
   stroke-width: 1.5;
 }
 
+/* A second pen goes over the rule as the page is read: as far along it as
+   the reader is down the page. main.js keeps --read up to date. */
+.banner-read {
+  stroke: var(--series);
+  stroke-width: 4;
+  stroke-dasharray: 1 1.2;
+  stroke-dashoffset: calc(1.05px - var(--read, 0) * 1.05px);
+}
+
 /* Title page --------------------------------------------------------------- */
 
 .cover {

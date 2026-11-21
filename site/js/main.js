@@ -13,6 +13,7 @@ import * as pledges from "./ui/pledges.js";
 import * as receipt from "./ui/receipt.js";
 import * as said from "./ui/said.js";
 import * as method from "./ui/method.js";
+import { follow } from "./ui/scroll.js";
 
 const bodyOf = (id) => document.querySelector(`#${id} .section-body`);
 
@@ -83,6 +84,13 @@ async function start() {
   }
   method.mount(bodyOf("method"), dataset, state);
   dress();
+
+  // How far down the page you are, for the line the banner draws along its
+  // bottom edge.
+  follow(() => {
+    const room = document.documentElement.scrollHeight - window.innerHeight;
+    document.documentElement.style.setProperty("--read", room > 0 ? Math.min(1, window.scrollY / room).toFixed(4) : 0);
+  });
 }
 
 start();

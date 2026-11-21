@@ -7,7 +7,8 @@ import * as sketch from "../lib/sketch.js";
 
 // A strip of coloured paper with an uneven bottom edge and a pen line along
 // it. It stays at the top of the screen, so on a narrow screen it says the
-// same thing in fewer words.
+// same thing in fewer words. A second pen goes over that line as the page is
+// read, as far along it as the reader is down the page.
 function strip(className, lead, text, short) {
   const node = el("div", { class: className, role: "status" },
     el("p", {}, el("strong", { text: lead }), el("span", { class: "long", text }), el("span", { class: "short", text: short })),
@@ -22,6 +23,7 @@ function strip(className, lead, text, short) {
     return [
       path(`${sketch.polyline(edge, { seed, rough: 1.6, passes: 1 })}L-6,-6L${width + 6},-6Z`, "banner-fill"),
       path(sketch.line(-6, height - 3.5, width + 6, height - 3.5, { seed: seed + 1, rough: 1.5, passes: 2 }), "banner-rule"),
+      path(sketch.line(-6, height - 3.5, width + 6, height - 3.5, { seed: seed + 2, rough: 1.2, passes: 1 }), "banner-read", { pathLength: 1 }),
     ];
   });
   return node;
