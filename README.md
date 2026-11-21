@@ -596,8 +596,11 @@ Times are Eastern.
   The item, price and club size went into the address, so a view can be shared. "What it
   would take" got its table of one thing priced three ways. The page gained the note for
   the board, the message for members, the parts on why this exists and how the survey was
-  made, the check against 2,000 made-up clubs, and the contents tab. The changes were then
-  read through again for mistakes, and the ones found were fixed.
+  made, the check against 2,000 made-up clubs, and the contents tab. Later in the same
+  stretch it added how many full-price payers could take the lower price before two
+  prices lose money, the treasurer's side of each way to offer a lower price, and the
+  check for after the event. The changes were read through for mistakes more than once
+  by a separate reviewing agent, and what it found was fixed.
 
 ## Outside resources
 
