@@ -5,7 +5,7 @@ const POINTS = [
   ["Who answered.", "Students who saw a link in a group chat and chose to open it. That is not a random sample of the campus, so read every number as what these students said."],
   ["Saying is not doing.", "People were asked at what price they would skip something. What they actually do can differ, in either direction."],
   ["Small numbers.", "Every share comes with a 95% interval, and nothing is shown for fewer than 5 students."],
-  ["The top of the scale.", "An answer at the top of a price slider means that much or more. It never counts as priced out here, and prices on this page stop one step below the top."],
+  ["The ends of the scale.", "An answer at the top of a price slider means that much or more. It never counts as priced out here, and prices on this page stop one step below the top. A skip price of $0 is read as no answer: skipping something that is free is not about the price."],
   ["What Flashpoint did.", "The survey itself: the questions, the trade-off question behind the ranking of fixes, the checks before publishing, the public link and the export of answers."],
   ["What this site did.", "Turned the exported answers into the curve, the intervals, the pledge cascade and the receipt. The page holds no names, emails, written answers or year in school."],
   ["What it is not for.", "Finding the highest price people will put up with, or deciding why one particular member said they were busy."],

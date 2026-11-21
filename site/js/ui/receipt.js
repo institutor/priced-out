@@ -1,7 +1,11 @@
 // The receipt for a year in the club: every line with the share of students
 // lost at it, the total, and the share priced out of at least one line.
-import { el, clear } from "./dom.js";
-import { sharesAt, outOfAny } from "../lib/curve.js";
+//
+// Every figure on the slip is worked out over the same students: those who
+// gave a price for every line that is ticked. Otherwise one line could show a
+// bigger share than "at least one line" does.
+import { el } from "./dom.js";
+import { sharesAt, outOfAny, answeredAll } from "../lib/curve.js";
 import { money, pct } from "../lib/format.js";
 import { maxPriceOf } from "./priceCheck.js";
 
@@ -9,82 +13,81 @@ const START_PRICE = { dues: 30, formal: 45, trip: 180 };
 
 export function mount(root, dataset, state) {
   const { items, rows, rules } = dataset;
-  const lines = items.map((item) => ({ item, on: true, price: START_PRICE[item.id] ?? item.step * 4 }));
-  const paper = el("div", { class: "receipt" });
 
-  const shown = (share, n) => (n < rules.minCell ? "–" : pct(share));
-
-  function render() {
-    clear(paper);
-    paper.append(
-      el("h3", { text: "Your club" }),
-      el("p", { class: "serial", text: "Member's copy" }),
-      el("hr"),
+  // The slip is built once and then updated in place, so the box being typed
+  // in keeps the cursor.
+  const lines = items.map((item) => {
+    const line = { item, on: true, price: START_PRICE[item.id] ?? item.step * 4 };
+    line.toggle = el("input", {
+      type: "checkbox",
+      checked: true,
+      onchange: (event) => {
+        line.on = event.target.checked;
+        update();
+      },
+    });
+    line.input = el("input", {
+      type: "number",
+      inputMode: "numeric",
+      min: 0,
+      max: maxPriceOf(item),
+      step: item.step,
+      value: line.price,
+      "aria-label": `Price of ${item.short.toLowerCase()} in dollars`,
+      onchange: (event) => {
+        const stepped = Math.round((Number(event.target.value) || 0) / item.step) * item.step;
+        line.price = Math.min(maxPriceOf(item), Math.max(0, stepped));
+        update();
+      },
+    });
+    line.lost = el("span");
+    line.node = el("div", { class: "receipt-line" },
+      el("div", { class: "top" }, el("label", {}, line.toggle, item.short), el("span", { class: "price" }, "$", line.input)),
+      el("div", { class: "lost" }, el("span", { text: "lost at this line" }), line.lost),
     );
-    for (const line of lines) {
-      const shares = sharesAt(rows, line.item, line.price);
-      const toggle = el("input", {
-        type: "checkbox",
-        checked: line.on,
-        onchange: (event) => {
-          line.on = event.target.checked;
-          render();
-        },
-      });
-      const price = el("input", {
-        type: "number",
-        inputMode: "numeric",
-        min: 0,
-        max: maxPriceOf(line.item),
-        step: line.item.step,
-        value: line.price,
-        "aria-label": `Price of ${line.item.short.toLowerCase()} in dollars`,
-        onchange: (event) => {
-          const stepped = Math.round((Number(event.target.value) || 0) / line.item.step) * line.item.step;
-          line.price = Math.min(maxPriceOf(line.item), Math.max(0, stepped));
-          render();
-        },
-      });
-      paper.append(
-        el("div", { class: line.on ? "receipt-line" : "receipt-line off" },
-          el("div", { class: "top" }, el("label", {}, toggle, line.item.short), el("span", { class: "price" }, "$", price)),
-          el("div", { class: "lost" }, el("span", { text: "lost at this line" }), el("span", { text: shown(shares.out, shares.n) })),
-        ),
-      );
-    }
+    return line;
+  });
 
+  const total = el("span");
+  const anyLine = el("span");
+  const note = el("p", { class: "receipt-note" });
+
+  function update() {
     const active = lines.filter((line) => line.on);
-    const any = outOfAny(rows, active);
-    paper.append(
-      el("hr"),
-      el("div", { class: "total" },
-        el("span", { text: "A year in this club" }),
-        el("span", { text: money(active.reduce((sum, line) => sum + line.price, 0)) }),
-      ),
-      el("div", { class: "total" },
-        el("span", { text: "Priced out of at least one line" }),
-        el("span", { text: active.length === 0 ? "–" : shown(any.share, any.n) }),
-      ),
-    );
-    if (active.length > 0 && any.n >= rules.minCell) {
-      paper.append(el("p", {
-        class: "receipt-note",
-        text: `${any.n} students answered every line. The true figure could be ${pct(any.low)} to ${pct(any.high)}.`,
-      }));
+    const base = answeredAll(rows, active.map((line) => line.item));
+    const enough = active.length > 0 && base.length >= rules.minCell;
+
+    for (const line of lines) {
+      line.node.classList.toggle("off", !line.on);
+      if (Number(line.input.value) !== line.price) line.input.value = line.price;
+      line.lost.textContent = line.on && enough ? pct(sharesAt(base, line.item, line.price).out) : "–";
     }
-    paper.append(el("hr"), el("p", { class: "sign-off", text: "The copy the treasurer never gets." }));
+
+    total.textContent = money(active.reduce((sum, line) => sum + line.price, 0));
+    const any = outOfAny(base, active);
+    anyLine.textContent = enough ? pct(any.share) : "–";
+    if (enough) {
+      note.textContent = `Worked out from the ${base.length} students who gave a price for every line. The true figure could be ${pct(any.low)} to ${pct(any.high)}.`;
+    } else if (active.length === 0) {
+      note.textContent = "Tick a line to add it up.";
+    } else {
+      note.textContent = `Only ${base.length} students gave a price for every line, and nothing is shown under ${rules.minCell}.`;
+    }
   }
 
-  // The line for whatever is being priced above follows that price.
-  state.subscribe(({ itemId, price }) => {
-    const line = lines.find((candidate) => candidate.item.id === itemId);
-    if (line.price === price) return;
-    line.price = price;
-    render();
+  // The line for whatever is being priced at the top of the page follows that
+  // price, but only when it changes there. A price typed on the receipt stays
+  // put while the club size or anything else changes.
+  let seen = state.get();
+  lines.find((line) => line.item.id === seen.itemId).price = seen.price;
+  state.subscribe((next) => {
+    const changed = next.itemId !== seen.itemId || next.price !== seen.price;
+    seen = next;
+    if (!changed) return;
+    lines.find((line) => line.item.id === next.itemId).price = next.price;
+    update();
   });
-  const current = state.get();
-  lines.find((candidate) => candidate.item.id === current.itemId).price = current.price;
-  render();
+  update();
 
   root.append(
     el("div", { class: "receipt-layout" },
@@ -93,7 +96,18 @@ export function mount(root, dataset, state) {
         el("p", { class: "aside", text: "Change a price, or untick a line to take it off. A person counts once, however many lines they are priced out of." }),
         el("button", { class: "button", type: "button", text: "Print this receipt", onclick: () => window.print() }),
       ),
-      paper,
+      el("div", { class: "receipt" },
+        el("h3", { text: "Your club" }),
+        el("p", { class: "serial", text: "Member's copy" }),
+        el("hr"),
+        lines.map((line) => line.node),
+        el("hr"),
+        el("div", { class: "total" }, el("span", { text: "A year in this club" }), total),
+        el("div", { class: "total" }, el("span", { text: "Priced out of at least one line" }), anyLine),
+        note,
+        el("hr"),
+        el("p", { class: "sign-off", text: "The copy the treasurer never gets." }),
+      ),
     ),
   );
 }

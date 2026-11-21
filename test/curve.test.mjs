@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { stateAt, sharesAt, priceGrid, curve, maxPriceFor, outOfAny, accessTier } from "../site/js/lib/curve.js";
+import { stateAt, sharesAt, priceGrid, curve, maxPriceFor, outOfAny, accessTier, answeredAll } from "../site/js/lib/curve.js";
 
 const formal = { id: "formal", label: "A ticket to the club formal", max: 150, step: 5 };
 const dues = { id: "dues", label: "One semester of club dues", max: 100, step: 5 };
@@ -90,4 +90,16 @@ test("accessTier reports who a cheaper tier brings back", () => {
   assert.equal(tier.addedRevenuePer100, 1125);
   assert.equal(accessTier(four, formal, 0), null);
   assert.equal(accessTier(four, formal, 15), null);
+});
+
+test("answeredAll keeps only rows that gave a skip price for every item", () => {
+  const rows = [
+    { dues: [10, 20], formal: [40, 70] },
+    { dues: null, formal: [10, 20] },
+    { dues: [5, null], formal: [5, 10] },
+    { dues: [5, 10] },
+  ];
+  assert.deepEqual(answeredAll(rows, [dues, formal]), [rows[0]]);
+  assert.deepEqual(answeredAll(rows, [formal]), [rows[0], rows[1], rows[2]]);
+  assert.deepEqual(answeredAll(rows, []), rows);
 });

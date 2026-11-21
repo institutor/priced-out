@@ -77,8 +77,10 @@ function numberLine(marks, interval) {
 export function mount(root, dataset) {
   const { said, skipped, guess, rows, items, rules } = dataset;
 
-  const answered = skipped.n - skipped.preferNot;
-  const ever = skipped.once + skipped.several;
+  // Under the minimum the counts are not in the dataset at all.
+  const counted = skipped.n >= rules.minCell;
+  const answered = counted ? skipped.n - skipped.preferNot : 0;
+  const ever = counted ? skipped.once + skipped.several : 0;
   if (answered >= rules.minCell) {
     root.append(el("p", {}, sentence(
       [`${ever} of the ${answered}`],
@@ -111,7 +113,7 @@ export function mount(root, dataset) {
     const own = Math.round(actual.out * 100);
     const typical = Math.round(guess.all.median);
     const marks = [
-      { shape: "dot", label: "Their own answers", value: own },
+      { shape: "dot", label: "From students' own prices", value: own },
       { shape: "diamond", label: "Typical guess", value: typical },
     ];
     let split = "Too few students who have set prices answered for their guesses to be shown separately.";
@@ -124,10 +126,13 @@ export function mount(root, dataset) {
       el("h3", { class: "subhead", text: "And what everyone guessed" }),
       el("p", {}, sentence(
         `We also asked: out of 100 Columbia students, how many would skip a $${guess.price} formal because of the price? The typical guess was `,
-        [typical], ". Going by the same students' own answers, it is ", [own], ". ", split,
+        [typical], ". Going by the prices students gave for themselves, it is ", [own], ". ", split,
       )),
       numberLine(marks, { low: Math.round(actual.outLow * 100), high: Math.round(actual.outHigh * 100) }),
-      el("p", { class: "aside", text: `${guess.all.n} students guessed. The pale band is the 95% interval around their own answers.` }),
+      el("p", {
+        class: "aside",
+        text: `${guess.all.n} students guessed. ${actual.n} gave their own price for a formal, and the pale band is the 95% interval around that figure.`,
+      }),
     );
   }
 }

@@ -39,11 +39,25 @@ export function mount(root, dataset) {
   }
   const ranked = [...fixes].sort((a, b) => b.score - a.score);
   const scale = scaleOf(fixes);
+
+  // Name every option that shares the top score, or the bottom one, so a tie
+  // is never reported as a winner.
+  const names = (list) => list.map((fix) => fix.label).join(" and ");
+  const top = ranked.filter((fix) => fix.score === ranked[0].score);
+  const bottom = ranked.filter((fix) => fix.score === ranked.at(-1).score);
+  let outcome = ["No option stood out: all six scored the same."];
+  if (top.length < ranked.length) {
+    outcome = sentence(
+      [names(top)], top.length > 1 ? " tied at the top. " : " came out on top. ",
+      [names(bottom)], bottom.length > 1 ? " tied at the bottom." : " came last.",
+    );
+  }
+
   root.append(
-    el("p", {}, sentence(
+    el("p", {},
       "A lower price only helps if people will take it. We showed students six ways a club could offer one and asked which would make them most and least likely to still go. ",
-      [ranked[0].label], " came out on top. ", [ranked.at(-1).label], " came last.",
-    )),
+      outcome,
+    ),
     el("ul", { class: "bar-list" }, ranked.map((fix) => row(fix, scale))),
     el("p", {
       class: "aside",

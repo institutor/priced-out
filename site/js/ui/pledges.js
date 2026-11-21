@@ -30,8 +30,17 @@ export function mount(root, dataset, state) {
       [conditional.length], " of them said only if enough other members did the same.",
     )));
 
+    // Three different reasons the pledges can come to nothing.
+    if (payers === 0) {
+      root.append(el("p", { text: `At ${money(price)} nobody in a club of ${size} would be paying, so there is nobody to pledge.` }));
+      return;
+    }
     if (outcome.pledgers === 0) {
-      root.append(el("p", { text: "In a club this size, nobody surveyed would go first, so the pledges never start." }));
+      const goFirst = willing.length - conditional.length;
+      const why = goFirst === 0
+        ? "Nobody surveyed said they would go first, so the pledges never start."
+        : `${goFirst} of ${pledges.length} said they would give no matter what, but among the ${payers} of your ${size} who would pay ${money(price)} that comes to less than one person, so the pledges never start.`;
+      root.append(el("p", { text: why }));
       return;
     }
 

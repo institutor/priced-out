@@ -44,7 +44,12 @@ export function mount(root, dataset, state) {
     inputMode: "numeric",
     min: 0,
     "aria-label": "Price in dollars",
-    onchange: (event) => state.set({ price: snap(Number(event.target.value), itemOf(state.get().itemId)) }),
+    onchange: (event) => {
+      const price = snap(Number(event.target.value), itemOf(state.get().itemId));
+      // Show the price actually used: 9999 becomes the top of the range, 47 becomes 45.
+      event.target.value = price;
+      state.set({ price });
+    },
   });
 
   const sizeInput = el("input", {
@@ -56,6 +61,7 @@ export function mount(root, dataset, state) {
     "aria-label": "Number of people in the club",
     onchange: (event) => {
       const size = Math.min(300, Math.max(5, Math.round(Number(event.target.value) || 5)));
+      event.target.value = size;
       state.set({ size });
     },
   });
@@ -76,8 +82,13 @@ export function mount(root, dataset, state) {
     onsubmit: (event) => {
       event.preventDefault();
       const { itemId, price, size } = state.get();
-      const count = Math.min(size, Math.max(0, Math.round(Number(guessInput.value) || 0)));
       justRevealed = true;
+      // The guess is optional: an empty box is no guess, not a guess of 0.
+      if (guessInput.value.trim() === "") {
+        state.set({ revealed: true, guess: null });
+        return;
+      }
+      const count = Math.min(size, Math.max(0, Math.round(Number(guessInput.value) || 0)));
       state.set({ revealed: true, guess: { itemId, price, size, count } });
     },
   }, gatePrompt, guessInput, el("button", { class: "button", type: "submit", text: "Show the answer" }));
@@ -167,15 +178,18 @@ export function mount(root, dataset, state) {
     const stretched = Math.min(size - out, people(shares.stretched, size));
     renderSeats({ go: size - out - stretched, stretched, out }, size);
 
-    if (out === 0) verdict.textContent = `At ${money(price)}, nobody surveyed would skip it.`;
+    // "Nobody" is only said when nobody surveyed gave that answer. A share
+    // too small to make one whole person in this club is said as that.
+    if (shares.outCount === 0) verdict.textContent = `At ${money(price)}, nobody surveyed would skip it.`;
+    else if (out === 0) verdict.textContent = `At ${money(price)}, fewer than 1 of your ${size} would skip it.`;
     else verdict.textContent = `${out} of your ${size} would skip it and tell you something else.`;
 
     clear(detail).append(...sentence(
       "That is ", [pct(shares.out)], ` of the ${shares.n} students who answered. With a sample this size the true figure could be anywhere from ${pct(shares.outLow)} to ${pct(shares.outHigh)}.`,
     ));
-    stretchedNote.textContent = stretched === 0
-      ? "Nobody else said this price would be a stretch."
-      : `Another ${stretched} would pay, but said it would be a stretch.`;
+    if (shares.stretchedCount === 0) stretchedNote.textContent = "Nobody else said this price would be a stretch.";
+    else if (stretched === 0) stretchedNote.textContent = "Fewer than 1 more would pay but find it a stretch.";
+    else stretchedNote.textContent = `Another ${stretched} would pay, but said it would be a stretch.`;
 
     const sameQuestion = guess && guess.itemId === itemId && guess.price === price && guess.size === size;
     guessNote.hidden = !sameQuestion;

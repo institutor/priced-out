@@ -25,6 +25,13 @@ function answeredPair(row, item) {
   return pair;
 }
 
+// The rows that gave a skip price for every one of the items. Figures that
+// sit side by side (the lines of the receipt) are worked out over these, so
+// they all describe the same people.
+export function answeredAll(rows, items) {
+  return rows.filter((row) => items.every((item) => answeredPair(row, item) !== null));
+}
+
 export function stateAt(pair, item, price) {
   const { stretch, skip } = thresholds(pair, item);
   if (price >= skip) return "out";
