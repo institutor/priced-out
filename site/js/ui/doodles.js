@@ -48,6 +48,14 @@ const STROKES = {
     sketch.line(13, 17, 35, 17, { seed: seed + 1, rough: 0.5, passes: 1 }),
     sketch.line(13, 24, 29, 24, { seed: seed + 2, rough: 0.5, passes: 1 }),
   ],
+  // A ruler: the prices laid out in a line.
+  ruler: (seed) => [
+    sketch.polygon([[4, 19], [44, 15], [45, 28], [5, 32]], { seed, rough: 0.8 }),
+    sketch.line(12, 18, 12.6, 24, { seed: seed + 1, rough: 0.4, passes: 1 }),
+    sketch.line(20, 17.2, 21, 26, { seed: seed + 2, rough: 0.4, passes: 1 }),
+    sketch.line(28, 16.4, 28.6, 22.4, { seed: seed + 3, rough: 0.4, passes: 1 }),
+    sketch.line(36, 15.6, 37, 24.4, { seed: seed + 4, rough: 0.4, passes: 1 }),
+  ],
   // A magnifying glass: how we know.
   glass: (seed) => [
     sketch.ellipse(20, 20, 12, 12, { seed, rough: 0.7, steps: 14 }),

@@ -6,6 +6,7 @@ import { drawWhenSeen, perforation, redrawAll, shiverWhileSeen, underlineLastLin
 import * as cover from "./ui/cover.js";
 import * as banner from "./ui/banner.js";
 import * as priceCheck from "./ui/priceCheck.js";
+import * as walk from "./ui/walk.js";
 import * as access from "./ui/access.js";
 import * as fixes from "./ui/fixes.js";
 import * as pledges from "./ui/pledges.js";
@@ -66,6 +67,7 @@ async function start() {
   const state = createState({ itemId: "formal", price: 45, size: 60, revealed: false, guess: null });
   banner.mount(document.getElementById("banner"), dataset);
   priceCheck.mount(document.getElementById("price-check"), dataset, state);
+  walk.mount(document.getElementById("walk"), dataset, state);
   access.mount(bodyOf("access"), dataset, state);
   fixes.mount(bodyOf("fixes"), dataset, state);
   pledges.mount(bodyOf("pledges"), dataset, state);

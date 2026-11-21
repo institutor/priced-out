@@ -994,6 +994,192 @@ td:first-child {
   text-align: left;
 }
 
+/* The walk up the price -------------------------------------------------- */
+
+/* While it is on screen the heading, the price and the strip stay put, and
+   the scroll moves a marker along the strip instead (walk.js). The run is
+   as tall as the scroll that takes. */
+#walk.pinned .walk-stage {
+  position: sticky;
+  top: calc(var(--banner, 3.5rem) + 0.75rem);
+}
+
+#walk h2 {
+  max-width: none;
+  margin-bottom: 0.45em;
+}
+
+.walk-intro {
+  max-width: 64ch;
+  margin: 0 0 0.9rem;
+}
+
+/* The price the marker is at, gone over with the highlighter, and how many
+   of the club have stepped out by then. */
+.walk-read {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1.5rem;
+  min-height: 4.25rem;
+  margin: 0 0 0.25rem 0.4rem;
+}
+
+.walk-price {
+  display: inline-block;
+  min-width: 2.4ch;
+  font: 900 clamp(2.75rem, 6vw, 4rem)/1 var(--font-display);
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.walk-count {
+  max-width: 26ch;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.walk-count strong {
+  font: 900 1.7em/1 var(--font-display);
+  letter-spacing: 0.01em;
+}
+
+/* The strip. Not pinned, it scrolls sideways under the finger. */
+.walk-view {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+#walk.pinned .walk-view {
+  overflow: clip;
+}
+
+/* Scrolled sideways, the strip leaves room under the ruler for the scroll
+   bar, so the bar does not sit on the prices. */
+#walk:not(.pinned) .walk-view {
+  box-sizing: content-box;
+  padding-bottom: 1.1rem;
+}
+
+.walk-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 var(--ground, 0);
+  will-change: transform;
+}
+
+/* Seen from far off the whole strip is small, but its lines are drawn with
+   the same pen: their width is divided by how far out the view is. */
+.walk-track path {
+  stroke-width: calc(var(--pen, 2.4px) / var(--zoom, 1));
+}
+
+.walk-ground,
+.walk-tick {
+  stroke: var(--ink-soft);
+}
+
+.walk-tick {
+  --pen: 1.5px;
+}
+
+/* The prices under the ruler, and the note over the people still in, stay
+   the size they are however far out the view is. */
+.walk-label,
+.walk-note {
+  font: 400 15px var(--font-display);
+  letter-spacing: 0.03em;
+  fill: var(--ink-soft);
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  transform: scale(calc(1 / var(--zoom, 1)));
+}
+
+.walk-note {
+  font-size: 17px;
+  fill: var(--ink);
+  transform-origin: 50% 100%;
+}
+
+/* Someone in the line is drawn standing and stepped out, in the same place.
+   Stepped out is in the other pen. */
+.walker-in,
+.walker-out {
+  transition: opacity 0.2s ease-out;
+}
+
+.walker-out,
+.walker.out .walker-in {
+  opacity: 0;
+}
+
+.walker.out .walker-out {
+  opacity: 1;
+}
+
+.walker-out path {
+  stroke: var(--mark-2);
+}
+
+.walk-flag path {
+  --pen: 1.8px;
+  stroke: var(--series);
+}
+
+.walk-flag .pennant {
+  fill: var(--series);
+}
+
+.walk-flag.yours path {
+  stroke: var(--ink);
+}
+
+.walk-flag.yours .pennant {
+  fill: var(--canary);
+}
+
+/* What a flag says can only be read close up. */
+.walk-flag text {
+  opacity: calc((var(--zoom, 1) - 0.6) * 5);
+}
+
+.flag-title {
+  font: 900 18px var(--font-display);
+  letter-spacing: 0.02em;
+  fill: var(--ink);
+}
+
+.flag-note {
+  font: 400 13px var(--font-body);
+  fill: var(--ink-soft);
+}
+
+/* The marker: where the price is now. */
+.walk-hand {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.walk-hand .art {
+  margin-left: -10px;
+}
+
+.walk-hand path {
+  stroke: var(--mark-2);
+  stroke-width: 2.4;
+}
+
+#walk:not(.pinned) .walk-hand {
+  display: none;
+}
+
 /* What it would take ---------------------------------------------------- */
 
 .statements {
