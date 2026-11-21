@@ -5,15 +5,15 @@
 const ASKS = {
   open: {
     run: "Make one code and send it in the same message as the price.",
-    snag: "Anyone can use it, including members who could pay in full. The sums above only work if most of them still do.",
+    snag: "Anyone can use it, including members who could pay in full. Each one who does costs the club the difference between the two prices.",
   },
   sliding: {
     run: "Put two or three prices on the form and let each member pick one in private.",
-    snag: "Some who could pay more will pick the lowest price. The sums above only work if most of them do not.",
+    snag: "Some who could pay more will pick the lowest price. Each one who does costs the club the difference between the prices.",
   },
   forward: {
     run: "Add a way to pay extra, and tell members how many covered tickets there are.",
-    snag: "It covers only as many seats as members pay for. The next part counts them.",
+    snag: "It covers only as many seats as members pay for. The next part works out how far members' pledges go.",
   },
   pwyc: {
     run: "Let each member type in what they will pay.",
@@ -24,7 +24,7 @@ const ASKS = {
     snag: "Luck decides who pays less, not need. The member who needed it most may get the least.",
   },
   request: {
-    run: "Nothing to set up. A member messages you, and you send a code.",
+    run: "Make a code. A member messages you, and you send it to them.",
     snag: "The member has to ask, and you find out who did. The published work further down found few people ask.",
   },
 };
