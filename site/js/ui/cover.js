@@ -5,15 +5,10 @@
 // finishes the drawing at once. Everything drawn here is decoration: what
 // the figures say, the question, the heading, the note and the link are
 // plain HTML and are there without it.
-//
-// Scrolling away from the title page does not move it. It stays where it is
-// and the view closes in on the one who can't come, while the rest of the
-// page slides up over it like the next sheet of paper.
 import { el, svg } from "./dom.js";
 import { drawnIn, inkButton } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
 import * as scene from "./scene.js";
-import { follow, stillPreferred } from "./scroll.js";
 
 // When each part of the drawing starts, in milliseconds. The strip of
 // figures goes first, and everything else follows from when it ends.
@@ -41,9 +36,6 @@ function lettersReady() {
   const giveUp = new Promise((resolve) => window.setTimeout(resolve, 1800));
   return Promise.race([wanted, giveUp]).catch(() => {});
 }
-
-// How much closer the view is by the time the title page is covered.
-const CLOSER = 1.5;
 
 const wait = (node, ms) => {
   node.style.setProperty("--wait", `${ms}ms`);
@@ -166,42 +158,4 @@ export async function mount(root) {
       for (const entry of entries) root.classList.toggle("offstage", !entry.isIntersecting);
     }).observe(root);
   }
-
-  // The zoom on the way out. It needs the title page to fit on the screen
-  // (a page taller than the screen has to scroll), a browser that can cut
-  // off what grows past the edge, and a reader who has not asked for less
-  // motion.
-  const runner = root.closest(".cover-run");
-  const canClip = typeof CSS !== "undefined" && CSS.supports?.("overflow", "clip");
-  if (!runner || !strip || !canClip || stillPreferred()) return;
-  let gone = 0;
-  let focusDown = 0;
-  follow(() => {
-    const banner = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--banner")) || 0;
-    const height = root.offsetHeight;
-    const pins = height <= window.innerHeight - banner + 2;
-    runner.classList.toggle("pins", pins);
-    runner.style.setProperty("--cover-h", `${height}px`);
-    const next = pins ? Math.min(1, Math.max(0, window.scrollY / height)) : 0;
-    if (next === gone) return;
-    if (gone === 0) {
-      // The point the view closes in on, found while nothing is enlarged.
-      const art = strip.querySelector(".scene-art").getBoundingClientRect();
-      const frame = root.getBoundingClientRect();
-      const [across, down] = scene.focus(Boolean(narrow?.matches));
-      focusDown = art.top - frame.top + down * art.height;
-      root.style.transformOrigin = `${(art.left - frame.left + across * art.width).toFixed(1)}px ${focusDown.toFixed(1)}px`;
-    }
-    gone = next;
-    // What is left showing of the title page is the band between the strip
-    // at the top and the sheet coming up. As the band narrows, the point the
-    // view is closing in on is kept in the middle of it.
-    const middle = Math.min(focusDown, (height * (1 - gone)) / 2);
-    const settled = Math.min(1, gone * 2);
-    const rise = (middle - focusDown) * settled * settled * (3 - 2 * settled);
-    const scale = 1 + CLOSER * gone ** 1.6;
-    root.style.transform = gone === 0 ? "" : `translate3d(0,${rise.toFixed(1)}px,0) scale(${scale.toFixed(4)})`;
-    // Enlarged, the wobble would cost more than it is worth.
-    root.classList.toggle("zooming", scale > 1.01);
-  });
 }

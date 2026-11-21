@@ -24,8 +24,6 @@
   --font-receipt: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --measure: 60ch;
   --gutter: clamp(1rem, 4vw, 3rem);
-  /* The shadow one sheet of paper throws on the one under it. */
-  --shade: rgb(27 31 107 / 0.4);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,7 +36,6 @@
     --blank-rule: #ffe873;
     --series: #767df0;
     --mark-2: #d9668f;
-    --shade: rgb(0 0 0 / 0.8);
   }
 }
 
@@ -285,7 +282,6 @@ h2 {
 /* Title page --------------------------------------------------------------- */
 
 .cover {
-  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -522,38 +518,6 @@ h2 {
 .cover.offstage .boil,
 .cover.offstage .shiver {
   animation-play-state: paused;
-}
-
-/* Leaving the title page. It stays where it is and the view closes in on
-   the one who can't come (cover.js sets the scale), while the rest of the
-   page slides up over it like the next sheet of paper. The run is twice the
-   height of the title page and gives half of it back, so the page is no
-   longer than it was. */
-.cover-run.pins {
-  height: calc(var(--cover-h) * 2);
-  margin-bottom: calc(var(--cover-h) * -1);
-  overflow-x: clip;
-}
-
-.cover-run.pins .cover {
-  position: sticky;
-  top: var(--banner, 3.5rem);
-  will-change: transform;
-}
-
-.cover.zooming .boil,
-.cover.zooming .shiver {
-  animation: none;
-}
-
-.sheet {
-  position: relative;
-  z-index: 1;
-  background: var(--paper);
-}
-
-.cover-run.pins + .sheet {
-  box-shadow: 0 -20px 32px -24px var(--shade);
 }
 
 /* Blanks to fill in -------------------------------------------------------- */
@@ -1823,7 +1787,6 @@ input:focus-visible + .tick {
 
 @media print {
   #banner,
-  .cover-run,
   .cover,
   .colophon,
   .tear,
@@ -1835,10 +1798,6 @@ input:focus-visible + .tick {
 
   main > section {
     padding: 0;
-  }
-
-  .sheet {
-    box-shadow: none;
   }
 
   .receipt {
