@@ -1665,6 +1665,40 @@ input:focus-visible + .tick {
   margin-top: 1.5rem;
 }
 
+/* The same decision as a message for the members, in a speech bubble like
+   the ones on the title page. */
+.for-members {
+  margin-top: 3.25rem;
+}
+
+.message-lead {
+  max-width: 46rem;
+}
+
+.message {
+  width: fit-content;
+  max-width: 34rem;
+  margin: 1.5rem 0 0;
+  /* The foot leaves room for the bubble's tail. */
+  padding: 1.1rem 1.5rem 2.3rem 1.4rem;
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.message-text {
+  margin: 0;
+  max-width: none;
+}
+
+.message-edge {
+  stroke: var(--ink);
+  stroke-width: 1.8;
+}
+
+.for-members .note-actions {
+  margin-top: 0.9rem;
+}
+
 .story {
   margin: 0;
   padding: 0.3rem 0 0.3rem 1.7rem;
@@ -2078,6 +2112,25 @@ input:focus-visible + .tick {
 
   .note {
     padding: 1.2rem 1.7rem 1.6rem 1.2rem;
+  }
+
+  /* On a narrow screen the tab is over the words being read, so it is only
+     its drawing. Its name is still there for a screen reader. */
+  .contents-tab {
+    padding: 0.95rem 0.9rem;
+  }
+
+  .contents-tab > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .message {
+    font-size: 1.1rem;
   }
 
   .note-line {
