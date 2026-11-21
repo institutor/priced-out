@@ -29,6 +29,8 @@ Engineering & Product track.
 
 ![The price check: a formal ticket at $45 in a club of 60, drawn as a room of seats, 19 of them empty](docs/screenshot-answer.jpg)
 
+![The note for the board: a card headed “A formal ticket at $45, in a club of 60” and labelled “simulated students, not real answers”, with five lines on who the price leaves out, the price that keeps nine in ten, two prices or one, how to offer a lower price and what members would cover themselves, and a last line saying where the numbers come from](docs/screenshot-note.jpg)
+
 ## Read this first: the numbers are simulated
 
 **No real student has answered the survey.** Every number on the site comes from a
