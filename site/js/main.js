@@ -156,7 +156,9 @@ async function start() {
       });
     }
 
-    const linkFor = mine ? null : (next) => new URL(addressOf(next), window.location.href).href;
+    // A link that is copied opens at the price check, where the answer is,
+    // and not at the title page above it.
+    const linkFor = mine ? null : (next) => new URL(`${addressOf(next)}#price-check`, window.location.href).href;
     banner.mount(document.getElementById("banner"), dataset);
     const stops = [priceCheck.mount(document.getElementById("price-check"), dataset, state, { linkFor })];
     access.mount(bodyOf("access"), dataset, state);

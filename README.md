@@ -71,7 +71,7 @@ Nothing to install. Open **https://institutor.github.io/priced-out/** and:
    size. Every section below follows: what a lower access price brings back, which fix
    won, and how many empty seats members' own pledges would pay for. The address follows
    what you set, so any view can be sent as a link, like
-   [a formal at $30](https://institutor.github.io/priced-out/?item=formal&price=30&club=60&answer=1).
+   [a formal at $30](https://institutor.github.io/priced-out/?item=formal&price=30&club=60&answer=1#price-check).
 4. **Build a year.** In the receipt, change a price or untick a line and watch "priced out
    of at least one line" move. **Print this receipt** gives a member's copy.
 5. **Take it to the board.** "What to take to your board" puts the answer on one card with
