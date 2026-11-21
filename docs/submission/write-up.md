@@ -98,6 +98,7 @@ see whether what people say they would use is what they use.
 
 ## Links
 
-- Site: https://institutor.github.io/priced-out/
+- Site: https://institutor.github.io/priced-out/ (guess how many of 60 skip a $45
+  formal, then press Show the answer)
 - Code: https://github.com/institutor/priced-out
 - Survey: https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a

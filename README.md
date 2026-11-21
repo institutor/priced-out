@@ -31,6 +31,31 @@ so in a banner on every screen, in every sentence that quotes a number, and on t
 receipt. The survey is live and the same code reads real answers the moment there are any
 (see [Rebuild the data](#rebuild-the-data-from-a-flashpoint-export)).
 
+## Try it yourself, in two minutes
+
+Nothing to install. Open **https://institutor.github.io/priced-out/** and:
+
+1. **Guess first.** The page opens on "A formal ticket at $45 in a club of 60". Type how
+   many of the 60 you think would skip it, and press **Show the answer**. The simulated
+   panel says 19, and the page tells you how far off you were.
+2. **Move the price.** Drag the slider down to $30. Seats fill back up, the answer drops
+   to 6 of 60, and the next section tells you $30 is the most a formal ticket can cost and
+   still lose no more than 1 in 10.
+3. **Make it your club.** Change the item to a weekend trip, or the 60 to your own club's
+   size. Every section below follows: what a lower access price brings back, which fix
+   won, and how many empty seats members' own pledges would pay for.
+4. **Build a year.** In the receipt, change a price or untick a line and watch "priced out
+   of at least one line" move. **Print this receipt** gives a member's copy.
+5. **See the survey.** [Open it](https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a)
+   to read the questions the personas were asked. It is the survey Flashpoint built and
+   hosts.
+
+To check the working instead of the page:
+
+- `npm test` runs the 119 tests on the rules behind every number ([Run it](#run-it)).
+- [`briefs/`](briefs) and [`replies/`](replies) hold everything sent to and received from
+  Flashpoint, each reply with its payment receipt.
+
 ## What it does
 
 One page, in the order a treasurer would use it.
