@@ -19,6 +19,7 @@ const POINTS = [
 ];
 
 const SIMULATED_POINTS = [
+  ["Why a stand-in.", "This page is built for one club at a time. The price that matters is the one where your own members drop out, and no campus-wide average can tell you that. Until a club has answered, the simulated students stand in for one."],
   ["Who answered.", "Nobody. Flashpoint generated AI personas meant to resemble Columbia and Barnard undergraduates, and a language model answered the survey as each one of them."],
   ["What was made up.", "Each persona's background, spending money and feelings about prices were invented by the generator. Flashpoint matched the panel's split by gender to the US adult population and invented age, race, education and income. It marks the panel uncalibrated: it has not been checked against real answers."],
   ["What that makes these numbers.", "A demonstration of the calculator, and a guess at the shape real answers might take. They are not evidence about what real students would do, and no price should be set from them."],
