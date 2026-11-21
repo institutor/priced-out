@@ -88,7 +88,7 @@ A **Contents** tab in the corner of the screen jumps between the parts of the pa
 
 To check the working instead of the page:
 
-- `npm test` runs the 187 tests on the rules behind every number ([Run it](#run-it)).
+- `npm test` runs the 190 tests on the rules behind every number ([Run it](#run-it)).
 - `node scripts/evaluate.mjs` runs the page's rules on 2,000 made-up clubs whose true
   answer is known ([Checked against a known answer](#checked-against-a-known-answer)).
 - [`briefs/`](briefs) and [`replies/`](replies) hold everything sent to and received from
@@ -109,7 +109,9 @@ One page, in the order a treasurer would use it.
    at the opening view).
 3. **The fix they picked.** Six ways to offer a lower price (sliding scale, waiver on
    request, open waiver code, pay what you can, paid-forward tickets, discount draw),
-   ranked by a trade-off question.
+   ranked by a trade-off question. Under the ranking, the treasurer's side: what each
+   way takes to run and its catch. Those lines are written by hand, not survey answers,
+   and the page says so.
 4. **Would members cover it themselves?** Many say they'd add a few dollars to their own
    ticket, but only if enough others do. The page plays that out for your club and counts
    how many empty seats the pool pays for.
@@ -376,7 +378,7 @@ build need no key.
 - A tie is never reported as a winner. Where two fixes share the top score, both are
   named and the page does not pick one.
 
-The rules live in `site/js/lib/` and are covered by the tests in `test/` (187 tests).
+The rules live in `site/js/lib/` and are covered by the tests in `test/` (190 tests).
 
 ## Privacy
 
@@ -525,9 +527,10 @@ the two method papers at the end are listed from their records.
 ```
 site/                 the page: index.html, css/, js/, data/dataset.json
 site/js/lib/          the rules (curve, pledge cascade, intervals, wording, the note for the
-                      board in plan.js, the message for members in announce.js, the view
-                      in the address in link.js), shared with Node, and sketch.js and
-                      figure.js, the geometry every drawing is made from
+                      board in plan.js, the message for members in announce.js, what each
+                      fix asks of the club in asks.js, the view in the address in
+                      link.js), shared with Node, and sketch.js and figure.js, the
+                      geometry every drawing is made from
 site/js/ui/           one module per section of the page, plus the title page (cover.js and
                       scene.js, its strip of stick figures), the contents tab and the pen
                       that draws under and over the page (ink.js, doodles.js)

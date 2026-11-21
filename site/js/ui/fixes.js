@@ -3,6 +3,7 @@ import { el, sentence } from "./dom.js";
 import { art, drawnIn, ink, marked, path, seedOf } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
 import { voice } from "../lib/voice.js";
+import { asksFor } from "../lib/asks.js";
 
 const signed = (score) => `${score > 0 ? "+" : score < 0 ? "−" : ""}${Math.abs(score).toFixed(2)}`;
 
@@ -70,6 +71,23 @@ function row(fix, scale, order, best) {
   );
 }
 
+// The other half of the choice: what each way takes to run, and its catch.
+// These lines are written by hand, not worked out from answers, and the
+// block says so.
+function asksBlock(ranked) {
+  const asks = asksFor(ranked);
+  if (asks.length === 0) return null;
+  const part = (kind, text) => el("p", {}, el("span", { class: "ask-kind", text: `${kind} ` }), text);
+  return el("div", { class: "asks" },
+    el("h3", { class: "sub", text: "What each one asks of you" }),
+    el("p", { text: "The ranking is the members' side of it. This is the treasurer's: what each way takes to run, and its catch. These lines describe how each one works. They are not answers from the survey." }),
+    el("dl", { class: "asks-list" }, asks.map((ask) => el("div", { class: "ask" },
+      el("dt", { text: ask.label }),
+      el("dd", {}, part("To run it.", ask.run), part("The catch.", ask.snag)),
+    ))),
+  );
+}
+
 export function mount(root, dataset) {
   const { fixes, fixesN, rules } = dataset;
   const say = voice(dataset.meta);
@@ -132,4 +150,6 @@ export function mount(root, dataset) {
       text: `Score: how often an option was picked as most likely to help, minus how often as least likely, out of the times it was shown. It can run from −1 to +1; the bars here are drawn from ${signed(-scale)} to ${signed(scale)}. ${fixesN} ${say.many} answered. The thin line across each bar is the 95% interval.`,
     }),
   );
+  const asks = asksBlock(ranked);
+  if (asks) root.append(asks);
 }

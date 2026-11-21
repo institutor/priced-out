@@ -1238,6 +1238,51 @@ td:first-child {
   max-width: 62ch;
 }
 
+/* What each way of offering a lower price takes to run, and its catch. */
+.asks {
+  margin: 3rem 0 0;
+}
+
+.asks-list {
+  display: grid;
+  gap: 0;
+  margin: 1.25rem 0 0;
+  max-width: 46rem;
+}
+
+.ask {
+  display: grid;
+  grid-template-columns: 11.5rem minmax(0, 1fr);
+  gap: 0.15rem 1.5rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.ask:first-child {
+  border-top: 1px solid var(--rule);
+}
+
+.ask dt {
+  font-weight: 700;
+}
+
+.ask dd {
+  margin: 0;
+}
+
+.ask dd p {
+  margin: 0;
+  max-width: none;
+}
+
+.ask dd p + p {
+  margin-top: 0.3em;
+}
+
+.ask-kind {
+  color: var(--ink-soft);
+}
+
 /* Bars: fixes and what people said -------------------------------------- */
 
 .bar-list {
@@ -2133,7 +2178,8 @@ input:focus-visible + .tick {
     font-size: 1.1rem;
   }
 
-  .note-line {
+  .note-line,
+  .ask {
     grid-template-columns: minmax(0, 1fr);
   }
 }
