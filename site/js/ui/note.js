@@ -1,7 +1,8 @@
 // What to take to the board: the page's answer in a few lines, on a card,
 // with a button that copies it as plain text. The card follows the price and
 // the club size set at the top of the page, and always says whose answers it
-// rests on. Under it is the same decision as a message for the members.
+// rests on. Under it is the same decision as a message for the members, and
+// under that a place to check the numbers once the event has happened.
 import { el } from "./dom.js";
 import { button, ink, path, seedOf, wipe } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
@@ -9,6 +10,7 @@ import { bubble } from "../lib/figure.js";
 import { plan, planText } from "../lib/plan.js";
 import { announcement, messageText, standIn } from "../lib/announce.js";
 import { money } from "../lib/format.js";
+import { afterBlock } from "./after.js";
 
 function opening(meta) {
   const follows = " It follows the price and the club size set at the top of the page.";
@@ -181,6 +183,7 @@ export function mount(root, dataset, state, { linkFor = null } = {}) {
     card,
     el("p", { class: "share note-actions" }, copy, said),
     forMembers(dataset, state),
+    afterBlock(dataset, state),
   );
   state.subscribe(render);
   render(state.get());

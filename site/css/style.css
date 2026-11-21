@@ -1238,6 +1238,54 @@ td:first-child {
   max-width: 62ch;
 }
 
+/* After the event: what was counted, beside what the answers said. */
+.after {
+  margin-top: 3.25rem;
+}
+
+.after-lead,
+.after-out {
+  max-width: 46rem;
+}
+
+.after-form {
+  margin: 1.4rem 0 0;
+}
+
+.after-fill {
+  margin: 0;
+  max-width: 46rem;
+  font-size: 1.2rem;
+  line-height: 2;
+}
+
+.after-hint {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.after-fill .blank-wrap {
+  font: 900 1.7rem/1.15 var(--font-display);
+  vertical-align: baseline;
+}
+
+.after-out {
+  margin-top: 1.1rem;
+}
+
+.after-line {
+  margin: 0 0 0.5em;
+}
+
+.after-came {
+  font-weight: 700;
+}
+
+.after .aside {
+  margin-top: 1.1rem;
+}
+
 /* What each way of offering a lower price takes to run, and its catch. */
 .asks {
   margin: 3rem 0 0;

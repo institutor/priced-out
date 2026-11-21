@@ -89,7 +89,7 @@ A **Contents** tab in the corner of the screen jumps between the parts of the pa
 
 To check the working instead of the page:
 
-- `npm test` runs the 198 tests on the rules behind every number ([Run it](#run-it)).
+- `npm test` runs the 208 tests on the rules behind every number ([Run it](#run-it)).
 - `node scripts/evaluate.mjs` runs the page's rules on 2,000 made-up clubs whose true
   answer is known ([Checked against a known answer](#checked-against-a-known-answer)).
 - [`briefs/`](briefs) and [`replies/`](replies) hold everything sent to and received from
@@ -120,7 +120,9 @@ One page, in the order a treasurer would use it.
    with the share lost at each line and at any line.
 6. **What to take to your board.** The answer in six lines on a card that can be copied,
    which says under its title and in its last line whose answers it rests on. Under it,
-   the same decision as a message a treasurer can send to members.
+   the same decision as a message a treasurer can send to members. And under that, a
+   check for after the event: type in how many paid each price, and the page sets the
+   share who took the lower price beside the share the answers said would.
 7. **What these numbers are, and what they are not.** Who answered, and what the numbers
    can't tell you.
 8. **Run it for your own club.** Send the survey, export the answers, load the file. The
@@ -379,7 +381,7 @@ build need no key.
 - A tie is never reported as a winner. Where two fixes share the top score, both are
   named and the page does not pick one.
 
-The rules live in `site/js/lib/` and are covered by the tests in `test/` (198 tests).
+The rules live in `site/js/lib/` and are covered by the tests in `test/` (208 tests).
 
 ## Privacy
 
@@ -403,7 +405,9 @@ The rules live in `site/js/lib/` and are covered by the tests in `test/` (198 te
   sample of the campus, and what people say they would do can differ from what they do,
   in either direction. People tend to say they would pay more than they then pay (Murphy
   and others, under [Sources](#sources)), and a member who knows the answers will set the
-  price has a reason to name a lower one. The check on both is who turns up.
+  price has a reason to name a lower one. The check on both is who turns up, and the
+  page has a place to make it: after the event, a treasurer types in how many paid each
+  price. That is one event, with everything else that moved turnout mixed in.
 - A club can't yet run it fully alone. The page reads a club's export in the browser, but
   the live survey sits in my Flashpoint account, so I still have to run that export and
   send the club its file. A copy of the survey for each club is the next thing to build.
@@ -528,10 +532,10 @@ the two method papers at the end are listed from their records.
 ```
 site/                 the page: index.html, css/, js/, data/dataset.json
 site/js/lib/          the rules (curve, pledge cascade, intervals, wording, the note for the
-                      board in plan.js, the message for members in announce.js, what each
-                      fix asks of the club in asks.js, the view in the address in
-                      link.js), shared with Node, and sketch.js and figure.js, the
-                      geometry every drawing is made from
+                      board in plan.js, the message for members in announce.js, the check
+                      after the event in after.js, what each fix asks of the club in
+                      asks.js, the view in the address in link.js), shared with Node, and
+                      sketch.js and figure.js, the geometry every drawing is made from
 site/js/ui/           one module per section of the page, plus the title page (cover.js and
                       scene.js, its strip of stick figures), the contents tab and the pen
                       that draws under and over the page (ink.js, doodles.js)
