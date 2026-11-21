@@ -1,20 +1,29 @@
-// The title page. A row of seats is coloured in, the title is pencilled a
-// letter at a time and inked over, and as "Out" goes down the last seats in
-// the row are rubbed out. A note in the other pen says what the people who
-// had them said. Everything it draws is decoration: the heading, the note
-// and the link are plain HTML and are there without it.
+// The title page. A strip of stick figures is drawn first (scene.js): a
+// price is called out, and one member says they can't make it. Under it the
+// question the page is for is written a word at a time, and then the title
+// is pencilled a letter at a time and inked over. A click, a tap or a key
+// finishes the drawing at once. Everything drawn here is decoration: what
+// the figures say, the question, the heading, the note and the link are
+// plain HTML and are there without it.
 import { el, svg } from "./dom.js";
-import { art, drawnIn, inkButton, seat } from "./ink.js";
+import { drawnIn, inkButton } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
+import * as scene from "./scene.js";
 
-const SEATS = 12;
-const LEAVING = 4;
-
-// When each part of the drawing starts, in milliseconds.
-const AT = { seats: 150, title: 650, out: 1650, leave: 2350, rule: 2700, excuse: 2950, note: 3000, go: 3250, settled: 4300 };
-
-// What the empty seats said.
-const EXCUSE = "“busy that night”";
+// When each part of the drawing starts, in milliseconds. The strip of
+// figures goes first, and everything else follows from when it ends.
+const SCENE = 250;
+const AFTER = SCENE + scene.LASTS;
+const AT = {
+  scene: SCENE,
+  ask: AFTER + 200,
+  title: AFTER + 750,
+  out: AFTER + 1500,
+  rule: AFTER + 2100,
+  note: AFTER + 1500,
+  go: AFTER + 1800,
+  settled: AFTER + 3200,
+};
 
 // The lettering needs its two typefaces before it can be measured. If they
 // never arrive the title is drawn in whatever the browser falls back to.
@@ -33,26 +42,14 @@ const wait = (node, ms) => {
   return node;
 };
 
-function drawRoom(room) {
-  for (let index = 0; index < SEATS; index++) {
-    const leaving = index >= SEATS - LEAVING;
-    const glyph = seat(leaving ? "out" : "go", 300 + index, { emptying: leaving });
-    const holder = el("span", { class: leaving ? "seat out leaving" : "seat" }, glyph);
-    wait(holder, AT.seats + index * 55);
-    if (leaving) holder.style.setProperty("--leave", `${AT.leave + (index - (SEATS - LEAVING)) * 130}ms`);
-    room.append(holder);
-  }
-}
-
-// The excuse is written above the seats that empty, with an arrow down to
-// them.
-function drawExcuse(seats) {
-  const pointer = art("excuse-arrow", 44, 46, drawnIn(sketch.arrow(6, 5, 30, 41, { seed: 31, head: 11, rough: 1.1, bend: -0.3 }), ""));
-  pointer.querySelectorAll("path").forEach((stroke, index) => wait(stroke, AT.excuse + 350 + index * 200));
-  const words = wait(el("span", { class: "excuse-words", text: EXCUSE }), AT.excuse);
-  const note = el("p", { class: "excuse" }, words, pointer);
-  seats.prepend(note);
-  return note;
+// The question is written out a word at a time.
+function writeOut(node, starts) {
+  const words = node.textContent.trim().split(/\s+/);
+  node.replaceChildren();
+  words.forEach((word, index) => {
+    if (index > 0) node.append(" ");
+    node.append(wait(el("span", { class: "word", text: word }), starts + index * 80));
+  });
 }
 
 // Each letter is its own piece of text, so each can be drawn in turn. The
@@ -94,37 +91,68 @@ function drawTitle(title) {
 }
 
 export async function mount(root) {
-  const seats = root.querySelector(".cover-seats");
-  const room = root.querySelector(".cover-room");
+  const strip = root.querySelector(".scene");
+  const ask = root.querySelector(".cover-ask");
   const title = root.querySelector(".title");
   const note = root.querySelector(".cover-note");
   const go = root.querySelector(".cover-go");
-  if (!room || !title) return;
+  if (!title) return;
 
   await lettersReady();
-  drawRoom(room);
-  const excuse = seats ? drawExcuse(seats) : null;
+  const narrow = typeof window.matchMedia === "function" ? window.matchMedia(scene.NARROW) : null;
+  const drawStrip = () => scene.draw(strip, { start: AT.scene, narrow: Boolean(narrow?.matches) });
+  let lines = strip ? drawStrip() : null;
+  if (ask) writeOut(ask, AT.ask);
   const stage = drawTitle(title);
-
   if (note) wait(note, AT.note);
   if (go) {
     wait(go, AT.go);
     const link = go.querySelector("a");
     if (link) inkButton(link, "cover");
-    const pointer = art("cover-arrow", 56, 84, drawnIn(sketch.arrow(14, 6, 30, 76, { seed: 12, head: 14, rough: 1.4, bend: -0.22 }), ""));
-    pointer.querySelectorAll("path").forEach((stroke, index) => wait(stroke, AT.go + 350 + index * 220));
-    go.append(pointer);
   }
 
-  root.classList.add("play");
-
-  // Once the drawing is done the lines keep a slight wobble, like frames of
-  // a hand-drawn film. It stops while the title page is off screen.
-  window.setTimeout(() => {
+  // Once the drawing is done it is simply there ("drawn" in place of
+  // "play"), and its lines keep a slight wobble, like frames of a hand-drawn
+  // film: the big letters of the title a slow one, the small figures a finer
+  // one. What the figures say holds still, so it stays easy to read. The
+  // wobble stops while the title page is off screen.
+  let timer = 0;
+  const settle = () => {
+    window.clearTimeout(timer);
+    root.classList.remove("play");
+    root.classList.add("drawn");
     stage.classList.add("boil");
-    room.classList.add("boil");
-    excuse?.classList.add("shiver");
-  }, AT.settled);
+    lines?.classList.add("shiver");
+  };
+  const play = () => {
+    window.clearTimeout(timer);
+    stage.classList.remove("boil");
+    lines?.classList.remove("shiver");
+    root.classList.remove("play", "drawn");
+    // Looking at the size makes the browser notice the class went, so the
+    // strokes start again when it comes back.
+    root.getBoundingClientRect();
+    root.classList.add("play");
+    timer = window.setTimeout(settle, AT.settled);
+  };
+  play();
+
+  // Anyone who would rather not watch can finish it with a click, a tap or
+  // a key. A key held for something else, such as Shift, does not count.
+  root.addEventListener("pointerdown", settle);
+  document.addEventListener("keydown", (event) => {
+    if (!["Shift", "Control", "Alt", "Meta"].includes(event.key)) settle();
+  });
+
+  if (strip) {
+    strip.append(el("button", { class: "again", type: "button", text: "Draw it again", onclick: play }));
+    // A page that becomes narrow, or wide, gets the strip drawn for its new
+    // shape, already finished.
+    narrow?.addEventListener?.("change", () => {
+      lines = drawStrip();
+      settle();
+    });
+  }
   if (typeof IntersectionObserver !== "undefined") {
     new IntersectionObserver((entries) => {
       for (const entry of entries) root.classList.toggle("offstage", !entry.isIntersecting);

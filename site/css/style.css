@@ -278,60 +278,103 @@ h2 {
   justify-content: center;
   align-items: flex-start;
   min-height: calc(100svh - var(--banner, 3.5rem));
-  padding-block: clamp(1.5rem, 5vh, 3.5rem) clamp(2.5rem, 8vh, 5rem);
+  padding-block: clamp(1.25rem, 4vh, 3rem) clamp(2.5rem, 8vh, 5rem);
 }
 
-.cover-seats {
-  width: min(100%, 50rem, 100svh);
-  margin-bottom: clamp(0.75rem, 3vh, 1.75rem);
+/* The strip of stick figures. On a short screen it is kept narrow enough
+   that the question and the title under it are still on that screen. */
+.scene {
+  position: relative;
+  width: min(100%, 150svh);
 }
 
-.cover-room {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: clamp(0.2rem, 0.9vw, 0.65rem);
-  padding-inline: 1%;
-}
-
-/* What the empty seats said, in the other pen, with an arrow down to them. */
-.excuse {
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-  gap: 0.35rem;
-  max-width: none;
-  margin: 0 0 0.3rem;
-  padding-right: 8%;
-  color: var(--mark-2);
-}
-
-.excuse-words {
-  font: 400 clamp(1.3rem, 2.7vw, 1.8rem)/1 var(--font-display);
-  letter-spacing: 0.02em;
-  margin-bottom: 1.15rem;
-  transform: rotate(-3deg);
-  transform-origin: right bottom;
-}
-
-.excuse-arrow {
-  flex: none;
-  width: clamp(2.1rem, 4.2vw, 2.9rem);
+.scene-art {
+  width: 100%;
   height: auto;
 }
 
-.excuse-arrow path {
-  stroke: var(--mark-2);
-  stroke-width: 2.6;
+.scene-art.tall {
+  max-width: 27rem;
 }
 
-.cover-room .seat {
+.scene-art path {
+  stroke-width: var(--pen, 2.6);
+}
+
+.scene-art .ground {
+  stroke: var(--ink-soft);
+  stroke-width: calc(var(--pen, 2.6) * 0.6);
+  opacity: 0.55;
+}
+
+.scene-art .ticket-fill {
+  fill: var(--canary);
+  stroke: none;
+}
+
+/* What the figures say, lettered by hand. */
+.said {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  fill: var(--ink);
+}
+
+/* The arrow and the note beside the one who can't come are in the other pen. */
+.scene-art .truth-line {
+  stroke: var(--mark-2);
+  stroke-width: calc(var(--pen, 2.6) * 1.15);
+}
+
+.said.truth {
+  fill: var(--mark-2);
+}
+
+/* Draws the strip again. It is only there once the drawing has finished. */
+.again {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.again:hover {
+  color: var(--ink);
+}
+
+.cover:not(.drawn) .again {
+  visibility: hidden;
+}
+
+/* The question the drawing asks, written under it. */
+.cover-ask {
+  font: 400 clamp(1.75rem, 3.6vw, 2.75rem)/1.08 var(--font-display);
+  letter-spacing: 0.015em;
+  max-width: none;
+  margin: clamp(0.5rem, 2vh, 1.25rem) 0 clamp(1rem, 3.5vh, 2.25rem);
+}
+
+.cover-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem clamp(1.5rem, 5vw, 4rem);
   width: 100%;
 }
 
 .title {
-  font: 400 clamp(4rem, 19vw, 13rem)/0.9 var(--font-display);
+  font: 400 clamp(4rem, 14vw, 9rem)/0.9 var(--font-display);
+  flex: 0 1 auto;
+  width: min(100%, 31rem, 62svh);
   margin: 0;
-  width: min(100%, 50rem, 100svh);
 }
 
 .title-art {
@@ -364,36 +407,26 @@ h2 {
   stroke-width: 4.5;
 }
 
+.cover-pitch {
+  flex: 1 1 17rem;
+}
+
 .cover-note {
-  font-size: clamp(1.15rem, 2.1vw, 1.4rem);
+  font-size: clamp(1.1rem, 1.9vw, 1.3rem);
   line-height: 1.4;
-  max-width: 34ch;
-  margin: clamp(0.5rem, 2vh, 1.25rem) 0 0;
+  max-width: 36ch;
+  margin: 0;
 }
 
 .cover-go {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.9rem;
   max-width: none;
-  margin: clamp(1.1rem, 3.5vh, 2rem) 0 0;
-}
-
-.cover-arrow {
-  width: 2.6rem;
-  height: auto;
-  margin-top: 0.5rem;
-}
-
-.cover-arrow path {
-  stroke: var(--mark-2);
-  stroke-width: 3;
+  margin: clamp(0.9rem, 2.5vh, 1.5rem) 0 0;
 }
 
 /* Until the lettering has been measured the title page waits, so the plain
    heading is not seen jumping into the drawn one. If the script never runs,
    the plain heading shows after a moment. */
-.js .cover:not(.play) > * {
+.js .cover:not(.play):not(.drawn) > * {
   animation: hold 4s;
 }
 
@@ -404,29 +437,32 @@ h2 {
   }
 }
 
-.cover.play .cover-room .seat {
-  animation: ink-in 0.25s ease-out both;
+/* While the title page plays, each stroke of the strip is drawn at its own
+   time and each word appears as it is written. Without "play" everything is
+   simply there, finished. */
+.cover.play .scene-art .draw {
+  animation: draw-on var(--lasts, 300ms) ease-out both;
   animation-delay: var(--wait, 0ms);
 }
 
-.cover.play .cover-room .seat-fill {
-  animation: draw-on 0.5s ease-out both;
-  animation-delay: calc(var(--wait, 0ms) + 60ms);
+.cover.play .scene-art tspan {
+  animation: word-in 0.18s ease-out both;
+  animation-delay: var(--wait, 0ms);
 }
 
-/* The last seats are coloured in like the rest, then rubbed out. */
-.cover.play .cover-room .leaving .seat-erase {
-  animation:
-    draw-on 0.5s ease-out calc(var(--wait, 0ms) + 60ms) both,
-    rub-out 0.65s ease-in-out var(--leave, 0ms) forwards;
+@keyframes word-in {
+  from {
+    fill-opacity: 0;
+  }
+  to {
+    fill-opacity: 1;
+  }
 }
 
-.cover.play .cover-room .leaving .seat-fade {
-  animation: fade-out 0.5s ease-in calc(var(--leave, 0ms) + 150ms) both;
-}
-
-.cover.play .cover-room .leaving .seat-gap {
-  animation: ink-in 0.4s ease-out calc(var(--leave, 0ms) + 350ms) both;
+.cover.play .scene-art .ticket-fill,
+.cover.play .cover-ask .word {
+  animation: ink-in 0.25s ease-out both;
+  animation-delay: var(--wait, 0ms);
 }
 
 .cover.play .t-sketch {
@@ -459,14 +495,11 @@ h2 {
   animation-delay: calc(var(--wait, 0ms) + 420ms);
 }
 
-.cover.play .title-rule,
-.cover.play .excuse-arrow .draw,
-.cover.play .cover-arrow .draw {
+.cover.play .title-rule {
   animation: draw-on 0.45s ease-out both;
   animation-delay: var(--wait, 0ms);
 }
 
-.cover.play .excuse-words,
 .cover.play .cover-note,
 .cover.play .cover-go > a {
   animation: ink-in 0.5s ease-out both;
@@ -1448,6 +1481,15 @@ input:focus-visible + .tick {
   }
 }
 
+/* On a narrow page the note in the other pen is under the strip, at the
+   right, so the button that draws it again goes to the left. */
+@media (max-width: 44rem) {
+  .again {
+    right: auto;
+    left: 0;
+  }
+}
+
 @media (max-width: 40rem) {
   .banner .long {
     display: none;
@@ -1538,6 +1580,11 @@ input:focus-visible + .tick {
   *::before,
   *::after {
     animation: none !important;
+  }
+
+  /* With nothing moving there is nothing to draw again. */
+  .again {
+    display: none;
   }
 }
 
