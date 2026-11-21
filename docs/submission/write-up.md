@@ -6,43 +6,52 @@ findings about students.**
 
 ## The problem
 
-A club sets its dues at $30 and its formal at $45 because that is what it cost last year.
-Some members can't pay that. Almost none of them say so. They say they have an exam, or
-other plans, and after the second or third time they stop coming. The treasurer sees a
-slightly smaller turnout and no reason for it.
+During my time in high school, I found myself often faced with times where I couldn't
+exactly afford to pay for certain club dues, and I wish I could have done something about
+it. For instance, my school's Science Olympiad competitions often cost hundreds of dollars
+for just travel and hotels alone, a cost that I could not afford to pay at all.
 
-So the price that decides who gets to belong is set by the people least able to see what it
-does. Priced Out measures where students quietly drop out, and puts the number in front of
-the person choosing the price, before they choose it.
+Priced Out is the idea I dreamt up that I wish the people setting those costs had had. It
+could have shown them, before the price went out, how many of us it would leave behind and
+which way of offering a lower price we would have used, without anyone having to say they
+couldn't pay. Because, you know, if thirty students pay twenty dollars for an event,
+that's actually more money netted than fifteen students paying thirty dollars.
+
+Students who can't pay rarely say so. They say they're busy and stop coming. In interviews
+at Princeton, low-income students turned down dinners, some giving other reasons; in a
+national poll, only 7% of parents had ever requested a fee waiver or scholarship.
 
 ## What I built
 
-A one-page calculator for club treasurers, fed by a survey made and run in Flashpoint
-(Engineering & Product track).
+A one-page calculator for club treasurers, fed by a survey made and run in Flashpoint.
+The survey is an anonymous link. It asks for no name, no email, and nothing about income
+or financial aid.
+
+**Why AI personas, not a student survey.** Only a club's own officers can get its members
+to answer, so I could not have surveyed a whole club, let alone every club. The answer is
+also different for each club. And the point is that any club can run this on its own
+members. So 120 AI personas stand in for one club and show it working.
 
 You fill in one line, "A formal ticket at $45 in a club of 60", and guess how many members
-would skip it. Then the page shows you a room of 60 seats, the ones that empty, and the
-full curve from $0 up. Below that, it turns the problem into a decision:
+would skip it. Then the page shows a room of 60 seats, the ones that empty, and the curve
+from $0 up. Below that:
 
 - the highest price that loses no more than 1 in 10
 - what a lower access price would bring back, in people and in dollars
-- which way of offering a lower price respondents picked over the others
+- which way of offering a lower price respondents picked
 - whether members' own "I will if you will" pledges would cover the empty seats
-- a printable receipt for a whole year in the club, with the share lost at each line
+- a printable receipt for a year in the club, with the share lost at each line
 
-The site is static: plain HTML, CSS and JavaScript reading one JSON file. The rules behind
-the numbers are small pure functions with 119 tests.
+The site is static, with 119 tests behind the numbers.
 
 ## How Flashpoint was used
 
-Flashpoint did the research, end to end, over MCP: sixteen paid calls, $6.50, every brief
-and reply saved in the repository with its payment receipt.
+Flashpoint did the research over MCP: sixteen paid calls, $6.50, every brief and reply
+saved with its receipt.
 
 **It built the survey from a written brief.** Two price questions for each of three items
 in rotating blocks, follow-ups shown only when they apply, an AI-moderated closing
-question, and a MaxDiff question over six fixes in ten designs it derived itself. Rating
-six fixes gets six polite "sounds fine" answers. Choosing the best and worst of four at a
-time gets a ranking.
+question, and a MaxDiff question over six fixes in ten designs it derived itself.
 
 **It corrected my design twice.** I had planned to reuse its Van Westendorp question with
 two custom price points. It told me that type needs exactly four, with fixed meanings, and
@@ -51,16 +60,18 @@ is stored as $0, which would read as "would skip it even if it were free". It is
 Flashpoint replaced the sliders with empty number inputs.
 
 **It generated and ran the respondents.** Flashpoint generated 120 personas meant to
-resemble Columbia and Barnard undergraduates, and a language model answered the survey as
-each one.
+resemble Columbia and Barnard undergraduates, and a language model answered as each one.
 
 **That run is where I learned the most.** The first four runs came back with all 480
-responses ended at the first question. Flashpoint's first diagnosis, an unpublished draft,
-was wrong. Asked to read the responses themselves, it found the cause: the synthetic
-runner walks pages in document order without evaluating skip rules, so every persona
-walked into the "this survey is for students" page that sat after the screener. A person
-in a browser would never have seen it. Flashpoint deleted the page, my reader took over
-the screening, and the fifth run completed 120 of 120.
+responses ended at the first question. Flashpoint's first diagnosis was wrong. Asked to
+read the responses themselves, it found the cause: the synthetic runner walks pages in
+document order without evaluating skip rules, so every persona walked into the "this
+survey is for students" page that sat after the screener. Flashpoint deleted the page, my
+reader took over the screening, and the fifth run completed 120 of 120.
+
+**What it changed, kept and ruled out.** Changed: the price questions and the sliders,
+above. Kept: the six fixes and the trade-off question between them. Ruled out: showing
+what personas said when they skipped, since an invented excuse is not evidence.
 
 ## What the simulated panel answered
 
@@ -69,6 +80,8 @@ Simulated, on November 20, 2026. 120 personas; 118 gave a price for each item.
 - **A $45 formal:** 37 of 118 would skip it and say something else (31%), and 23 more
   called it a stretch. In a club of 60 that is 19 empty seats. **$30 dues:** 57 of 118
   (48%).
+- **A $20 access price for that formal** brings back about 16 of the 60. At $45 they were
+  paying nothing, so that is about $320 more for the club, not less.
 - **The highest price that loses no more than 1 in 10:** $10 for dues, $30 for the formal,
   $70 for a weekend trip.
 - **The fix that won** was an open waiver code sent to every member, no questions asked
@@ -78,27 +91,14 @@ Simulated, on November 20, 2026. 120 personas; 118 gave a price for each item.
   only if enough others did. At a $45 formal in a club of 60 that pays for 3 of the 19
   empty seats.
 
-## What it can't tell you
+## Limits and what I would do next
 
-Whether any of this is true of students. A language model's idea of a student on a tight
-budget is not that student. Flashpoint marks the panel uncalibrated, and the site says so
-on every screen: a banner, the word "simulated" in every sentence with a number in it, and
-a line on the printed receipt. The survey also asks what people said when they skipped
-something. An invented person's excuse is not evidence, so the site leaves that out.
-
-The product is deliberately not two things. It is not a lie detector: it says nothing about
-why any one member is busy. And it is not a price maximiser: it shows who a price leaves
-out, never the most a club could get away with charging.
-
-## What I would do next
-
-Put the survey in front of one real club. The link is live and the same code reads the
-answers, never mixing people with personas. Then run the winning fix at one real event, to
-see whether what people say they would use is what they use.
+Swap the stand-in for a real club: the link is live and the same code reads members'
+answers, though today I still export them myself. Then try the winning fix at one event,
+to see whether people use what they said they would.
 
 ## Links
 
-- Site: https://institutor.github.io/priced-out/ (guess how many of 60 skip a $45
-  formal, then press Show the answer)
-- Code: https://github.com/institutor/priced-out
+- Site: https://institutor.github.io/priced-out/
+- Code and sources: https://github.com/institutor/priced-out
 - Survey: https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a
