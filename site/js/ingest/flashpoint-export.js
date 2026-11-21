@@ -26,12 +26,16 @@ function unknown(column, value) {
 }
 
 // A plain amount: digits, with an optional leading $, thousands commas,
-// decimals and a trailing + ("150+"). Anything else ("-5", "30-40", words) is
-// refused rather than guessed at.
+// decimals and a trailing + ("150+"). A comma before one or two last digits
+// is a decimal comma, as a spreadsheet set to another language writes it:
+// "12,5" is twelve and a half, not 125. Anything else ("-5", "30-40", words)
+// is refused rather than guessed at.
 function readNumber(row, column) {
   const value = row[column];
   if (isBlank(value)) return null;
-  const text = String(value).trim().replace(/^\$/, "").replace(/,/g, "").replace(/\+$/, "").trim();
+  let text = String(value).trim().replace(/^\$/, "").replace(/\+$/, "").trim();
+  if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(text)) text = text.replace(/,/g, "");
+  else if (/^\d+,\d{1,2}$/.test(text)) text = text.replace(",", ".");
   if (!/^\d+(\.\d+)?$/.test(text)) throw unknown(column, value);
   return Number(text);
 }
@@ -192,6 +196,18 @@ function readPledge(row, columns, answers) {
   return [amount, threshold];
 }
 
+// Whether a row came from a synthetic panel and not from a person. The
+// export's Source column says "synthetic" for one. A file that has been
+// through other hands may word it differently, so any wording that names a
+// synthetic or simulated panel counts, and so does the export's Panel column
+// when it names one. Calling invented answers real is the worse mistake, so
+// either sign is enough.
+function fromPanel(row, source) {
+  const said = String(row[source.column] ?? "").trim();
+  if (sameText(said, source.synthetic) || /synth|simulat|persona/i.test(said)) return true;
+  return source.panel !== null && /^synth/i.test(String(row[source.panel] ?? "").trim());
+}
+
 // One export can hold answers from people and answers from a Flashpoint
 // synthetic panel (AI personas). They are never read together: `synthetic`
 // says which of the two this reading is of, and the other kind is set aside
@@ -211,7 +227,12 @@ export function normalizeExport(objects, mapping, report = {}, { synthetic = fal
     values: rule.values,
   }));
   const source = mapping.source
-    ? { column: findColumn(headers, mapping.source.column, "source"), synthetic: mapping.source.synthetic }
+    ? {
+      column: findColumn(headers, mapping.source.column, "source"),
+      synthetic: mapping.source.synthetic,
+      // The Panel column is looked for by its exact name, and may be absent.
+      panel: headers.includes(mapping.source.panel) ? mapping.source.panel : null,
+    }
     : null;
   if (synthetic && !source) {
     throw new Error("The mapping has no \"source\" entry, so the rows of a synthetic panel cannot be told from people.");
@@ -219,7 +240,7 @@ export function normalizeExport(objects, mapping, report = {}, { synthetic = fal
 
   const respondents = [];
   for (const row of objects) {
-    if (source && sameText(row[source.column] ?? "", source.synthetic) !== synthetic) {
+    if (source && fromPanel(row, source) !== synthetic) {
       report.otherSource += 1;
       continue;
     }

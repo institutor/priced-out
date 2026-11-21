@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseCsv, toObjects } from "../site/js/ingest/csv.js";
+import { parseCsv, sniffDelimiter, toObjects } from "../site/js/ingest/csv.js";
 import { mulberry32, shuffle } from "../site/js/ingest/rng.js";
 
 test("parseCsv handles quotes, commas and doubled quotes", () => {
@@ -16,6 +16,28 @@ test("parseCsv handles CRLF, newlines inside quotes and a byte-order mark", () =
 test("parseCsv keeps empty cells and drops a trailing blank line", () => {
   assert.deepEqual(parseCsv("a,b,c\n1,,3\n\n"), [["a", "b", "c"], ["1", "", "3"]]);
   assert.deepEqual(parseCsv(""), []);
+});
+
+test("parseCsv reads lines that end in a lone CR, and keeps a CR inside quotes", () => {
+  assert.deepEqual(parseCsv("a,b\r1,2\r3,4\r"), [["a", "b"], ["1", "2"], ["3", "4"]]);
+  assert.deepEqual(parseCsv('a\r\n"one\rtwo"\r\n'), [["a"], ["one\rtwo"]]);
+});
+
+test("parseCsv drops rows with nothing in any cell", () => {
+  assert.deepEqual(parseCsv("a,b,c\n1,2,3\n,,\n , ,\n"), [["a", "b", "c"], ["1", "2", "3"]]);
+});
+
+test("parseCsv splits on the delimiter it is given", () => {
+  assert.deepEqual(parseCsv('a;b\n"x; y";2,5\n', { delimiter: ";" }), [["a", "b"], ["x; y", "2,5"]]);
+  assert.deepEqual(parseCsv("a\tb\n1\t2\n", { delimiter: "\t" }), [["a", "b"], ["1", "2"]]);
+});
+
+test("sniffDelimiter goes by the first line, outside quotes", () => {
+  assert.equal(sniffDelimiter("a,b,c\n1;2;3\n"), ",");
+  assert.equal(sniffDelimiter('a;b;"c, d, e, f"\n'), ";");
+  assert.equal(sniffDelimiter("a\tb\tc\r\n"), "\t");
+  assert.equal(sniffDelimiter("one cell\n"), ",");
+  assert.equal(sniffDelimiter(""), ",");
 });
 
 test("toObjects keys each row by the header", () => {
