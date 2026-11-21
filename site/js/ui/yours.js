@@ -13,6 +13,30 @@ const EXAMPLE = "data/example-club.csv";
 // some other file, and reading it would only freeze the page.
 const TOO_BIG = 4 * 1024 * 1024;
 
+// What the survey asks, in the order it asks it. The wording is the survey's
+// own, from the brief Flashpoint built it from (briefs/02-draft.txt).
+const QUESTIONS = [
+  ["What year are you?", "The only question that has to be answered. Every other one can be skipped."],
+  ["Have you ever helped plan a paid event or set dues for a student club?", ""],
+  ["At what price would this start to feel like a stretch for you? At what price would you skip it and give a different reason for not going?", "Asked about a semester of dues, a formal ticket and a weekend trip, in an order that changes from one person to the next. Each answer is a dollar amount in a box that starts empty."],
+  ["Out of 100 Columbia students, how many do you think would skip a $40 club formal because of the price?", ""],
+  ["Have you ever skipped a club event, or decided not to join a club, mainly because of the cost?", "Never, once or twice, several times, or prefer not to say."],
+  ["What did you say at the time?", "Only asked of those who have skipped something."],
+  ["Suppose a club event costs more than you can comfortably pay. Which of these would make you most likely to still go, and which least likely?", "Six ways of offering a lower price, shown four at a time over six screens."],
+  ["Would you add a little to your own ticket so that a member who cannot afford it could come?", "Then, for those who would: would it depend on other members doing the same?"],
+  ["Tell me about the last time the cost of something kept you from joining in.", "An open question at the end, asked by an AI moderator. This page never reads or shows what is written there."],
+];
+
+function asked() {
+  return el("details", { class: "asked" },
+    el("summary", { text: "See the nine questions" }),
+    el("ol", { class: "asked-list" }, QUESTIONS.map(([question, note]) => el("li", {},
+      el("span", { class: "asked-q", text: question }),
+      note ? el("span", { class: "asked-note", text: ` ${note}` }) : null,
+    ))),
+  );
+}
+
 // A step's number, with a loop of pen round it.
 function numeral(n) {
   const node = el("span", { class: "step-n", "aria-hidden": "true", text: String(n) });
@@ -118,6 +142,7 @@ export function mount(root, dataset, { read, reset, said = "", evaluation = null
       step(1, "Send your members the survey",
         el("p", { text: "It asks at what price dues, a formal and a weekend trip become too much, which way of offering a lower price a member would use, and whether they would chip in for someone else. It asks for no name, no email, and nothing about income or financial aid." }),
         el("p", {}, outside(SURVEY, "Open the survey")),
+        asked(),
       ),
       step(2, "Export the answers",
         el("p", { text: "Flashpoint exports every response as one CSV file. Under 20 answers the page marks every number as a pilot, and it shows no figure for fewer than 5." }),

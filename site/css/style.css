@@ -1717,6 +1717,33 @@ input:focus-visible + .tick {
   margin-bottom: 0;
 }
 
+/* The survey's questions, folded away under the first step. */
+.asked {
+  margin-top: 0.9rem;
+}
+
+.asked summary {
+  width: fit-content;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.asked-list {
+  margin: 0.9rem 0 0;
+  padding-left: 1.5rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.asked-q {
+  font-weight: 700;
+}
+
+.asked-note {
+  color: var(--ink-soft);
+}
+
 .load-actions {
   margin: 1.4rem 0 1rem;
 }
