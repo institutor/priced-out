@@ -8,14 +8,16 @@
 //   --survey <id>             Flashpoint survey id, recorded in the dataset
 //   --from <date> --to <date> when answers were collected
 //   --synthetic <csv>         export of a Flashpoint synthetic-respondent run, kept apart and labelled
-//   --fixes <json>            use MaxDiff scores computed by Flashpoint instead of scoring the export
+//   --fixes <json>            use MaxDiff scores computed by Flashpoint instead of scoring the export.
+//                             The file is {"n": 41, "scores": [{"id": "open", "score": 0.3, "low": 0.1, "high": 0.5}, ...]}
+//                             with one entry per fix id, and n the number of students who answered.
 //
 // The raw export stays in data/raw/, which is not committed.
 import fs from "node:fs";
 import { parseCsv, toObjects } from "./lib/csv.mjs";
 import { normalizeExport } from "./lib/flashpoint-export.mjs";
 import { buildDataset } from "./lib/aggregate.mjs";
-import { FIXES, ITEMS } from "./lib/vocab.mjs";
+import { FIXES, ITEMS, MIN_CELL } from "./lib/vocab.mjs";
 
 const [input, ...rest] = process.argv.slice(2);
 if (!input || input.startsWith("--")) {
@@ -26,8 +28,9 @@ const options = {};
 for (let i = 0; i < rest.length; i += 2) options[rest[i].replace(/^--/, "")] = rest[i + 1];
 
 const mapping = JSON.parse(fs.readFileSync(options.mapping ?? "data/mapping.json", "utf8"));
-const read = (file) => normalizeExport(toObjects(parseCsv(fs.readFileSync(file, "utf8"))), mapping);
-const respondents = read(input);
+const read = (file, report) => normalizeExport(toObjects(parseCsv(fs.readFileSync(file, "utf8"))), mapping, report);
+const report = {};
+const respondents = read(input, report);
 
 const meta = {
   kind: "real",
@@ -50,13 +53,18 @@ if (options.synthetic) {
 const dataset = buildDataset(respondents, meta, extras);
 
 if (options.fixes) {
-  const scores = JSON.parse(fs.readFileSync(options.fixes, "utf8"));
-  dataset.fixes = FIXES.map((fix) => {
-    const row = scores.find((candidate) => candidate.id === fix.id);
-    if (!row) throw new Error(`--fixes file has no entry for "${fix.id}"`);
+  const file = JSON.parse(fs.readFileSync(options.fixes, "utf8"));
+  if (!Number.isInteger(file.n) || !Array.isArray(file.scores)) {
+    throw new Error('--fixes file must look like {"n": 41, "scores": [{"id": "open", "score": 0.3, "low": 0.1, "high": 0.5}, ...]}');
+  }
+  const fixes = FIXES.map((fix) => {
+    const row = file.scores.find((candidate) => candidate.id === fix.id);
+    if (!row || typeof row.score !== "number") throw new Error(`--fixes file has no score for "${fix.id}"`);
     return { ...fix, score: row.score, low: row.low ?? row.score, high: row.high ?? row.score };
   });
-  dataset.fixesN = scores.n ?? dataset.meta.n;
+  // The same floor as everything else: no ranking from fewer than MIN_CELL students.
+  dataset.fixes = file.n < MIN_CELL ? null : fixes;
+  dataset.fixesN = file.n;
   dataset.meta.fixesSource = "MaxDiff scores computed by Flashpoint";
 }
 
@@ -64,6 +72,12 @@ const out = options.out ?? "site/data/dataset.json";
 fs.writeFileSync(out, `${JSON.stringify(dataset)}\n`);
 
 console.log(`Wrote ${out}`);
+console.log(`  rows in the export: ${report.rows}`);
+console.log(`  left out: ${report.excluded} excluded by the mapping, ${report.screenedOut} screened out, ${report.noAnswers} answered nothing after the first question`);
+for (const item of ITEMS) {
+  if (report.zeroSkip[item.id] > 0) console.log(`  ${item.id}: ${report.zeroSkip[item.id]} skip price(s) of 0 read as no answer`);
+  if (report.aboveMax[item.id] > 0) console.log(`  ${item.id}: ${report.aboveMax[item.id]} answer(s) above ${item.max} read as ${item.max}`);
+}
 console.log(`  respondents: ${dataset.meta.n}`);
 for (const item of ITEMS) {
   console.log(`  answered ${item.id}: ${dataset.rows.filter((row) => row[item.id] !== null).length}`);

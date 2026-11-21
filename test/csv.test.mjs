@@ -40,3 +40,12 @@ test("shuffle keeps every element and leaves its input alone", () => {
   assert.deepEqual([...output].sort((a, b) => a - b), input);
   assert.notDeepEqual(output, input);
 });
+
+test("toObjects keeps both columns when a header repeats", () => {
+  const objects = toObjects([["Q1", "Q1", "Q2", "Q1"], ["a", "b", "c", "d"]]);
+  assert.deepEqual(objects, [{ Q1: "a", "Q1 (2)": "b", Q2: "c", "Q1 (3)": "d" }]);
+});
+
+test("parseCsv refuses a quote that never closes", () => {
+  assert.throws(() => parseCsv('a,b\n1,"oops\n2,3\n'), /line 2/);
+});

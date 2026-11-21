@@ -5,7 +5,10 @@
 // file, not this code. Anything unexpected throws with the column and value
 // named, because a silently misread answer would end up on the site as a
 // finding.
-import { FIXES } from "./vocab.mjs";
+//
+// normalizeExport takes an optional `report` object and fills it with counts
+// of the rows and answers it set aside, so the build can print them.
+import { FIXES, ITEMS } from "./vocab.mjs";
 
 const isBlank = (value) => value === undefined || value === null || String(value).trim() === "";
 const sameText = (a, b) => String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
@@ -22,12 +25,40 @@ function unknown(column, value) {
   return new Error(`Unknown answer in column "${column}": "${value}"`);
 }
 
+// A plain amount: digits, with an optional leading $, thousands commas,
+// decimals and a trailing + ("150+"). Anything else ("-5", "30-40", words) is
+// refused rather than guessed at.
 function readNumber(row, column) {
   const value = row[column];
   if (isBlank(value)) return null;
-  const match = String(value).replace(/,/g, "").match(/-?\d+(?:\.\d+)?/);
-  if (!match) throw unknown(column, value);
-  return Number(match[0]);
+  const text = String(value).trim().replace(/^\$/, "").replace(/,/g, "").replace(/\+$/, "").trim();
+  if (!/^\d+(\.\d+)?$/.test(text)) throw unknown(column, value);
+  return Number(text);
+}
+
+// The two prices for one item.
+// - A skip price of 0 is read as no answer. Skipping something that is free
+//   is not about price, and a slider nobody touched can be stored the same way.
+// - A price above the top of the scale is read as the top, which already
+//   means "this much or more".
+function readPrices(row, pair, item, report) {
+  let stretch = readNumber(row, pair.stretch);
+  let skip = readNumber(row, pair.skip);
+  if (skip === 0) {
+    skip = null;
+    report.zeroSkip[item.id] += 1;
+  }
+  let above = false;
+  if (stretch !== null && stretch > item.max) {
+    stretch = item.max;
+    above = true;
+  }
+  if (skip !== null && skip > item.max) {
+    skip = item.max;
+    above = true;
+  }
+  if (above) report.aboveMax[item.id] += 1;
+  return [stretch, skip];
 }
 
 function readCoded(row, column, answers) {
@@ -39,11 +70,19 @@ function readCoded(row, column, answers) {
 }
 
 // Options may be exported with their full description, so match on how the
-// text starts.
+// text starts. If a second option turns up later in the same text, the list
+// was split on the wrong separator: refuse it, or several answers would be
+// read as one.
 function codeByPrefix(text, answers, column) {
   const lower = String(text).trim().toLowerCase();
-  const key = Object.keys(answers).find((candidate) => lower.startsWith(candidate.toLowerCase()));
-  if (key === undefined) throw unknown(column, text);
+  const keys = Object.keys(answers);
+  const matches = keys.filter((candidate) => lower.startsWith(candidate.toLowerCase()));
+  if (matches.length === 0) throw unknown(column, text);
+  const key = matches.reduce((longest, candidate) => (candidate.length > longest.length ? candidate : longest));
+  const rest = lower.slice(key.length);
+  if (keys.some((candidate) => rest.includes(candidate.toLowerCase()))) {
+    throw new Error(`Column "${column}" holds more than one answer in "${text}". Check answers.separator in the mapping.`);
+  }
   return answers[key];
 }
 
@@ -126,8 +165,11 @@ function readPledge(row, columns, answers) {
   return [amount, threshold];
 }
 
-export function normalizeExport(objects, mapping) {
+export function normalizeExport(objects, mapping, report = {}) {
+  const perItem = () => Object.fromEntries(ITEMS.map((item) => [item.id, 0]));
+  Object.assign(report, { rows: objects.length, excluded: 0, screenedOut: 0, noAnswers: 0, zeroSkip: perItem(), aboveMax: perItem() });
   if (objects.length === 0) return [];
+
   const headers = Object.keys(objects[0]);
   const columns = resolveColumns(headers, mapping.columns);
   const answers = mapping.answers;
@@ -139,16 +181,23 @@ export function normalizeExport(objects, mapping) {
 
   const respondents = [];
   for (const row of objects) {
-    if (excluded.some((rule) => rule.values.some((value) => sameText(value, row[rule.column] ?? "")))) continue;
-    if (!isBlank(row[columns.year]) && sameText(row[columns.year], answers.screenOut)) continue;
+    if (excluded.some((rule) => rule.values.some((value) => sameText(value, row[rule.column] ?? "")))) {
+      report.excluded += 1;
+      continue;
+    }
+    if (!isBlank(row[columns.year]) && sameText(row[columns.year], answers.screenOut)) {
+      report.screenedOut += 1;
+      continue;
+    }
 
     const prices = {};
     for (const [itemId, pair] of Object.entries(columns.prices)) {
-      prices[itemId] = [readNumber(row, pair.stretch), readNumber(row, pair.skip)];
+      const item = ITEMS.find((candidate) => candidate.id === itemId);
+      if (!item) throw new Error(`The mapping has prices for "${itemId}", which is not one of the survey's items.`);
+      prices[itemId] = readPrices(row, pair, item, report);
     }
     const guess = readNumber(row, columns.guess);
-
-    respondents.push({
+    const respondent = {
       year: isBlank(row[columns.year]) ? null : String(row[columns.year]).trim(),
       officer: readCoded(row, columns.officer, answers.officer),
       prices,
@@ -157,7 +206,24 @@ export function normalizeExport(objects, mapping) {
       said: readSaid(row, columns.said, answers, separator),
       maxdiff: readMaxDiff(row, columns.maxdiff, answers, separator),
       pledge: readPledge(row, columns, answers),
-    });
+    };
+
+    // Someone who opened the survey and answered nothing after the first
+    // question is not counted as a respondent. A price pair only counts if it
+    // has a skip price or a stretch price above 0.
+    const gavePrice = Object.values(prices).some((pair) => pair[1] !== null || pair[0] > 0);
+    const answeredSomething = gavePrice
+      || respondent.officer !== null
+      || respondent.guess !== null
+      || respondent.skipped !== null
+      || respondent.said.length > 0
+      || respondent.maxdiff.length > 0
+      || !isBlank(row[columns.pledgeAmount]);
+    if (!answeredSomething) {
+      report.noAnswers += 1;
+      continue;
+    }
+    respondents.push(respondent);
   }
   return respondents;
 }

@@ -86,3 +86,68 @@ test("the build script writes a real dataset from an export", () => {
   assert.equal(dataset.rows.length, 5);
   assert.ok(!JSON.stringify(dataset).includes("ski trip"));
 });
+
+// One export row with every mapped column, blank unless overridden.
+const blankRow = Object.fromEntries(Object.keys(objects[0]).map((header) => [header, ""]));
+const row = (overrides) => ({ ...blankRow, Status: "Complete", Year: "Junior", ...overrides });
+
+test("a skip price of 0 is no answer, and is counted", () => {
+  const report = {};
+  const [person] = normalizeExport([row({ "Dues stretch": "0", "Dues skip": "0", "Formal stretch": "0", "Formal skip": "$40" })], mapping, report);
+  assert.deepEqual(person.prices.dues, [0, null]);
+  assert.deepEqual(person.prices.formal, [0, 40]);
+  assert.deepEqual(report.zeroSkip, { dues: 1, formal: 0, trip: 0 });
+});
+
+test("a price above the top of the scale reads as the top, and is counted", () => {
+  const report = {};
+  const [person] = normalizeExport([row({ "Dues stretch": "20", "Dues skip": "500", "Trip skip": "150+" })], mapping, report);
+  assert.deepEqual(person.prices.dues, [20, 100]);
+  assert.deepEqual(person.prices.trip, [null, 150]);
+  assert.deepEqual(report.aboveMax, { dues: 1, formal: 0, trip: 0 });
+});
+
+test("numbers that are not plain amounts are refused", () => {
+  assert.throws(() => normalizeExport([row({ "Dues skip": "-5" })], mapping), /Dues skip.*-5/);
+  assert.throws(() => normalizeExport([row({ "Formal skip": "30-40" })], mapping), /Formal skip.*30-40/);
+  assert.throws(() => normalizeExport([row({ Guess: "about ten" })], mapping), /Guess.*about ten/);
+  const [person] = normalizeExport([row({ "Trip skip": "$1,200.00", Guess: "45.0" })], mapping);
+  assert.deepEqual(person.prices.trip, [null, 400]);
+  assert.equal(person.guess, 45);
+});
+
+test("someone who answered nothing after the first question is not a respondent", () => {
+  const report = {};
+  const people = normalizeExport([row({}), row({ Year: "" }), row({ Year: "Not a student (typo)" }), row({ Officer: "No" })], mapping, report);
+  assert.equal(people.length, 1);
+  assert.equal(report.noAnswers, 3);
+});
+
+test("answers joined with the wrong separator are refused, not read as one", () => {
+  const joined = row({ Skipped: "Once or twice", Said: "I said I was busy, I said it cost too much" });
+  assert.throws(() => normalizeExport([joined], mapping), /Said[\s\S]*separator/);
+  const shown = row({ "MD1 shown": "Sliding scale, Waiver on request, Open waiver code, Pay what you can", "MD1 best": "Open waiver code", "MD1 worst": "Waiver on request" });
+  assert.throws(() => normalizeExport([shown], mapping), /MD1 shown[\s\S]*separator/);
+});
+
+test("--fixes takes Flashpoint's own scores and still hides them under the minimum", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "priced-out-fixes-"));
+  const scores = ["sliding", "request", "open", "pwyc", "forward", "draw"].map((id, index) => ({ id, score: index / 10, low: index / 10 - 0.1, high: index / 10 + 0.1 }));
+  const build = (n) => {
+    const fixesFile = path.join(dir, `fixes-${n}.json`);
+    const out = path.join(dir, `dataset-${n}.json`);
+    fs.writeFileSync(fixesFile, JSON.stringify({ n, scores }));
+    execFileSync("node", [
+      "scripts/build-data.mjs", "test/fixtures/export-small.csv",
+      "--mapping", "test/fixtures/mapping-small.json", "--fixes", fixesFile, "--out", out,
+    ], { cwd: new URL("..", import.meta.url), stdio: "pipe" });
+    return JSON.parse(fs.readFileSync(out, "utf8"));
+  };
+  const enough = build(40);
+  assert.equal(enough.fixesN, 40);
+  assert.equal(enough.fixes.length, 6);
+  assert.equal(enough.fixes.find((fix) => fix.id === "draw").score, 0.5);
+  const tooFew = build(3);
+  assert.equal(tooFew.fixesN, 3);
+  assert.equal(tooFew.fixes, null);
+});
