@@ -54,6 +54,42 @@
       }
     }
   </style>
+  <!-- The page script is made of many small files. Asking for them all here
+       lets the browser fetch them together, not one layer at a time. A test
+       keeps this list the same as what the script imports. -->
+  <link rel="modulepreload" href="js/lib/announce.js">
+  <link rel="modulepreload" href="js/lib/curve.js">
+  <link rel="modulepreload" href="js/lib/figure.js">
+  <link rel="modulepreload" href="js/lib/format.js">
+  <link rel="modulepreload" href="js/lib/link.js">
+  <link rel="modulepreload" href="js/lib/plan.js">
+  <link rel="modulepreload" href="js/lib/pledge.js">
+  <link rel="modulepreload" href="js/lib/reading.js">
+  <link rel="modulepreload" href="js/lib/sketch.js">
+  <link rel="modulepreload" href="js/lib/stats.js">
+  <link rel="modulepreload" href="js/lib/voice.js">
+  <link rel="modulepreload" href="js/state.js">
+  <link rel="modulepreload" href="js/ui/access.js">
+  <link rel="modulepreload" href="js/ui/banner.js">
+  <link rel="modulepreload" href="js/ui/chart.js">
+  <link rel="modulepreload" href="js/ui/contents.js">
+  <link rel="modulepreload" href="js/ui/cover.js">
+  <link rel="modulepreload" href="js/ui/dom.js">
+  <link rel="modulepreload" href="js/ui/doodles.js">
+  <link rel="modulepreload" href="js/ui/enough.js">
+  <link rel="modulepreload" href="js/ui/fixes.js">
+  <link rel="modulepreload" href="js/ui/ink.js">
+  <link rel="modulepreload" href="js/ui/links.js">
+  <link rel="modulepreload" href="js/ui/made.js">
+  <link rel="modulepreload" href="js/ui/method.js">
+  <link rel="modulepreload" href="js/ui/note.js">
+  <link rel="modulepreload" href="js/ui/pledges.js">
+  <link rel="modulepreload" href="js/ui/priceCheck.js">
+  <link rel="modulepreload" href="js/ui/receipt.js">
+  <link rel="modulepreload" href="js/ui/said.js">
+  <link rel="modulepreload" href="js/ui/scene.js">
+  <link rel="modulepreload" href="js/ui/why.js">
+  <link rel="modulepreload" href="js/ui/yours.js">
   <script>document.documentElement.classList.add("js");</script>
 </head>
 <body>
