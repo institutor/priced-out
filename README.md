@@ -1,12 +1,22 @@
 # Priced Out
 
+During my time in high school, I found myself often faced with times where I couldn't
+exactly afford to pay for certain club dues, and I wish I could have done something about
+it. For instance, my school's Science Olympiad competitions often cost hundreds of dollars
+for just travel and hotels alone, a cost that I could not afford to pay at all.
+
+Priced Out is the idea I dreamt up that I wish the people setting those costs had had. It
+could have shown them, before the price went out, how many of us it would leave behind and
+which way of offering a lower price we would have used, without anyone having to say they
+couldn't pay. Because, you know, if thirty students pay twenty dollars for an event,
+that's actually more money netted than fifteen students paying thirty dollars.
+
 Students who can't afford a club's dues, formal or trip rarely say so. They say they're
 busy, and stop showing up. The people setting the price never find out.
 
 Priced Out is a calculator for club treasurers. It takes a survey that asks students for
 the price at which that happens, and gives the treasurer the answer before the price is
-announced: at this price, in a club this size, about this many members would quietly skip
-it.
+announced: at this price, in a club this size, about this many members would skip it.
 
 Built by one person for the Flashpoint AI x Columbia AI Club hackathon (November 2026),
 Engineering & Product track.
@@ -25,6 +35,18 @@ Flashpoint synthetic panel: 120 AI personas that Flashpoint generated to resembl
 and Barnard undergraduates, each answered by a language model (`gpt-5.4-mini`). Flashpoint
 itself marks the panel `uncalibrated`, meaning it has not been checked against real
 answers.
+
+**Why I did not survey students.** Three reasons.
+
+- **Only a club can survey a club.** Getting a whole club to answer takes someone its
+  members listen to, which means its own officers. I could not have done that for one club
+  from the outside, let alone for every club that might use this.
+- **Every club is different.** The price where members drop out depends on the club and on
+  who is in it. One club's answers would not carry over to the next, and a survey of
+  whichever students I could reach would have described no club in particular.
+- **The point is that any club can use it.** Priced Out is the instrument: a three-minute
+  survey and the page that reads it, for a club to run on its own members. So here 120 AI
+  personas stand in for one club, and show it working from end to end.
 
 So the site is a working product on simulated input, not a finding about students. It says
 so in a banner on every screen, in every sentence that quotes a number, and on the printed
@@ -281,6 +303,9 @@ The rules live in `site/js/lib/` and are covered by the tests in `test/` (119 te
   a student on a tight budget.
 - With real answers, students who open a link in a group chat would still not be a random
   sample of the campus, and what people say they would do can differ from what they do.
+- A club can't yet run it alone. The survey lives in my Flashpoint account, so swapping
+  the stand-in for a real club means I export that club's answers and rebuild the page
+  with one command.
 - It is not a way to find the highest price people will tolerate, and it can't tell you
   why one particular member said they were busy.
 
@@ -297,7 +322,7 @@ scripts/              build-data (export to dataset), make-sample, dev server
 scripts/lib/          CSV reader, Flashpoint export reader, MaxDiff scoring, aggregation
 test/                 node:test suites
 briefs/, replies/     everything sent to and received from Flashpoint
-flashpoint.mjs        the MCP client that pays per call
+flashpoint.mjs        the MCP client that pays per call (the organizers' starter, unchanged)
 ask.mjs, panel.mjs    send one brief to the survey agent, run the synthetic panel
 go.mjs                the publish, run and export steps in order
 data/mapping.json     which export column is which question, and the MaxDiff designs
@@ -310,7 +335,7 @@ docs/                 design, build plan, submission write-up
   the MaxDiff design, generated and ran the synthetic panel, and exported its answers.
   The panel's answers were written by `gpt-5.4-mini`, the model Flashpoint ran it on.
 - **Claude Code** (Anthropic): wrote the code, tests and documents in this repository with
-  me, and drafted the briefs I sent to Flashpoint.
+  me, as well as assisting in co-writing the briefs I sent to Flashpoint.
 
 No AI runs in the live site. Every respondent in the data is AI-generated, and the site
 says so wherever a number appears.

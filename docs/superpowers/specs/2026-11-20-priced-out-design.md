@@ -32,7 +32,7 @@ live and the code reads real answers unchanged, but none have been collected.
 
 ## Why
 
-Club dues, formals and trips quietly exclude students who can't afford them. They give a
+Club dues, formals and trips exclude students who can't afford them. They give a
 different reason and stop showing up, so the people setting prices never see it. Priced Out
 measures the price at which that happens and gives a club treasurer a number to act on
 before the price is announced.
