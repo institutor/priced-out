@@ -1,0 +1,34 @@
+{
+  "sent": {
+    "brief": "confirm",
+    "conversation_id": "01a1fb42-9e87-7c02-aef9-92cd1f3af623",
+    "survey_id": "0a4c06d5-1ea1-43dd-89d7-2458c955b58a"
+  },
+  "receipts": [
+    "paid: https://basescan.org/tx/0x2df87314675e973038c75da5ffcc297189f7ee3e25da69313559ea5287af14c5"
+  ],
+  "result": {
+    "conversation_id": "01a1fb42-9e87-7c02-aef9-92cd1f3af623",
+    "task_id": "01a1fba4-5187-7ee2-8349-76f61557e9bf",
+    "task_name": "surveys_agent",
+    "status": "completed",
+    "result": {
+      "conversation_id": "01a1fb42-9e87-7c02-aef9-92cd1f3af623",
+      "survey_id": "0a4c06d5-1ea1-43dd-89d7-2458c955b58a",
+      "iterations": 4,
+      "usage": {
+        "input_tokens": 13,
+        "output_tokens": 484,
+        "cache_creation_input_tokens": 3462,
+        "cache_read_input_tokens": 658225
+      },
+      "final_text": "The system requires one final confirm specifically for the push action. Pushing v2 will replace the live survey immediately — TERM1 is gone, all S1 options continue to Q2. Please reply **confirm**."
+    },
+    "error": null,
+    "message_id": null,
+    "trace_id": null,
+    "traceparent": null,
+    "duration_ms": 10962,
+    "completed_at": "2026-11-21T01:07:03.394996Z"
+  }
+}
