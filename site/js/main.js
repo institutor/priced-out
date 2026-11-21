@@ -1,6 +1,9 @@
 // Loads the survey dataset and mounts each section of the page.
 import { createState } from "./state.js";
 import { el } from "./ui/dom.js";
+import { doodle, mark } from "./ui/doodles.js";
+import { drawWhenSeen, perforation, redrawAll, underlineLastLine } from "./ui/ink.js";
+import * as cover from "./ui/cover.js";
 import * as banner from "./ui/banner.js";
 import * as priceCheck from "./ui/priceCheck.js";
 import * as access from "./ui/access.js";
@@ -12,7 +15,42 @@ import * as method from "./ui/method.js";
 
 const bodyOf = (id) => document.querySelector(`#${id} .section-body`);
 
+// The title page needs nothing from the survey, so it starts straight away.
+// Whatever happens to its drawing, the page underneath is shown.
+function openCover() {
+  const root = document.getElementById("top");
+  cover.mount(root).catch(() => {}).finally(() => root.classList.add("play"));
+}
+
+// The pen work every section shares: a torn line above it, a small drawing
+// beside its heading, and an underline under the heading's last line.
+function dress() {
+  for (const section of document.querySelectorAll("main > section")) {
+    section.prepend(perforation(el("div", { class: "tear" }), section.id));
+    const heading = section.querySelector("h2");
+    if (heading) {
+      underlineLastLine(heading, section.id);
+      heading.prepend(doodle(heading.dataset.doodle));
+      drawWhenSeen(heading);
+    }
+    const body = section.querySelector(".section-body");
+    if (body) drawWhenSeen(body);
+  }
+
+  const footer = document.querySelector(".colophon-rule");
+  const sign = footer.querySelector(".colophon-mark");
+  sign.append(mark(), el("span", { class: "wordmark" }, "Priced ", el("span", { class: "out", text: "Out" })));
+  footer.prepend(perforation(el("div", { class: "tear" }), "footer"));
+  drawWhenSeen(sign);
+
+  // The hand lettering can arrive after the first drawing. When it does the
+  // words move, and the lines drawn under them are drawn again.
+  document.fonts?.ready.then(() => redrawAll());
+}
+
 async function start() {
+  openCover();
+
   let dataset;
   try {
     const response = await fetch("data/dataset.json");
@@ -42,6 +80,7 @@ async function start() {
     said.mount(bodyOf("said"), dataset, state);
   }
   method.mount(bodyOf("method"), dataset, state);
+  dress();
 }
 
 start();

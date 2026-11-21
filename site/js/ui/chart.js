@@ -1,7 +1,11 @@
 // The price curve: share who would skip the item at each price, with its 95%
-// interval, the chosen price, and the visitor's guess.
+// interval, the chosen price, and the visitor's guess. It is drawn in pen:
+// the curve gone over twice, the interval shaded with slanted lines, the
+// guess marked with a cross. The points the pen passes through are the data.
 import { el, svg, clear } from "./dom.js";
+import { drawnIn, path, seedOf } from "./ink.js";
 import { money, pct } from "../lib/format.js";
+import * as sketch from "../lib/sketch.js";
 
 const MARGIN = { top: 20, right: 24, bottom: 42, left: 46 };
 
@@ -37,18 +41,21 @@ export function renderCurve(root, { points, item, price, guess, n, synthetic, na
   const y = (share) => MARGIN.top + (1 - share) * INNER_HEIGHT;
   const at = (value) => points.reduce((best, point) => (Math.abs(point.price - value) < Math.abs(best.price - value) ? point : best));
 
+  const seed = seedOf(`curve ${item.id} ${narrow}`);
   const chart = svg("svg", {
+    class: "art",
     viewBox: `0 0 ${WIDTH} ${HEIGHT}`,
     role: "img",
     "aria-label": `Share of ${people} who would skip ${item.label.toLowerCase()} at each price from ${money(0)} to ${money(maxPrice)}. The numbers are in the table below the chart.`,
   });
 
-  for (const share of [0, 0.25, 0.5, 0.75, 1]) {
+  [0, 0.25, 0.5, 0.75, 1].forEach((share, index) => {
+    const rule = sketch.line(MARGIN.left, y(share), WIDTH - MARGIN.right, y(share), { seed: seed + index, rough: 1, passes: share === 0 ? 2 : 1 });
     chart.append(
-      svg("line", { x1: MARGIN.left, x2: WIDTH - MARGIN.right, y1: y(share), y2: y(share), stroke: "var(--rule)", "stroke-width": 1 }),
+      path(rule, share === 0 ? "axis-line" : "grid-line"),
       svg("text", { x: MARGIN.left - 8, y: y(share) + 4, "text-anchor": "end", text: share === 0 ? "0" : pct(share) }),
     );
-  }
+  });
   for (const tick of priceTicks(maxPrice, narrow ? 4 : 6)) {
     chart.append(svg("text", { x: x(tick), y: HEIGHT - MARGIN.bottom + 18, "text-anchor": "middle", text: money(tick) }));
   }
@@ -58,39 +65,39 @@ export function renderCurve(root, { points, item, price, guess, n, synthetic, na
     ...points.map((point) => [x(point.price), y(point.outHigh)]),
     ...[...points].reverse().map((point) => [x(point.price), y(point.outLow)]),
   ];
-  chart.append(svg("path", { d: `${pathOf(band)}Z`, fill: "var(--series-wash)" }));
+  // The interval is shaded with one run of slanted pen lines, cut off at its
+  // edges.
+  const shade = drawnIn(
+    sketch.hatch(MARGIN.left, MARGIN.top, INNER_WIDTH, INNER_HEIGHT, { seed: seed + 10, gap: 7, rough: 1, angle: -58 }),
+    "band-hatch",
+  );
+  shade.forEach((stroke) => {
+    stroke.setAttribute("clip-path", "url(#curve-band)");
+    stroke.style.setProperty("--lasts", "1100ms");
+  });
+  chart.append(svg("clipPath", { id: "curve-band" }, svg("path", { d: `${pathOf(band)}Z` })), ...shade);
 
   if (synthetic) {
     const last = synthetic.points.at(-1);
     chart.append(
-      svg("path", {
-        d: pathOf(synthetic.points.map((point) => [x(point.price), y(point.out)])),
-        fill: "none",
-        stroke: "var(--mark-2)",
-        "stroke-width": 2,
-        "stroke-dasharray": "2 5",
-        "stroke-linecap": "round",
-      }),
+      path(sketch.polyline(synthetic.points.map((point) => [x(point.price), y(point.out)]), { seed: seed + 20, rough: 0.8, passes: 1 }), "synthetic-line"),
       svg("text", { x: x(last.price), y: y(last.out) - 8, "text-anchor": "end", text: "AI-simulated students" }),
     );
   }
 
-  chart.append(
-    svg("path", {
-      d: pathOf(points.map((point) => [x(point.price), y(point.out)])),
-      fill: "none",
-      stroke: "var(--series)",
-      "stroke-width": 2,
-      "stroke-linejoin": "round",
-      "stroke-linecap": "round",
-    }),
+  const line = drawnIn(
+    sketch.polyline(points.map((point) => [x(point.price), y(point.out)]), { seed: seed + 30, rough: 0.9, passes: 2 }),
+    "curve-line",
+    { wait: 250 },
   );
+  line.forEach((stroke) => stroke.style.setProperty("--lasts", "900ms"));
+  chart.append(...line);
 
   const current = at(price);
   const labelOnRight = x(current.price) < WIDTH - (narrow ? 150 : 190);
   chart.append(
-    svg("line", { x1: x(current.price), x2: x(current.price), y1: MARGIN.top, y2: HEIGHT - MARGIN.bottom, stroke: "var(--ink-soft)", "stroke-width": 1 }),
-    svg("circle", { cx: x(current.price), cy: y(current.out), r: 5.5, fill: "var(--series)", stroke: "var(--paper)", "stroke-width": 2 }),
+    path(sketch.line(x(current.price), MARGIN.top, x(current.price), HEIGHT - MARGIN.bottom, { seed: seed + 40, rough: 0.9, passes: 1 }), "marker-line"),
+    path(`${sketch.ellipse(x(current.price), y(current.out), 6, 6, { seed: seed + 41, rough: 0.6, steps: 10 })}Z`, "marker-dot"),
     svg("text", {
       class: "label",
       x: x(current.price) + (labelOnRight ? 12 : -12),
@@ -105,16 +112,11 @@ export function renderCurve(root, { points, item, price, guess, n, synthetic, na
     const gy = y(Math.min(1, Math.max(0, guess.share)));
     const guessOnRight = !labelOnRight || Math.abs(guess.price - current.price) > maxPrice * 0.12;
     chart.append(
-      svg("rect", {
-        x: gx - 5,
-        y: gy - 5,
-        width: 10,
-        height: 10,
-        transform: `rotate(45 ${gx} ${gy})`,
-        fill: "var(--mark-2)",
-        stroke: "var(--paper)",
-        "stroke-width": 2,
-      }),
+      path(
+        sketch.line(gx - 6, gy - 6, gx + 6, gy + 6, { seed: seed + 50, rough: 0.7, passes: 1 })
+          + sketch.line(gx + 6, gy - 6, gx - 6, gy + 6, { seed: seed + 51, rough: 0.7, passes: 1 }),
+        "guess-mark",
+      ),
       svg("text", {
         class: "label",
         x: gx + (guessOnRight ? 12 : -12),
@@ -126,8 +128,8 @@ export function renderCurve(root, { points, item, price, guess, n, synthetic, na
   }
 
   // Hover: a crosshair that snaps to the nearest surveyed price, and a readout.
-  const crosshair = svg("line", { y1: MARGIN.top, y2: HEIGHT - MARGIN.bottom, stroke: "var(--ink)", "stroke-width": 1, visibility: "hidden" });
-  const hoverDot = svg("circle", { r: 4, fill: "var(--series)", stroke: "var(--paper)", "stroke-width": 2, visibility: "hidden" });
+  const crosshair = svg("line", { class: "cross-line", y1: MARGIN.top, y2: HEIGHT - MARGIN.bottom, visibility: "hidden" });
+  const hoverDot = svg("circle", { class: "marker-dot", r: 4, visibility: "hidden" });
   const tooltip = el("div", { class: "tooltip", hidden: true });
   const overlay = svg("rect", { x: MARGIN.left, y: MARGIN.top, width: INNER_WIDTH, height: INNER_HEIGHT, fill: "transparent" });
 

@@ -1,6 +1,9 @@
 // The price check: a fill-in line (what, at what price, in how big a club),
 // a guess, then the answer as a room of seats and a curve.
 import { el, clear, sentence } from "./dom.js";
+import { art, blank, button, drawWhenSeen, highlight, ink, path, seat, seedOf } from "./ink.js";
+import { doodle } from "./doodles.js";
+import * as sketch from "../lib/sketch.js";
 import { sharesAt, curve } from "../lib/curve.js";
 import { money, pct, people } from "../lib/format.js";
 import { renderCurve } from "./chart.js";
@@ -76,9 +79,25 @@ export function mount(root, dataset, state) {
   });
   const sliderLow = el("span", { text: "$0" });
   const sliderHigh = el("span");
+  // The real slider is still there and still does the work. What is seen is
+  // a pen line for the rail and a drawn knob that follows it.
+  const knob = el("span", { class: "knob", "aria-hidden": "true" }, art("knob-art", 28, 28,
+    path(sketch.blob(4, 4, 20, 20, { seed: 21, rough: 1, round: 0.5 }), "knob-fill"),
+    path(sketch.ellipse(14, 14, 10.5, 10.5, { seed: 22, rough: 0.9, steps: 12 }), "knob-line"),
+  ));
+  const rail = el("div", { class: "rail" }, slider, knob);
+  ink(rail, (width, height) => {
+    const seed = seedOf("rail");
+    const middle = height / 2;
+    return [
+      path(sketch.line(5, middle, width - 5, middle, { seed, rough: 1.4, passes: 2 }), "rail-line"),
+      path(sketch.line(5, middle - 7, 5, middle + 7, { seed: seed + 1, rough: 0.6, passes: 1 }), "rail-line"),
+      path(sketch.line(width - 5, middle - 7, width - 5, middle + 7, { seed: seed + 2, rough: 0.6, passes: 1 }), "rail-line"),
+    ];
+  });
 
   const gatePrompt = el("p");
-  const guessInput = el("input", { type: "number", inputMode: "numeric", min: 0, value: "", placeholder: "?", "aria-label": "Your guess" });
+  const guessInput = el("input", { class: "blank", type: "number", inputMode: "numeric", min: 0, value: "", placeholder: "?", "aria-label": "Your guess" });
   const gate = el("form", {
     class: "gate",
     onsubmit: (event) => {
@@ -93,13 +112,13 @@ export function mount(root, dataset, state) {
       const count = Math.min(size, Math.max(0, Math.round(Number(guessInput.value) || 0)));
       state.set({ revealed: true, guess: { itemId, price, size, count } });
     },
-  }, gatePrompt, guessInput, el("button", { class: "button", type: "submit", text: "Show the answer" }));
+  }, gatePrompt, blank(guessInput, "guess"), button({ type: "submit" }, "Show the answer"));
 
   const seats = el("div", { class: "seats", role: "img" });
   const key = el("ul", { class: "key" },
-    el("li", {}, el("span", { class: "seat" }), "Would go"),
-    el("li", {}, el("span", { class: "seat stretched" }), "Would go, but it's a stretch"),
-    el("li", {}, el("span", { class: "seat out" }), "Would skip it and say something else"),
+    el("li", {}, el("span", { class: "seat" }, seat("go", 11)), "Would go"),
+    el("li", {}, el("span", { class: "seat stretched" }, seat("stretched", 12)), "Would go, but it's a stretch"),
+    el("li", {}, el("span", { class: "seat out" }, seat("out", 13)), "Would skip it and say something else"),
   );
   const verdict = el("p", { class: "verdict" });
   const detail = el("p");
@@ -118,11 +137,17 @@ export function mount(root, dataset, state) {
   let justRevealed = false;
   const narrowScreen = window.matchMedia("(max-width: 40rem)");
 
-  root.append(
+  const opening = el("div", {},
+    doodle("tag"),
     el("p", { class: "form-line" },
-      "A ", el("span", { class: "pick" }, itemSizer, itemSelect), " at $", priceInput, " in a club of ", sizeInput, ".",
+      "A ", highlight(el("span", { class: "pick" }, itemSizer, itemSelect), "item", { caret: true }),
+      " at $", blank(priceInput, "price"), " in a club of ", blank(sizeInput, "size"), ".",
     ),
-    el("div", { class: "price-slider" }, slider, el("div", { class: "ends" }, sliderLow, sliderHigh)),
+  );
+  drawWhenSeen(opening);
+  root.append(
+    opening,
+    el("div", { class: "price-slider" }, rail, el("div", { class: "ends" }, sliderLow, sliderHigh)),
     gate,
     tooFew,
     result,
@@ -136,12 +161,15 @@ export function mount(root, dataset, state) {
     if (size <= 80) seatSize = "1.6rem";
     if (size <= 40) seatSize = "2rem";
     seats.style.setProperty("--seat", seatSize);
+    // Each seat is drawn with its own seed, so no two are quite alike, and
+    // the same seat is drawn the same way every time.
     let outIndex = 0;
-    for (let seat = 0; seat < size; seat++) {
+    for (let index = 0; index < size; index++) {
       let kind = "out";
-      if (seat < counts.go) kind = "go";
-      else if (seat < counts.go + counts.stretched) kind = "stretched";
-      const node = el("span", { class: kind === "go" ? "seat" : `seat ${kind}` });
+      if (index < counts.go) kind = "go";
+      else if (index < counts.go + counts.stretched) kind = "stretched";
+      const glyph = seat(kind, 700 + index, { emptying: justRevealed && kind === "out" });
+      const node = el("span", { class: kind === "go" ? "seat" : `seat ${kind}` }, glyph);
       if (kind === "out") node.style.setProperty("--i", outIndex++);
       seats.append(node);
     }
@@ -164,6 +192,7 @@ export function mount(root, dataset, state) {
     slider.max = maxPriceOf(item);
     slider.step = item.step;
     slider.value = price;
+    rail.style.setProperty("--at", maxPriceOf(item) > 0 ? price / maxPriceOf(item) : 0);
     sliderHigh.textContent = money(maxPriceOf(item));
     guessInput.max = size;
 
@@ -176,6 +205,8 @@ export function mount(root, dataset, state) {
     clear(gatePrompt).append(...sentence("Before you look: how many of the ", [size], " would skip it and tell you something else?"));
     if (!revealed || notEnough) return;
 
+    // The curve draws itself when the answer is first shown, and only then.
+    result.classList.toggle("drawing", justRevealed);
     const out = people(shares.out, size);
     const stretched = Math.min(size - out, people(shares.stretched, size));
     renderSeats({ go: size - out - stretched, stretched, out }, size);
