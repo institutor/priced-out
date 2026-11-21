@@ -204,7 +204,7 @@ function readPledge(row, columns, answers) {
 // either sign is enough.
 function fromPanel(row, source) {
   const said = String(row[source.column] ?? "").trim();
-  if (sameText(said, source.synthetic) || /synth|simulat|persona/i.test(said)) return true;
+  if (sameText(said, source.synthetic) || /synth|simulat|persona(?!l)/i.test(said)) return true;
   return source.panel !== null && /^synth/i.test(String(row[source.panel] ?? "").trim());
 }
 
@@ -239,18 +239,18 @@ export function normalizeExport(objects, mapping, report = {}, { synthetic = fal
   }
 
   const respondents = [];
-  for (const row of objects) {
+  const readRow = (row) => {
     if (source && fromPanel(row, source) !== synthetic) {
       report.otherSource += 1;
-      continue;
+      return;
     }
     if (excluded.some((rule) => rule.values.some((value) => sameText(value, row[rule.column] ?? "")))) {
       report.excluded += 1;
-      continue;
+      return;
     }
     if (!isBlank(row[columns.year]) && sameText(row[columns.year], answers.screenOut)) {
       report.screenedOut += 1;
-      continue;
+      return;
     }
 
     const prices = {};
@@ -284,9 +284,19 @@ export function normalizeExport(objects, mapping, report = {}, { synthetic = fal
       || !isBlank(row[columns.pledgeAmount]);
     if (!answeredSomething) {
       report.noAnswers += 1;
-      continue;
+      return;
     }
     respondents.push(respondent);
-  }
+  };
+  objects.forEach((row, index) => {
+    try {
+      readRow(row);
+    } catch (error) {
+      // Which row it was, counted from the first row of answers, so that
+      // whoever shows the error can say where to look.
+      if (error.row === undefined) error.row = index;
+      throw error;
+    }
+  });
   return respondents;
 }

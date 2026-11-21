@@ -7,7 +7,7 @@ import { button, ink, path, seedOf, wipe } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
 import { bubble } from "../lib/figure.js";
 import { plan, planText } from "../lib/plan.js";
-import { announcement } from "../lib/announce.js";
+import { announcement, messageText, standIn } from "../lib/announce.js";
 import { money } from "../lib/format.js";
 
 function opening(meta) {
@@ -41,14 +41,23 @@ async function copyOr(text, node, said, { copied, selected }) {
   }
 }
 
-// Whose answers the message's lower price rests on, said beside it. The
-// message itself is only a price and an offer, so it carries no label.
-function restsOn(meta, lower) {
-  const price = lower === 0 ? "free place" : `${money(lower)}`;
-  if (meta.loaded?.example) return ` It is built on the made-up club, so the ${price} in it shows the form and is not a finding.`;
-  if (meta.kind === "simulated") return ` It is built on simulated students, so the ${price} in it shows the form and is not a finding.`;
-  if (meta.kind === "sample") return ` It is built on sample data, so the ${price} in it shows the form and is not a finding.`;
-  return "";
+// Whose answers the message rests on, said beside it. The message in the
+// bubble is only a price and an offer. A copy of it starts with a line that
+// says whose answers it came from.
+function restsOn(meta, told) {
+  const whose = standIn(meta);
+  if (!whose) return "";
+  if (!told.shows.lower) return ` It is built on ${whose}, so the way it offers a lower price shows the form and is not a finding.`;
+  const price = told.lower === 0 ? "free place" : money(told.lower);
+  return ` It is built on ${whose}, so the ${price} in it shows the form and is not a finding.`;
+}
+
+// What to say once the message is copied.
+function copiedSaid(meta, told) {
+  const said = ["Copied."];
+  if (standIn(meta)) said.push("Its first line says it is an example.");
+  if (told.shows.code) said.push("Put your own code in before you send it.");
+  return said.join(" ");
 }
 
 // The decision as a message for the members: the price, and the lower price
@@ -62,10 +71,10 @@ function forMembers(dataset, state) {
     "message-edge",
   ));
   const said = el("span", { class: "share-said", role: "status" });
-  let text = "";
+  let told = null;
   const copy = button({
-    onclick: () => copyOr(text, words, said, {
-      copied: "Copied. Put your own code in before you send it.",
+    onclick: () => copyOr(messageText(told, dataset.meta), words, said, {
+      copied: copiedSaid(dataset.meta, told),
       selected: "Your browser would not copy it, so the message is selected. Copy it from there.",
     }),
   }, "Copy the message");
@@ -75,8 +84,15 @@ function forMembers(dataset, state) {
     lead, message, actions,
   );
 
+  // Why there is only the price to announce, where no lower price is offered.
+  const onlyThePrice = (why, { price, size }) => {
+    if (why === "never") return "Even free, more than 1 in 20 said they would skip it, so a lower price is not what would bring them back, and there is only the price to announce.";
+    if (why === "inside") return `At ${money(price)} no more than 1 in 20 are left out, so the page works out no second price, and there is only the price to announce.`;
+    return `In a club of ${size} a lower price comes to less than one more person, so there is only the price to announce.`;
+  };
+
   function render(view) {
-    const told = announcement(dataset, view);
+    told = announcement(dataset, view);
     said.textContent = "";
     // With too few answers or no ranking there is nothing to build on, and
     // the parts above already say so.
@@ -87,17 +103,16 @@ function forMembers(dataset, state) {
       lead.textContent = `The board's decision still has to reach the members. ${told.tied.join(" and ")} tied at the top, so the page does not pick one of them for you.`;
       return;
     }
-    if (told.why === "nobody") {
-      lead.textContent = `The board's decision still has to reach the members. At ${money(view.price)} the answers give no lower price that would bring anyone back, so there is only the price to announce.`;
+    if (told.why === "never" || told.why === "inside" || told.why === "nobody") {
+      lead.textContent = `The board's decision still has to reach the members. ${onlyThePrice(told.why, view)}`;
       return;
     }
     if (told.text === null) return;
-    text = told.text;
     words.textContent = told.text;
     lead.replaceChildren(
       "The board's decision still has to reach the members. This is the price as a message, with the lower price offered the way that came out on top: ",
       el("strong", { text: told.fix.label }),
-      `.${restsOn(dataset.meta, told.lower)}`,
+      `.${restsOn(dataset.meta, told)}`,
     );
   }
   state.subscribe(render);

@@ -2174,6 +2174,11 @@ input:focus-visible + .tick {
     white-space: nowrap;
   }
 
+  /* Room under the last line of the page, so the tab is not over it. */
+  .colophon {
+    padding-bottom: 5rem;
+  }
+
   .message {
     font-size: 1.1rem;
   }

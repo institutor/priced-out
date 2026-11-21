@@ -43,8 +43,13 @@ function plain(error, objects = []) {
   }
   const answer = text.match(/^Unknown answer in column "(.+?)": "(.*)"$/s);
   if (answer) {
-    const row = objects.findIndex((candidate) => candidate[answer[1]] === answer[2]);
+    // The reader says which row it stopped at. Without that, the first row
+    // holding the same answer is the one to look at.
+    const row = Number.isInteger(error?.row) ? error.row : objects.findIndex((candidate) => candidate[answer[1]] === answer[2]);
     const where = row >= 0 ? ` It is in the ${nth(row + 1)} row of answers.` : "";
+    if (answer[2].trim() === "") {
+      return `The column "${short(answer[1])}" is empty in a row that needs it.${where} That row has answers to the question the column belongs to, so the cell cannot be blank. Fill it in, or empty those answers, and load the file again.`;
+    }
     return `The column "${short(answer[1])}" holds an answer this page does not know: "${short(answer[2])}".${where} Correct or empty that cell and load the file again. If there are many, the file may come from a different survey.`;
   }
   return text;
@@ -63,7 +68,9 @@ function attempt(work, objects) {
 // opened and saved in a spreadsheet can come back changed: semicolons or tabs
 // between cells, a first line that names the separator, or one heading row
 // where Flashpoint writes two. Each of those is read as what it is. The
-// heading row is the one that has the Source column in it.
+// heading row is the one with a cell that says exactly "Source". A looser
+// match would take a row of answers for the headings when one answer has
+// the word in it ("resources").
 function rowsOf(text, mapping) {
   let body = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
   let delimiter = null;
@@ -79,14 +86,10 @@ function rowsOf(text, mapping) {
   }
 
   const usual = mapping.headerRow ?? 1;
+  const hasSource = (row) => row.some((cell) => sameText(cell, mapping.source.column));
   for (const headerRow of [...new Set([usual, 1, 2])]) {
     if (table.length < headerRow) continue;
-    try {
-      findColumn(table[headerRow - 1], mapping.source.column, "source");
-    } catch {
-      continue;
-    }
-    return toObjects(table, headerRow);
+    if (hasSource(table[headerRow - 1])) return toObjects(table, headerRow);
   }
   throw new FileProblem(`This does not look like an export of the Priced Out survey: it has no column named "${mapping.source.column}".`);
 }

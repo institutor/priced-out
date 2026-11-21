@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { announcement } from "../site/js/lib/announce.js";
+import { announcement, messageText, standIn } from "../site/js/lib/announce.js";
+import { maxPriceFor } from "../site/js/lib/curve.js";
 import { priceGrid, waysToPrice } from "../site/js/lib/curve.js";
 import { datasetFromExport } from "../site/js/ingest/club.js";
 
@@ -34,8 +35,13 @@ test("the lower price in the message is the one in the sum with two prices", () 
         const said = announcement(dataset, { itemId: item.id, price, size: 60 });
         const two = waysToPrice(dataset.rows, item, price, 60).find((way) => way.kind === "two");
         if (said.text === null) {
-          assert.equal(said.why, "nobody");
+          assert.ok(["never", "inside", "nobody"].includes(said.why), said.why);
           assert.equal(two, undefined);
+          // The reason given is the true one.
+          const accessPrice = maxPriceFor(dataset.rows, item, 0.05);
+          if (said.why === "never") assert.equal(accessPrice, null);
+          if (said.why === "inside") assert.ok(accessPrice >= price);
+          if (said.why === "nobody") assert.ok(accessPrice < price);
         } else {
           assert.equal(said.lower, two.accessPrice);
         }
@@ -88,10 +94,58 @@ test("a tie at the top is not settled by the page", () => {
   assert.deepEqual([...said.tied].sort(), ["Open waiver code", "Sliding scale"]);
 });
 
-test("where no lower price would bring anyone back, there is no message", () => {
-  const said = announcement(published, { ...view, price: 0 });
+test("where the price already keeps nearly everyone, there is no message and it says why", () => {
+  // The access price for the formal is $20. At $20 a few still skip it, and
+  // a lower price would bring them back, so "no lower price helps" would be
+  // wrong. What is true is that no more than 1 in 20 are left out.
+  for (const price of [0, 20]) {
+    const said = announcement(published, { ...view, price });
+    assert.equal(said.text, null);
+    assert.equal(said.why, "inside");
+  }
+});
+
+test("where a lower price comes to less than one person, there is no message and it says why", () => {
+  const said = announcement(published, { ...view, size: 5, price: 25 });
   assert.equal(said.text, null);
   assert.equal(said.why, "nobody");
+});
+
+test("where even free loses more than 1 in 20, there is no message and it says why", () => {
+  // Three of twenty would skip it at any price, free included.
+  const rows = Array.from({ length: 20 }, (_, index) => ({ formal: index < 3 ? [0, 0] : [50, 60] }));
+  const said = announcement({ ...published, rows }, { itemId: "formal", price: 40, size: 20 });
+  assert.equal(said.text, null);
+  assert.equal(said.why, "never");
+});
+
+test("the message says whether it names the lower price and whether it has a code to fill in", () => {
+  const shows = (id) => announcement(led(published, id), view).shows;
+  assert.deepEqual(shows("open"), { lower: true, code: true });
+  assert.deepEqual(shows("sliding"), { lower: true, code: false });
+  assert.deepEqual(shows("request"), { lower: true, code: false });
+  for (const id of ["forward", "pwyc", "draw"]) {
+    assert.deepEqual(shows(id), { lower: false, code: false });
+    assert.doesNotMatch(announcement(led(published, id), view).text, /\$20|free/);
+  }
+});
+
+test("a copy of the message built on stand-in answers starts by saying so", () => {
+  const told = announcement(published, view);
+  assert.equal(standIn(published.meta), "simulated students");
+  assert.equal(messageText(told, published.meta), `[An example, built on simulated students. Not your members' answers.]\n\n${told.text}`);
+  assert.equal(standIn(example.meta), "a made-up club");
+  assert.match(messageText(announcement(example, view), example.meta), /^\[An example, built on a made-up club\. Not your members' answers\.\]\n\n/);
+  assert.equal(standIn({ kind: "sample" }), "sample data");
+});
+
+test("a copy of the message built on a club's own answers is the message alone", () => {
+  const meta = { kind: "real", loaded: { name: "our-club.csv", example: false } };
+  const told = announcement(published, view);
+  assert.equal(standIn(meta), null);
+  assert.equal(messageText(told, meta), told.text);
+  assert.equal(messageText(announcement(published, { ...view, price: 0 }), meta), "");
+  assert.equal(messageText(null, meta), "");
 });
 
 test("too few answers, or no ranking, gives no message", () => {

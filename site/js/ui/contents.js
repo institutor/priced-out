@@ -71,16 +71,23 @@ export function mount(root, { cover = document.getElementById("top") } = {}) {
   }, listMark(), el("span", { text: "Contents" })), "contents");
 
   const isOpen = () => !sheet.hidden;
-  const open = () => {
-    // The line is a third of the way down the screen.
+  // Marks the part being read. The line is a third of the way down the screen.
+  const mark = () => {
     const line = window.innerHeight / 3;
     const reading = partBeingRead(sections.map((section) => section.getBoundingClientRect().top), line);
     links.forEach((link, index) => {
       if (index === reading) link.setAttribute("aria-current", "location");
       else link.removeAttribute("aria-current");
     });
+    return links[reading] ?? null;
+  };
+  const open = () => {
+    const reading = mark();
     sheet.hidden = false;
     tab.setAttribute("aria-expanded", "true");
+    // On a short screen the list scrolls, and the marked part may be below
+    // the fold of it.
+    reading?.scrollIntoView?.({ block: "nearest" });
   };
   const close = ({ focus = false } = {}) => {
     if (!isOpen()) return;
@@ -94,20 +101,26 @@ export function mount(root, { cover = document.getElementById("top") } = {}) {
   sheet.addEventListener("click", (event) => {
     if (event.target.closest("a")) close();
   });
-  root.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && isOpen()) {
-      event.stopPropagation();
-      close({ focus: true });
-    }
-  });
+  // Escape closes the list wherever the focus is: some browsers do not move
+  // the focus to a button that is clicked.
+  const onKey = (event) => {
+    if (event.key === "Escape" && isOpen()) close({ focus: true });
+  };
   // The list also closes when the reader goes back to the page.
-  root.addEventListener("focusout", (event) => {
+  const onFocusOut = (event) => {
     if (event.relatedTarget && !root.contains(event.relatedTarget)) close();
-  });
+  };
   const outside = (event) => {
     if (!root.contains(event.target)) close();
   };
+  // Scrolling with the list open moves the mark with the reader.
+  const onScroll = () => {
+    if (isOpen()) mark();
+  };
+  document.addEventListener("keydown", onKey);
+  root.addEventListener("focusout", onFocusOut);
   document.addEventListener("pointerdown", outside);
+  window.addEventListener("scroll", onScroll, { passive: true });
 
   // The tab stays off the title page, which has its own ways in.
   let watching = null;
@@ -124,7 +137,10 @@ export function mount(root, { cover = document.getElementById("top") } = {}) {
 
   root.append(tab, sheet);
   return () => {
+    document.removeEventListener("keydown", onKey);
+    root.removeEventListener("focusout", onFocusOut);
     document.removeEventListener("pointerdown", outside);
+    window.removeEventListener("scroll", onScroll);
     watching?.disconnect();
   };
 }

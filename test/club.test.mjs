@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { datasetFromExport, describeReport, FileProblem } from "../site/js/ingest/club.js";
 import { makeClubCsv } from "../scripts/make-example.mjs";
+import { parseCsv } from "../site/js/ingest/csv.js";
 
 const mapping = JSON.parse(fs.readFileSync(new URL("../site/data/mapping.json", import.meta.url), "utf8"));
 const exampleFile = fs.readFileSync(new URL("../site/data/example-club.csv", import.meta.url), "utf8");
@@ -149,6 +150,41 @@ test("a file saved again by a spreadsheet reads the same as the export", () => {
   sameAnswers(people.split("\n").slice(1).join("\n"), "one heading row");
   const width = people.split("\n")[1].split(",").length;
   sameAnswers(`${people}${",".repeat(width - 1)}\n${",".repeat(width - 1)}\n`, "empty rows at the end");
+});
+
+// A table written back out as a CSV file.
+const toCsv = (rows) => rows.map((row) => row.map((cell) => (/[",\n]/.test(cell) ? `"${cell.replace(/"/g, '""')}"` : cell)).join(",")).join("\n");
+
+test("an empty cell that a row needs is pointed to by its own row", () => {
+  const rows = parseCsv(people, { delimiter: "," });
+  const design = rows[1].indexOf("Q7/Design");
+  assert.ok(design > 0);
+  // The first member skipped the trade-off question, which is allowed.
+  for (let at = design; at <= design + 12; at += 1) rows[2][at] = "";
+  // The tenth answered it, and the design number has gone missing.
+  assert.notEqual(rows[11][design + 1], "");
+  rows[11][design] = "";
+  assert.throws(() => datasetFromExport(toCsv(rows), mapping), (error) => {
+    assert.ok(error instanceof FileProblem);
+    assert.match(error.message, /^The column "Q7\/Design" is empty in a row that needs it\. It is in the 10th row of answers\./);
+    return true;
+  });
+});
+
+test("a one-heading-row file is read even when its first answer has the word source in it", () => {
+  const rows = parseCsv(people, { delimiter: "," }).slice(1).filter((row) => row.length > 1);
+  rows[0].push("Q9");
+  rows.slice(1).forEach((row, index) => row.push(index === 0 ? "I asked about resources on campus" : ""));
+  sameAnswers(toCsv(rows), "resources in the first answer");
+});
+
+test("a source that only looks like the word persona is still read as people", () => {
+  for (const word of ["Personal link", "personal invite"]) {
+    assert.equal(datasetFromExport(withSource(exampleFile, word), mapping).dataset.meta.kind, "real", word);
+  }
+  for (const word of ["persona", "Persona panel", "persona_panel", "AI personas"]) {
+    assert.equal(datasetFromExport(withSource(exampleFile, word), mapping).dataset.meta.kind, "simulated", word);
+  }
 });
 
 test("empty rows a spreadsheet leaves behind are not counted as people", () => {
