@@ -1,0 +1,67 @@
+{
+  "sent": {
+    "action": "run",
+    "panel_id": "01a1fb81-fae0-7bb2-bf49-2431da9b8cad",
+    "survey_id": "0a4c06d5-1ea1-43dd-89d7-2458c955b58a"
+  },
+  "receipts": [
+    "paid: https://basescan.org/tx/0x09960d18285c4d0ee527f04f3bef6ca702390451891ff8d1c1ee18d57e0893c3"
+  ],
+  "result": {
+    "task_id": "01a1fba2-6d2c-7a60-9e52-aa13974e4575",
+    "task_name": "synthetic_panel_take_survey",
+    "status": "completed",
+    "result": {
+      "panel_id": "01a1fb81-fae0-7bb2-bf49-2431da9b8cad",
+      "survey_id": "0a4c06d5-1ea1-43dd-89d7-2458c955b58a",
+      "total_personas": 120,
+      "responses_submitted": 120,
+      "status_breakdown": {
+        "TERMINATED": 120
+      },
+      "analytics_scope": {
+        "survey_id": "0a4c06d5-1ea1-43dd-89d7-2458c955b58a",
+        "panel_id": "01a1fb81-fae0-7bb2-bf49-2431da9b8cad",
+        "calibration_version": "uncalibrated",
+        "run_id": "01a1fba2-6d2c-7a60-9e52-aa13974e4575"
+      },
+      "analytics_note": "To analyse this run, scope every analytics call to panel_id=01a1fb81-fae0-7bb2-bf49-2431da9b8cad, run_id=01a1fba2-6d2c-7a60-9e52-aa13974e4575 (calibration_version=uncalibrated). Omitting panel_id combines every panel that ran this survey; omitting run_id combines every run of this panel. If a result carries scope_warning, the numbers combine runs: say so.",
+      "sampled_answers": {
+        "sampled": 120,
+        "changed_from_top": 13
+      },
+      "warning": "This survey has unpublished edits: the personas answered the LIVE published version, not the latest draft shown in the editor. Publish the pending version and re-run the panel if you wanted the edited survey.",
+      "artifact": {
+        "type": "survey_results",
+        "title": "Results — Survey · Priced Out: simulated Columbia and Barnard undergraduates",
+        "summary": "Target: 120 · 120 responses · model: gpt-5.4-mini · live analytics, crosstabs, responses",
+        "storage_kind": "reference",
+        "storage": {
+          "survey_id": "0a4c06d5-1ea1-43dd-89d7-2458c955b58a",
+          "survey_name": "Survey",
+          "panel_id": "01a1fb81-fae0-7bb2-bf49-2431da9b8cad",
+          "panel_name": "Priced Out: simulated Columbia and Barnard undergraduates",
+          "panel_kind": "synthetic",
+          "calibration_version": "uncalibrated",
+          "panel_size": 120,
+          "responses_submitted": 120,
+          "service": "flashpoint-surveys",
+          "inference_backend": "openai",
+          "inference_model": "gpt-5.4-mini",
+          "inference_models": [
+            "gpt-5.4-mini"
+          ],
+          "last_run_id": "01a1fba2-6d2c-7a60-9e52-aa13974e4575",
+          "fit_run_id": null
+        }
+      }
+    },
+    "error": null,
+    "conversation_id": "01a1fba2-6d2b-7870-a7b3-47203ad9786e",
+    "message_id": null,
+    "trace_id": null,
+    "traceparent": null,
+    "completed_at": "2026-11-21T01:04:59.680841",
+    "duration_ms": 11238
+  }
+}

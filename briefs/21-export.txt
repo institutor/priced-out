@@ -1,0 +1,15 @@
+This is about survey 0a4c06d5-1ea1-43dd-89d7-2458c955b58a (Priced Out), which is live. Do not change the survey.
+
+A synthetic panel has just been run through it: panel_id {{panel_id}}, run_id {{panel_run_id}}. Everything below is about that run only. Do not combine it with any other run or with any other respondents.
+
+1. First tell me how many of that run's responses hold an answer to DUES_B, and how many hold an answer to Q8. If the answer to both is none, skip 2 to 5. Instead open three of the run's responses, tell me exactly where each one ended and why, and tell me what a synthetic panel needs in order to complete this survey.
+
+2. Export that run's results as CSV with with_labels=true, so option text appears in place of codes, and give me the download link.
+
+3. Q7 is the MaxDiff question. Give me its design: for every design (version) and every set, the four items shown, and how I can tell which design a given respondent saw from their row in the CSV. If every respondent saw the same design, say so.
+
+4. Give me the key from code to option text for S1, Q2, Q5, Q6_1 to Q6_7, the six Q7 items, Q8 and Q8B, in case any column still holds a code.
+
+5. For that run: the number of responses by status, and for each of the six Q7 items the number of times it was shown, picked as most likely and picked as least likely.
+
+Keep the reply short: the link first, then the answers as compact tables.
