@@ -1,6 +1,6 @@
 // The six ways to lower the cost, ranked by the survey's trade-off question.
 import { el, sentence } from "./dom.js";
-import { drawnIn, ink, path, seedOf } from "./ink.js";
+import { art, drawnIn, ink, marked, path, seedOf } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
 import { voice } from "../lib/voice.js";
 
@@ -13,7 +13,23 @@ function scaleOf(fixes) {
   return Math.max(0.25, Math.ceil(widest * 4) / 4);
 }
 
-function row(fix, scale, order) {
+// Which way the scale runs, said once above the bars: a small arrow and a
+// few words at each end.
+function ends() {
+  const pointer = (seed, flip) => art("end-arrow", 30, 14, path(
+    flip
+      ? sketch.arrow(27, 7, 3, 7, { seed, head: 6, rough: 0.5, bend: 0.06 })
+      : sketch.arrow(3, 7, 27, 7, { seed, head: 6, rough: 0.5, bend: 0.06 }),
+  ));
+  return el("li", { class: "bar-row fix bar-ends", "aria-hidden": "true" },
+    el("span", { class: "scale-ends" },
+      el("span", {}, pointer(51, true), "least likely to go"),
+      el("span", {}, "most likely to go", pointer(52, false)),
+    ),
+  );
+}
+
+function row(fix, scale, order, best) {
   // The track runs from 0 to 1 with zero in the middle.
   const position = (score) => 0.5 + Math.max(-1, Math.min(1, score / scale)) * 0.5;
   const side = fix.score >= 0 ? "up" : "down";
@@ -39,15 +55,18 @@ function row(fix, scale, order) {
           + sketch.line(high, middle - 5, high, middle + 5, { seed: seed + 4, rough: 0.4, passes: 1 }),
         "whisker-line",
       ),
-      path(sketch.line(zero, -5, zero, height + 5, { seed: seed + 5, rough: 0.6, passes: 1 }), "zero-line"),
     ];
   });
 
-  return el("li", { class: "bar-row" },
-    el("span", { class: "bar-name", text: fix.label }),
+  // The option that came out on top is gone over with the highlighter.
+  const name = el("span", { class: "bar-name", text: fix.label });
+  return el("li", { class: "bar-row fix" },
+    el("div", { class: "bar-what" },
+      best ? marked(name, `fix ${fix.label}`) : name,
+      el("p", { class: "bar-detail", text: fix.detail }),
+    ),
     track,
     el("span", { class: "bar-value", text: signed(fix.score) }),
-    el("p", { class: "bar-detail", text: fix.detail }),
   );
 }
 
@@ -77,15 +96,40 @@ export function mount(root, dataset) {
     );
   }
 
+  // A single winner is marked. A tie at the top is not.
+  const best = top.length === 1 ? top[0] : null;
+  const list = el("ul", { class: "bar-list fixes" }, ends(), ranked.map((fix, order) => row(fix, scale, order, fix === best)));
+  // Zero is one pen line down the whole chart, through the middle of the
+  // bars' column. On a narrow screen each bar sits under its own name, and
+  // a line down the chart would run through the words, so there each bar
+  // gets a short stroke of its own.
+  ink(list, (width, height) => {
+    const tracks = [...list.querySelectorAll(".diverge")];
+    const head = list.querySelector(".bar-ends");
+    if (tracks.length === 0 || !head) return [];
+    const seed = seedOf("fixes zero");
+    const zero = tracks[0].offsetLeft + tracks[0].offsetWidth / 2;
+    const what = tracks[0].previousElementSibling;
+    const stacked = tracks[0].offsetLeft < what.offsetLeft + what.offsetWidth - 1;
+    if (!stacked) {
+      const from = head.offsetTop + head.offsetHeight - 2;
+      return path(sketch.line(zero, from, zero, height + 6, { seed, rough: 1.2, passes: 2 }), "zero-line");
+    }
+    return tracks.map((track, index) => path(
+      sketch.line(zero, track.offsetTop - 5, zero, track.offsetTop + track.offsetHeight + 5, { seed: seed + index, rough: 0.6, passes: 1 }),
+      "zero-line",
+    ));
+  });
+
   root.append(
     el("p", {},
       `A lower price only helps if people will take it. ${say.shown} six ways a club could offer one and asked which would make them most and least likely to still go. `,
       outcome,
     ),
-    el("ul", { class: "bar-list" }, ranked.map((fix, order) => row(fix, scale, order))),
+    list,
     el("p", {
       class: "aside",
-      text: `Score: how often an option was picked as most likely to help, minus how often as least likely, out of the times it was shown. It can run from −1 to +1; the bars here are drawn from ${signed(-scale)} to ${signed(scale)}. ${fixesN} ${say.many} answered. The thin line is the 95% interval.`,
+      text: `Score: how often an option was picked as most likely to help, minus how often as least likely, out of the times it was shown. It can run from −1 to +1; the bars here are drawn from ${signed(-scale)} to ${signed(scale)}. ${fixesN} ${say.many} answered. The thin line across each bar is the 95% interval.`,
     }),
   );
 }

@@ -820,8 +820,7 @@ input.blank::-webkit-inner-spin-button {
   gap: 0.45rem;
 }
 
-.key .seat,
-.key .swatch {
+.key .seat {
   flex: none;
   width: 1.1rem;
   height: 1.1rem;
@@ -1057,27 +1056,103 @@ td:first-child {
   font-variant-numeric: tabular-nums;
 }
 
+/* The ranking of fixes: what each one is on the left, its bar on a scale
+   that runs both ways from one line down the middle, its score on the right. */
+.bar-list.fixes {
+  max-width: 62rem;
+  gap: 1.2rem;
+}
+
+.bar-row.fix {
+  grid-template-columns: minmax(0, 21rem) minmax(0, 1fr) 4rem;
+  gap: 0.1rem 1.5rem;
+}
+
+.bar-name.marked {
+  display: inline-block;
+}
+
 .bar-detail {
-  grid-column: 1 / -1;
   color: var(--ink-soft);
   font-size: 0.95rem;
-  margin: 0;
+  line-height: 1.4;
+  margin: 0.1rem 0 0;
   max-width: none;
+}
+
+.scale-ends {
+  grid-column: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.scale-ends > span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+/* The arrows only go in where the bars' column is wide enough for them. */
+.end-arrow {
+  display: none;
+  flex: none;
+  width: 1.9rem;
+  height: auto;
+}
+
+.end-arrow path {
+  stroke: var(--ink-soft);
+  stroke-width: 1.5;
 }
 
 /* Pledges --------------------------------------------------------------- */
 
-/* The spans are what a pointer hovers; the drawing underneath is the bar. */
-.cascade {
-  display: flex;
-  gap: 3px;
-  height: 28px;
-  max-width: 46rem;
-  margin: 1.5rem 0 0.6rem;
+.pledge-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 2rem clamp(1.5rem, 4vw, 3.5rem);
+  align-items: start;
+  margin: 1.75rem 0 1.5rem;
 }
 
-.cascade span {
-  min-width: 4px;
+.pledge-layout .figure {
+  margin-top: 0.25rem;
+}
+
+/* One line for each round of pledges: how many, what they said, and a bar
+   as long as their share of everyone who pays. */
+.rounds {
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+  padding: 0;
+  margin: 0;
+}
+
+.round {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 10.5rem) minmax(0, 1fr);
+  gap: 0 0.9rem;
+  align-items: center;
+}
+
+.round-count {
+  font: 900 2rem/1 var(--font-display);
+  letter-spacing: 0.01em;
+  text-align: right;
+}
+
+.round.rest {
+  color: var(--ink-soft);
+}
+
+.round-bar {
+  display: block;
+  height: 26px;
 }
 
 .round-fill {
@@ -1097,16 +1172,12 @@ td:first-child {
   stroke-dasharray: 3.5 3.5;
 }
 
-.swatch path {
-  stroke-width: 1.5;
-}
-
 .tickets {
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
   max-width: 46rem;
-  margin: 1.5rem 0 0.6rem;
+  margin: 1.25rem 0 0;
 }
 
 .tickets .seat {
@@ -1371,6 +1442,7 @@ input:focus-visible + .tick {
 
 @media (max-width: 52rem) {
   .result,
+  .pledge-layout,
   .receipt-layout {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1390,6 +1462,26 @@ input:focus-visible + .tick {
   }
 
   .bar-name {
+    grid-column: 1 / -1;
+  }
+
+  .bar-row.fix {
+    grid-template-columns: minmax(0, 1fr) 4rem;
+  }
+
+  .bar-what {
+    grid-column: 1 / -1;
+  }
+
+  .scale-ends {
+    grid-column: 1;
+  }
+
+  .round {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+  }
+
+  .round-bar {
     grid-column: 1 / -1;
   }
 }

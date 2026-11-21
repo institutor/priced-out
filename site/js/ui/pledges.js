@@ -1,16 +1,35 @@
 // "I will if you will": would members' own pledges cover the empty seats?
 import { el, sentence } from "./dom.js";
-import { drawnIn, ink, path, seat, seedOf, wipe } from "./ink.js";
-import { swatch } from "./doodles.js";
+import { circled, drawnIn, ink, path, seat, seedOf, wipe } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
-
-// How close the shading lines are for each round of pledges: the first to
-// give are shaded darkest, each later round a little lighter.
-const SHADING = [3.2, 5, 7.5, 11];
 import { sharesAt } from "../lib/curve.js";
 import { cascade, seatsCovered } from "../lib/pledge.js";
 import { money, people } from "../lib/format.js";
 import { voice } from "../lib/voice.js";
+
+// How close the shading lines are for each round of pledges: the first to
+// give are shaded darkest, each later round a little lighter.
+const SHADING = [3.2, 5, 7.5, 11];
+
+// One round of the cascade: how many, what they said, and a bar. The longest
+// bar is the biggest group and the rest are drawn against it. People who add
+// nothing get an empty bar.
+function round({ count, lead, label, share, gap, order }) {
+  const seed = seedOf(`pledge ${order}`);
+  const bar = el("span", { class: "round-bar", "aria-hidden": "true" });
+  ink(bar, (width, height) => {
+    const length = Math.max(6, share * width);
+    const outline = sketch.blob(0, 3, length, height - 6, { seed, rough: 0.7, round: 0.15 });
+    if (!gap) return [path(outline, "round-line rest")];
+    const shading = sketch.hatch(1, 4, length - 2, height - 8, { seed: seed + 1, gap, rough: 0.7 });
+    return [...drawnIn(shading, "round-fill", { from: order * 3 }), path(outline, "round-line")];
+  });
+  return el("li", { class: gap ? "round" : "round rest" },
+    el("span", { class: "round-count", text: `${lead}${count}` }),
+    el("span", { class: "round-label", text: label }),
+    bar,
+  );
+}
 
 export function mount(root, dataset, state) {
   const { items, rows, rules } = dataset;
@@ -53,49 +72,36 @@ export function mount(root, dataset, state) {
       return;
     }
 
-    // One bar for everyone who pays: each round of the cascade, then the rest.
-    const bar = el("div", { class: "cascade", role: "img" });
-    const key = el("ul", { class: "key" });
-    let previous = 0;
-    outcome.steps.forEach((total, index) => {
-      const joined = total - previous;
-      previous = total;
-      if (joined <= 0) return;
-      const gap = SHADING[Math.min(index, SHADING.length - 1)];
-      const segment = el("span", {});
-      segment.dataset.gap = gap;
-      segment.style.flexGrow = joined;
-      const label = index === 0 ? `${joined} give no matter what` : `${joined} more join once ${outcome.steps[index - 1]} have`;
-      segment.title = label;
-      bar.append(segment);
-      key.append(el("li", {}, swatch(gap, 60 + index), label));
-    });
+    // Who chips in, a round at a time: those who give anyway, then everyone
+    // who was waiting for that many, and so on, then those who add nothing.
     const rest = payers - outcome.pledgers;
+    const joins = outcome.steps.map((total, index) => total - (outcome.steps[index - 1] ?? 0));
+    const biggest = Math.max(rest, ...joins);
+    const rounds = el("ol", { class: "rounds" });
+    joins.forEach((joined, index) => {
+      if (joined <= 0) return;
+      rounds.append(round({
+        count: joined,
+        lead: index === 0 ? "" : "+",
+        label: index === 0 ? "give no matter what" : `join once ${outcome.steps[index - 1]} have`,
+        share: joined / biggest,
+        gap: SHADING[Math.min(index, SHADING.length - 1)],
+        order: index,
+      }));
+    });
     if (rest > 0) {
-      const segment = el("span", { title: `${rest} add nothing` });
-      segment.style.flexGrow = rest;
-      bar.append(segment);
-      key.append(el("li", {}, swatch(0, 70, "rest"), `${rest} add nothing`));
+      rounds.append(round({ count: rest, lead: "", label: "add nothing", share: rest / biggest, gap: 0, order: joins.length }));
     }
-    // The spans above set how wide each part is and carry its label. The
-    // drawing follows them: an outline for each, shaded where people give.
-    const parts = [...bar.children];
-    ink(bar, (width, height) => parts.flatMap((part, index) => {
-      const seed = seedOf(`pledge ${index}`);
-      const outline = sketch.blob(part.offsetLeft, 2, part.offsetWidth, height - 4, { seed, rough: 0.7, round: 0.15 });
-      if (!part.dataset.gap) return [path(outline, "round-line rest")];
-      const shading = sketch.hatch(part.offsetLeft + 1, 3, part.offsetWidth - 2, height - 6, { seed: seed + 1, gap: Number(part.dataset.gap), rough: 0.7 });
-      return [...drawnIn(shading, "round-fill", { from: index * 3 }), path(outline, "round-line")];
-    }));
-    bar.setAttribute("aria-label", `Of the ${payers} who would pay ${money(price)}, ${outcome.pledgers} would add to their ticket.`);
-    root.append(
-      el("p", {}, sentence(`Scaled to the ${payers} of your ${size} who would pay ${money(price)}, `, [outcome.pledgers], " would chip in:")),
-      bar,
-      key,
+    const who = el("div", {},
+      // Nobody pays for something that is free, so there they are the ones who go.
+      el("p", {}, sentence(`Among the ${payers} of your ${size} who would ${price > 0 ? `pay ${money(price)}` : "go"}, `, [outcome.pledgers], " would chip in:")),
+      rounds,
     );
 
+    // What that adds up to, and how many of the empty seats it fills.
+    const pot = el("div", { class: "statement" }, circled(el("span", { class: "figure", text: money(outcome.pool) }), "pot"));
     if (left === 0) {
-      root.append(el("p", { text: `At ${money(price)} ${say.nobody} is left out, so there is nothing to cover.` }));
+      pot.append(el("p", { text: `is what they would add between them. At ${money(price)} ${say.nobody} is left out, so there is nothing to cover.` }));
     } else {
       const tickets = el("div", {
         class: "tickets",
@@ -106,19 +112,22 @@ export function mount(root, dataset, state) {
         const kind = index < covered ? "stretched" : "out";
         tickets.append(el("span", { class: `seat ${kind}` }, seat(kind, 900 + index)));
       }
-      root.append(
-        tickets,
-        el("p", {}, sentence(
-          "Together that is about ", [money(outcome.pool)], ", which pays for ",
-          [`${covered} of the ${left}`], ` seats that would otherwise sit empty at ${money(price)}.`,
-        )),
-      );
+      const pays = covered === 0
+        ? [`is what they would add between them. That is less than one ticket at ${money(price)}, so none of the ${left} seats that would otherwise sit empty is covered.`]
+        : sentence(
+          "is what they would add between them. It pays for ", [`${covered} of the ${left}`],
+          ` seats that would otherwise sit empty at ${money(price)}.`,
+        );
+      pot.append(el("p", {}, pays), tickets);
     }
 
-    root.append(el("p", {
-      class: "aside",
-      text: `A pledge in a survey is a promise, not a payment. Amounts are what ${say.many} said they would add, and an answer of $10 or more is counted as $10.`,
-    }));
+    root.append(
+      el("div", { class: "pledge-layout" }, who, pot),
+      el("p", {
+        class: "aside",
+        text: `A pledge in a survey is a promise, not a payment. Amounts are what ${say.many} said they would add, and an answer of $10 or more is counted as $10.`,
+      }),
+    );
   }
 
   state.subscribe(render);

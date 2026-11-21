@@ -94,11 +94,3 @@ export function tickBox(seed) {
     path(sketch.check(4, 0, 21, { seed: seed + 1, rough: 0.7 }), "tick-mark"),
   );
 }
-
-// A small square of shading for a key. `gap` sets how close the lines are;
-// with no gap the square is left empty.
-export function swatch(gap, seed, className = "") {
-  const outline = path(sketch.blob(2, 2, 12, 12, { seed, rough: 0.5, round: 0.2 }), `round-line ${className}`.trim());
-  if (!gap) return art("swatch", 16, 16, outline);
-  return art("swatch", 16, 16, path(sketch.hatch(2.5, 2.5, 11, 11, { seed, gap, rough: 0.4 }), "round-fill"), outline);
-}

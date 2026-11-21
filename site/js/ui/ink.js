@@ -154,6 +154,17 @@ export function highlight(node, name, { caret = false } = {}) {
   return node;
 }
 
+// A highlighter swipe over a few words, with no rule under it.
+export function marked(node, name) {
+  const seed = seedOf(`marked ${name}`);
+  node.classList.add("marked");
+  ink(node, (width, height) => path(
+    sketch.blob(-5, height * 0.2, width + 10, height * 0.72, { seed, rough: 1.5, round: 0.3 }),
+    "hl-fill",
+  ));
+  return node;
+}
+
 // A text input inside a highlighted blank.
 export function blank(input, name) {
   return highlight(el("span", { class: "blank-wrap" }, input), name);
