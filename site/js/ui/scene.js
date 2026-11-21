@@ -70,6 +70,11 @@ const TALL = {
   truth: { size: 21, x: 352, y: 248, anchor: "end", turn: -3, from: [254, 230], to: [288, 172], bend: -0.32 },
 };
 
+// Where the eye should end up when the view closes in on the drawing: the
+// middle of the one who can't come, what they say and the note about them,
+// as a share of the drawing's width and of its height.
+export const focus = (narrow) => (narrow ? [0.8, 0.55] : [0.8, 0.53]);
+
 // A pen that keeps the time. Each stroke it puts down starts as the one
 // before it is finishing.
 function makePen(stage) {
