@@ -1733,6 +1733,17 @@ input:focus-visible + .tick {
   font-weight: 700;
 }
 
+/* How many answers are enough: the check against made-up clubs. */
+.enough {
+  max-width: 46rem;
+  margin-top: 3.25rem;
+  scroll-margin-top: calc(var(--banner, 3rem) + 1.5rem);
+}
+
+.enough-table {
+  max-width: 36rem;
+}
+
 .load-status:empty,
 .load-problem:empty {
   display: none;

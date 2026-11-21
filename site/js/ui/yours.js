@@ -6,6 +6,7 @@ import { el } from "./dom.js";
 import { button, ink, path, seedOf } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
 import { SURVEY, inRepo, outside } from "./links.js";
+import { enough } from "./enough.js";
 
 const EXAMPLE = "data/example-club.csv";
 // An export of this survey is a few hundred bytes a row. Anything this big is
@@ -31,7 +32,8 @@ function step(n, title, ...body) {
 // throws an error with a message for the page if it cannot. `reset()` puts
 // back the answers the page opened with. `said` is what the last reading
 // reported, shown again because the page is laid out afresh after each one.
-export function mount(root, dataset, { read, reset, said = "" } = {}) {
+// `evaluation` is what the check against made-up clubs found, if it loaded.
+export function mount(root, dataset, { read, reset, said = "", evaluation = null } = {}) {
   const { meta } = dataset;
   const loaded = meta.loaded ?? null;
 
@@ -137,5 +139,6 @@ export function mount(root, dataset, { read, reset, said = "" } = {}) {
         problem,
       ),
     ),
+    enough(evaluation),
   ].filter(Boolean));
 }

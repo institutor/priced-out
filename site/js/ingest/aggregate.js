@@ -27,7 +27,7 @@ function publicRow(respondent) {
 
 // A shuffle with a fixed seed can be undone by anyone who knows the seed.
 // Sorting the rows as text needs no seed and gives the same file every time.
-function publicRows(respondents) {
+export function publicRows(respondents) {
   return respondents
     .map((respondent) => JSON.stringify(publicRow(respondent)))
     .sort()

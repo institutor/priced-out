@@ -1,0 +1,78 @@
+{
+  "what": "The page's figures against made-up clubs whose true answer is known. Written by scripts/evaluate.mjs.",
+  "settings": {
+    "sizes": [
+      10,
+      20,
+      40,
+      80,
+      160
+    ],
+    "trials": 400,
+    "population": 20000,
+    "seed": 4000,
+    "gentle": 0.1,
+    "prices": {
+      "dues": 30,
+      "formal": 45,
+      "trip": 180
+    }
+  },
+  "truth": {
+    "dues": {
+      "share": 0.399,
+      "gentle": 10
+    },
+    "formal": {
+      "share": 0.353,
+      "gentle": 20
+    },
+    "trip": {
+      "share": 0.542,
+      "gentle": 60
+    }
+  },
+  "clubs": 2000,
+  "bySize": [
+    {
+      "size": 10,
+      "checks": 1200,
+      "held": 0.943,
+      "typicalMiss": 0.101,
+      "badMiss": 0.268,
+      "priceWithinOneStep": 0.693
+    },
+    {
+      "size": 20,
+      "checks": 1200,
+      "held": 0.963,
+      "typicalMiss": 0.083,
+      "badMiss": 0.18,
+      "priceWithinOneStep": 0.823
+    },
+    {
+      "size": 40,
+      "checks": 1200,
+      "held": 0.973,
+      "typicalMiss": 0.053,
+      "badMiss": 0.12,
+      "priceWithinOneStep": 0.934
+    },
+    {
+      "size": 80,
+      "checks": 1200,
+      "held": 0.943,
+      "typicalMiss": 0.037,
+      "badMiss": 0.095,
+      "priceWithinOneStep": 0.978
+    },
+    {
+      "size": 160,
+      "checks": 1200,
+      "held": 0.947,
+      "typicalMiss": 0.029,
+      "badMiss": 0.067,
+      "priceWithinOneStep": 0.991
+    }
+  ]
+}

@@ -87,11 +87,18 @@ async function start() {
   // in them. Each time the page is laid out it starts from a copy of these.
   const blank = document.getElementById("app").cloneNode(true);
 
+  // What the check against made-up clubs found. The page works without it.
+  const checking = fetch("data/evaluation.json")
+    .then((response) => (response.ok ? response.json() : null))
+    .catch(() => null);
+
   let published;
+  let evaluation;
   try {
     const response = await fetch("data/dataset.json");
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     published = await response.json();
+    evaluation = await checking;
   } catch {
     document.getElementById("price-check").append(
       el("p", { class: "empty", text: "The survey data did not load. If you opened this page as a file, run npm run dev and open the address it prints." }),
@@ -144,10 +151,10 @@ async function start() {
     } else {
       said.mount(bodyOf("said"), dataset, state);
     }
-    yours.mount(bodyOf("yours"), dataset, { read, reset, said: reported });
+    yours.mount(bodyOf("yours"), dataset, { read, reset, said: reported, evaluation });
     why.mount(bodyOf("why"));
     made.mount(bodyOf("made"));
-    method.mount(bodyOf("method"), dataset, state);
+    method.mount(bodyOf("method"), dataset, state, { evaluation });
     retitle(dataset.meta);
     dress();
   }
