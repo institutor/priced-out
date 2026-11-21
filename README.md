@@ -54,7 +54,7 @@ To check the working instead of the page:
 
 - `npm test` runs the 119 tests on the rules behind every number ([Run it](#run-it)).
 - [`briefs/`](briefs) and [`replies/`](replies) hold everything sent to and received from
-  Flashpoint, each reply with its payment receipt.
+  Flashpoint, each paid reply with its payment receipt.
 
 ## What it does
 
