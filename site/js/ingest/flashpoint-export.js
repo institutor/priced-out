@@ -13,7 +13,7 @@ import { FIXES, ITEMS } from "./vocab.js";
 const isBlank = (value) => value === undefined || value === null || String(value).trim() === "";
 const sameText = (a, b) => String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
 
-function findColumn(headers, wanted, field) {
+export function findColumn(headers, wanted, field) {
   if (headers.includes(wanted)) return wanted;
   const loose = headers.filter((header) => header.toLowerCase().includes(wanted.toLowerCase()));
   if (loose.length === 1) return loose[0];

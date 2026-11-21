@@ -48,6 +48,14 @@ const STROKES = {
     sketch.line(13, 17, 35, 17, { seed: seed + 1, rough: 0.5, passes: 1 }),
     sketch.line(13, 24, 29, 24, { seed: seed + 2, rough: 0.5, passes: 1 }),
   ],
+  // A sheet with a corner folded down: a club's own file of answers.
+  sheet: (seed) => [
+    sketch.polygon([[11, 5], [29, 5], [38, 14], [38, 43], [11, 43]], { seed, rough: 0.9 }),
+    sketch.polyline([[29, 5.5], [29, 14], [37.5, 14]], { seed: seed + 1, rough: 0.4, passes: 1 }),
+    sketch.line(16, 22, 33, 22, { seed: seed + 2, rough: 0.5, passes: 1 }),
+    sketch.line(16, 28.5, 33, 28.5, { seed: seed + 3, rough: 0.5, passes: 1 }),
+    sketch.line(16, 35, 27, 35, { seed: seed + 4, rough: 0.5, passes: 1 }),
+  ],
   // A magnifying glass: how we know.
   glass: (seed) => [
     sketch.ellipse(20, 20, 12, 12, { seed, rough: 0.7, steps: 14 }),

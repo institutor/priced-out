@@ -1,7 +1,7 @@
 {
-  "_note": "Maps Flashpoint's CSV export onto the survey's fields. Column names are the ones in the second header row of the export (see headerRow). Answer texts are the ones the survey shows respondents. The MaxDiff designs are the ones Flashpoint reported for question Q7 (replies/21-export.json): for each design number, the four options on each of the six screens, in the order shown.",
+  "_note": "Maps Flashpoint's CSV export onto the survey's fields. Column names are the ones in the second header row of the export (see headerRow). Answer texts are the ones the survey shows respondents. The MaxDiff designs are the ones Flashpoint reported for question Q7 (replies/21-export.json): for each design number, the four options on each of the six screens, in the order shown. A file whose Source column says \"example\" is a made-up club (site/data/example-club.csv) and is always labelled as one.",
   "headerRow": 2,
-  "source": { "column": "Source", "synthetic": "synthetic" },
+  "source": { "column": "Source", "synthetic": "synthetic", "example": "example" },
   "exclude": [],
   "columns": {
     "year": "S1",

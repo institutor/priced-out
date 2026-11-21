@@ -34,6 +34,26 @@ test("the range for real answers gives both ends", () => {
   assert.match(voice({ kind: "real" }).range("22%", "47%"), /22% to 47%/);
 });
 
+test("every phrase about the made-up club says it is made up", () => {
+  const say = voice({ kind: "sample", loaded: { name: "example-club.csv", example: true } });
+  assert.equal(say.simulated, true);
+  for (const phrase of phrasesOf(say)) assert.match(phrase, /made-up/i);
+  assert.doesNotMatch(say.range("22%", "47%"), /true figure/);
+});
+
+test("a club's own answers are described as its members", () => {
+  const say = voice({ kind: "real", loaded: { name: "our-club.csv", example: false } });
+  assert.equal(say.simulated, false);
+  assert.equal(say.many, "members");
+  assert.equal(say.Nobody, "None of the members who answered");
+  assert.match(say.range("22%", "47%"), /22% to 47%/);
+});
+
+test("a panel file someone loads is still called simulated", () => {
+  const say = voice({ kind: "simulated", loaded: { name: "panel.csv", example: false } });
+  for (const phrase of phrasesOf(say)) assert.match(phrase, /simulated/i);
+});
+
 test("capitalised phrases start a sentence", () => {
   assert.equal(voice({ kind: "real" }).Nobody, "Nobody surveyed");
   assert.equal(voice({ kind: "simulated" }).Nobody, "None of the simulated students");

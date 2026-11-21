@@ -28,6 +28,12 @@ export function mount(root, dataset, state) {
   if (meta.kind === "simulated") {
     source = `Simulated: these numbers come from ${meta.n} AI personas, not real students.`;
   }
+  if (meta.loaded && meta.kind === "real") {
+    source = `From an anonymous survey of ${meta.n} members of this club.`;
+  }
+  if (meta.loaded?.example) {
+    source = `A made-up club: these ${meta.n} members were invented, and the numbers are not real responses.`;
+  }
 
   // The slip is built once and then updated in place, so the box being typed
   // in keeps the cursor.

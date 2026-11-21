@@ -8,6 +8,7 @@ import { el, svg, sentence } from "./dom.js";
 import { drawnIn, ink, path, seedOf } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
 import { sharesAt } from "../lib/curve.js";
+import { voice } from "../lib/voice.js";
 
 function saidBars(said) {
   const ranked = [...said.options].sort((a, b) => b.count - a.count);
@@ -86,6 +87,9 @@ function numberLine(marks, interval) {
 
 export function mount(root, dataset) {
   const { said, skipped, guess, rows, items, rules } = dataset;
+  // Who the answers came from: students, a club's own members, or the
+  // invented members of the made-up club.
+  const who = voice(dataset.meta).many;
 
   // Under the minimum the counts are not in the dataset at all.
   const counted = skipped.n >= rules.minCell;
@@ -94,7 +98,7 @@ export function mount(root, dataset) {
   if (answered >= rules.minCell) {
     root.append(el("p", {}, sentence(
       [`${ever} of the ${answered}`],
-      " students who answered said they had skipped a club event, or decided not to join a club, mainly because of the cost.",
+      ` ${who} who answered said they had skipped a club event, or decided not to join a club, mainly because of the cost.`,
       skipped.several >= rules.minCell ? ` ${skipped.several} said it had happened several times.` : "",
     )));
   }
@@ -103,18 +107,18 @@ export function mount(root, dataset) {
     const truth = said.options.find((option) => option.id === "truth");
     root.append(
       el("p", {}, sentence(
-        `${said.n} of them told us what they said at the time. `,
+        `${said.n} of them gave what they said at the time. `,
         [`${truth.count} said it was the cost.`],
         " They could pick more than one answer.",
       )),
       saidBars(said),
       el("p", {
         class: "aside",
-        text: "This counts what students who were priced out said. It cannot tell you why any one person says they are busy.",
+        text: `This counts what ${who} who were priced out said. It cannot tell you why any one person says they are busy.`,
       }),
     );
   } else {
-    root.append(el("p", { class: "empty", text: "Too few students told us what they said at the time for it to be shown." }));
+    root.append(el("p", { class: "empty", text: `Too few ${who} gave what they said at the time for it to be shown.` }));
   }
 
   const item = items.find((candidate) => candidate.id === guess.item);
@@ -123,25 +127,25 @@ export function mount(root, dataset) {
     const own = Math.round(actual.out * 100);
     const typical = Math.round(guess.all.median);
     const marks = [
-      { shape: "dot", label: "From students' own prices", value: own },
+      { shape: "dot", label: `From the ${who}' own prices`, value: own },
       { shape: "diamond", label: "Typical guess", value: typical },
     ];
-    let split = "Too few students who have set prices answered for their guesses to be shown separately.";
+    let split = `Too few ${who} who have set prices answered for their guesses to be shown separately.`;
     if (guess.officers && guess.others) {
       const officers = Math.round(guess.officers.median);
-      marks.push({ shape: "hollow", label: "Guess from students who set prices", value: officers });
-      split = `Students who have planned a paid event or set dues guessed ${officers}. Everyone else guessed ${Math.round(guess.others.median)}.`;
+      marks.push({ shape: "hollow", label: "Guess from those who set prices", value: officers });
+      split = `Those who have planned a paid event or set dues guessed ${officers}. Everyone else guessed ${Math.round(guess.others.median)}.`;
     }
     root.append(
       el("h3", { class: "subhead", text: "And what everyone guessed" }),
       el("p", {}, sentence(
-        `We also asked: out of 100 Columbia students, how many would skip a $${guess.price} formal because of the price? The typical guess was `,
-        [typical], ". Going by the prices students gave for themselves, it is ", [own], ". ", split,
+        `The survey also asks: out of 100 Columbia students, how many would skip a $${guess.price} formal because of the price? The typical guess was `,
+        [typical], `. Going by the prices these ${who} gave for themselves, it is `, [own], ". ", split,
       )),
       numberLine(marks, { low: Math.round(actual.outLow * 100), high: Math.round(actual.outHigh * 100) }),
       el("p", {
         class: "aside",
-        text: `${guess.all.n} students guessed. ${actual.n} gave their own price for a formal, and the pale band is the 95% interval around that figure.`,
+        text: `${guess.all.n} ${who} guessed. ${actual.n} gave their own price for a formal, and the pale band is the 95% interval around that figure.`,
       }),
     );
   }

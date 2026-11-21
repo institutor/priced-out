@@ -294,6 +294,10 @@ export function mount(root, dataset, state, { linkFor = null } = {}) {
   }
 
   state.subscribe(render);
-  narrowScreen.addEventListener("change", () => render(state.get()));
+  narrowScreen.addEventListener("change", () => {
+    // The page can be laid out again for other answers. A price check that
+    // has been taken off the page has nothing left to draw.
+    if (root.isConnected) render(state.get());
+  });
   render(state.get());
 }

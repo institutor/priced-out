@@ -256,6 +256,11 @@ h2 {
   display: none;
 }
 
+.banner a {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .banner-fill {
   fill: var(--pink);
   stroke: none;
@@ -1484,6 +1489,102 @@ input:focus-visible + .tick {
 .bullet path {
   stroke: var(--series);
   stroke-width: 2.4;
+}
+
+/* Running it for your own club: three numbered steps, each number looped in
+   pen, and the control that reads a file. */
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0 0;
+  display: grid;
+  gap: 2.25rem;
+  max-width: 46rem;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 3.4rem minmax(0, 1fr);
+  gap: 0 1.4rem;
+  align-items: start;
+}
+
+.step-n {
+  display: grid;
+  place-items: center;
+  width: 3.1rem;
+  height: 3.1rem;
+  font: 900 2rem/1 var(--font-display);
+  padding-top: 0.08em;
+}
+
+.step-ring {
+  stroke: var(--mark-2);
+  stroke-width: 2.2;
+}
+
+.step-body .sub {
+  margin-top: 0.55rem;
+}
+
+.step-body p:last-child {
+  margin-bottom: 0;
+}
+
+.load-actions {
+  margin: 1.4rem 0 1rem;
+}
+
+.load-try .text-button {
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+.load-status,
+.load-problem {
+  margin-top: 1rem;
+  font-weight: 700;
+}
+
+.load-status:empty,
+.load-problem:empty {
+  display: none;
+}
+
+.now-showing:focus {
+  outline: none;
+}
+
+.load-problem {
+  color: var(--mark-2);
+}
+
+.now-showing {
+  max-width: 46rem;
+  margin: 1.5rem 0 0;
+  padding: 0.1rem 0 0.1rem 1.1rem;
+  border-left: 4px solid var(--mark-2);
+}
+
+.now-showing p {
+  margin: 0 0 0.3rem;
+}
+
+.now-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1.4rem;
+  margin-top: 0.4rem;
+}
+
+.now-actions .text-button {
+  font-size: inherit;
+}
+
+.text-link {
+  font-weight: 700;
 }
 
 .number-line {

@@ -125,7 +125,7 @@ export function mount(root, dataset, state) {
       waysBlock(item, price, size),
       el("p", {
         class: "aside",
-        text: `${say.simulated ? "Every figure here is worked out from the simulated students. " : ""}The access price is the highest price that loses no more than 1 in 20. The sums assume people who can pay the full price still do. Whether they would depends on how the lower price is offered, which is the next question.`,
+        text: `${say.simulated ? `Every figure here is worked out from the ${say.many}. ` : ""}The access price is the highest price that loses no more than 1 in 20. The sums assume people who can pay the full price still do. Whether they would depends on how the lower price is offered, which is the next question.`,
       }),
     );
   }
