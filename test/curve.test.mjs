@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { stateAt, sharesAt, priceGrid, curve, maxPriceFor, outOfAny, accessTier, answeredAll } from "../site/js/lib/curve.js";
+import { stateAt, sharesAt, priceGrid, curve, maxPriceFor, outOfAny, accessTier, answeredAll, waysToPrice } from "../site/js/lib/curve.js";
 
 const formal = { id: "formal", label: "A ticket to the club formal", max: 150, step: 5 };
 const dues = { id: "dues", label: "One semester of club dues", max: 100, step: 5 };
@@ -102,4 +102,32 @@ test("answeredAll keeps only rows that gave a skip price for every item", () => 
   assert.deepEqual(answeredAll(rows, [dues, formal]), [rows[0]]);
   assert.deepEqual(answeredAll(rows, [formal]), [rows[0], rows[1], rows[2]]);
   assert.deepEqual(answeredAll(rows, []), rows);
+});
+
+test("waysToPrice sets the price now beside one lower price and beside two prices", () => {
+  // Three of the four would skip a $60 formal, so 2 of a club of 8 pay.
+  assert.deepEqual(waysToPrice(four, formal, 60, 8), [
+    { kind: "now", price: 60, there: 2, taken: 120 },
+    { kind: "lower", price: 15, there: 8, taken: 120 },
+    { kind: "two", price: 60, accessPrice: 15, there: 8, taken: 210 },
+  ]);
+});
+
+test("waysToPrice gives only the price now when nothing lower would bring anyone back", () => {
+  assert.deepEqual(waysToPrice(four, formal, 15, 8), [{ kind: "now", price: 15, there: 8, taken: 120 }]);
+});
+
+test("waysToPrice leaves out a way that would not move one whole person in a small club", () => {
+  // At $25 one in four skips. In a club of 1 that rounds to nobody.
+  assert.deepEqual(waysToPrice(four, formal, 25, 1), [{ kind: "now", price: 25, there: 1, taken: 25 }]);
+});
+
+test("waysToPrice counts a free access price as bringing people and no money", () => {
+  const rows = [{ formal: [0, 5] }, { formal: [50, 100] }, { formal: [50, 100] }, { formal: [50, 100] }];
+  const ways = waysToPrice(rows, formal, 50, 4);
+  assert.deepEqual(ways.at(-1), { kind: "two", price: 50, accessPrice: 0, there: 4, taken: 150 });
+});
+
+test("waysToPrice is null when nobody answered", () => {
+  assert.equal(waysToPrice([], formal, 60, 8), null);
 });

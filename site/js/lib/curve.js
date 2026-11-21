@@ -124,3 +124,34 @@ export function accessTier(rows, item, price, target = 0.05) {
   if (regained <= 0) return null;
   return { accessPrice, regained, addedRevenuePer100: regained * 100 * accessPrice };
 }
+
+// The same thing priced three ways, for a club of `size`: the price as it
+// is, one lower price for everyone (the highest that loses no more than
+// `gentle`), and the price as it is with a second, lower price for those who
+// need it (the highest that loses no more than `access`). Each way says how
+// many would be there and what the club would take in. People are counted
+// whole, as they are everywhere on the page, and a way that would not bring
+// one more whole person is left out. The two-price line assumes that those
+// who can pay the full price still do.
+export function waysToPrice(rows, item, price, size, { gentle = 0.1, access = 0.05 } = {}) {
+  const now = sharesAt(rows, item, price);
+  if (now.n === 0) return null;
+  const whole = (share) => Math.round(share * size);
+  const paying = size - whole(now.out);
+  const ways = [{ kind: "now", price, there: paying, taken: paying * price }];
+
+  const lower = maxPriceFor(rows, item, gentle);
+  if (lower !== null && lower < price) {
+    const there = size - whole(sharesAt(rows, item, lower).out);
+    if (there > paying) ways.push({ kind: "lower", price: lower, there, taken: there * lower });
+  }
+
+  const tier = accessTier(rows, item, price, access);
+  if (tier) {
+    const back = whole(tier.regained);
+    if (back > 0) {
+      ways.push({ kind: "two", price, accessPrice: tier.accessPrice, there: paying + back, taken: paying * price + back * tier.accessPrice });
+    }
+  }
+  return ways;
+}

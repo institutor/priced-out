@@ -1032,6 +1032,60 @@ td:first-child {
   max-width: 34ch;
 }
 
+/* The same thing priced two or three ways, on one small table. */
+.sub {
+  font: 900 clamp(1.45rem, 2.6vw, 1.9rem)/1.1 var(--font-display);
+  letter-spacing: 0.01em;
+  margin: 0 0 0.5em;
+  max-width: 28ch;
+  text-wrap: balance;
+}
+
+.ways {
+  margin: 2.75rem 0 1.5rem;
+}
+
+.ways-table {
+  width: 100%;
+  max-width: 42rem;
+  margin: 0.25rem 0 1.25rem;
+  font-size: 1.1rem;
+}
+
+.ways-table th,
+.ways-table td {
+  padding: 0.6rem 1.5rem 0.6rem 0;
+  vertical-align: baseline;
+}
+
+.ways-table th:last-child,
+.ways-table td:last-child {
+  padding-right: 0.4rem;
+}
+
+.ways-table thead th {
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.ways-table tbody th {
+  font-weight: 400;
+}
+
+.ways-table td {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ways-table .marked {
+  display: inline-block;
+}
+
+.ways-read {
+  max-width: 62ch;
+}
+
 /* Bars: fixes and what people said -------------------------------------- */
 
 .bar-list {
