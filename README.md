@@ -18,8 +18,6 @@ Engineering & Product track.
 
 ![The price check: a formal ticket at $45 in a club of 60, drawn as a room of seats, 19 of them empty](docs/screenshot-answer.jpg)
 
-![The walk up the price: stick figures stand along a ruler of prices. The price has been walked up to $53, and the five figures it has passed have stepped out of line, drawn in pink with their heads down](docs/screenshot-walk.jpg)
-
 ## Read this first: the numbers are simulated
 
 **No real student has answered the survey.** Every number on the site comes from a
@@ -40,29 +38,21 @@ One page, in the order a treasurer would use it.
 1. **Price check.** Fill in the line "A *formal ticket* at $*45* in a club of *60*", guess
    how many would skip it, then see the answer: a room of seats that empties, the share
    behind it with a 95% interval, and the whole curve from $0 up.
-2. **Walk the price up.** Twenty stick figures stand along a ruler of prices, each at the
-   price where 1 in 20 said they would skip. The strip stays put while you scroll: the
-   view closes in, the price climbs, and everyone it passes steps out of line.
-3. **What it would take.** The highest price that loses no more than 1 in 10, and what a
+2. **What it would take.** The highest price that loses no more than 1 in 10, and what a
    lower access price would bring back, in people and in dollars.
-4. **The fix they picked.** Six ways to offer a lower price (sliding scale, waiver on
+3. **The fix they picked.** Six ways to offer a lower price (sliding scale, waiver on
    request, open waiver code, pay what you can, paid-forward tickets, discount draw),
    ranked by a trade-off question.
-5. **Would members cover it themselves?** Many say they'd add a few dollars to their own
+4. **Would members cover it themselves?** Many say they'd add a few dollars to their own
    ticket, but only if enough others do. The page plays that out for your club and counts
    how many empty seats the pool pays for.
-6. **The receipt for a year in your club.** Dues, formal and trip on one printable slip,
+5. **The receipt for a year in your club.** Dues, formal and trip on one printable slip,
    with the share lost at each line and at any line.
-7. **What these numbers are, and what they are not.** Who answered, and what the numbers
+6. **What these numbers are, and what they are not.** Who answered, and what the numbers
    can't tell you.
 
-An eighth section, what priced-out students said at the time, is built and tested but is
+A seventh section, what priced-out students said at the time, is built and tested but is
 shown only when the answers come from people. An invented person's excuse is not evidence.
-
-The title page draws itself: a strip of stick figures in which one member says "Sorry,
-can't make it." Scrolling on closes the view in on that one while the rest of the page
-slides up over it. Anyone who has asked their device for less motion gets a page that
-holds still, and the walk becomes a strip to scroll sideways.
 
 ## How it uses Flashpoint
 
@@ -247,7 +237,7 @@ build need no key.
 - People are whole: "19 of your 60" is the share times the club size, rounded, and the
   dollar figures and pledge rounds are worked out from those whole people.
 
-The rules live in `site/js/lib/` and are covered by the tests in `test/` (131 tests).
+The rules live in `site/js/lib/` and are covered by the tests in `test/` (119 tests).
 
 ## Privacy
 
@@ -274,12 +264,10 @@ The rules live in `site/js/lib/` and are covered by the tests in `test/` (131 te
 ```
 site/                 the page: index.html, css/, js/, data/dataset.json
 site/js/lib/          the rules (curve, pledge cascade, intervals, wording), shared with Node,
-                      sketch.js and figure.js, the geometry every drawing is made from, and
-                      walk.js, where the line of figures stands and how the scroll is spent
+                      and sketch.js and figure.js, the geometry every drawing is made from
 site/js/ui/           one module per section of the page, plus the title page (cover.js and
-                      scene.js, its strip of stick figures), whatever follows the scroll
-                      (scroll.js) and the pen that draws under and over the page (ink.js,
-                      doodles.js)
+                      scene.js, its strip of stick figures) and the pen that draws under
+                      and over the page (ink.js, doodles.js)
 scripts/              build-data (export to dataset), make-sample, dev server
 scripts/lib/          CSV reader, Flashpoint export reader, MaxDiff scoring, aggregation
 test/                 node:test suites
