@@ -153,7 +153,8 @@ h2 {
 /* Price check: the form line ------------------------------------------- */
 
 .form-line {
-  font: 700 clamp(2.5rem, 6.6vw, 5.2rem)/1.1 var(--font-display);
+  /* The top size keeps the opening line on one row in the widest column. */
+  font: 700 clamp(2.5rem, 6.6vw, 4.5rem)/1.1 var(--font-display);
   margin: 0 0 1.25rem;
   max-width: none;
 }

@@ -4,6 +4,32 @@ Date: 2026-11-20. Deadline: submissions close Saturday 2026-11-21, 1:00pm ET.
 Entry: Flashpoint AI x Columbia AI Club hackathon, Engineering & Product track, also aiming
 at Best Social Impact. One person, software only.
 
+## Change of plan, evening of November 20
+
+This document was written in the afternoon, when the plan was to send the survey to real
+students overnight. That did not happen. The respondents are instead a Flashpoint synthetic
+panel: 120 AI personas, each answered by a language model. What follows is kept as
+written, and wherever it says "students" answered, read "the simulated panel".
+
+What changed in the build because of it:
+
+- The dataset has a third kind, `simulated`, beside `sample` and `real`. In that kind a
+  banner sits on every screen, every sentence that quotes a number says "simulated
+  students", the printed receipt carries the same line, and the section on what people
+  said when they skipped is not shown.
+- The interval beside a share is described as what it is for a simulated panel: how much a
+  panel this size moves by chance, and nothing about how close it is to real students.
+- The screener no longer ends the survey. Flashpoint's synthetic runner walks pages in
+  order without evaluating skip rules, so a terminate page ended every persona. The reader
+  drops non-students instead.
+- The price sliders became empty number inputs, after Flashpoint confirmed that an
+  untouched slider is stored as $0.
+- The reader takes one kind of respondent per build, people by default, so a persona
+  cannot reach a dataset that claims to be students.
+
+The goal "a survey of real Columbia and Barnard students" below was not met. The survey is
+live and the code reads real answers unchanged, but none have been collected.
+
 ## Why
 
 Club dues, formals and trips quietly exclude students who can't afford them. They give a
