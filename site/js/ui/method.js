@@ -1,5 +1,6 @@
 // How the numbers were made, and what they can't tell you.
 import { el } from "./dom.js";
+import { bullet } from "./doodles.js";
 import { voice } from "../lib/voice.js";
 
 const SMALL_NUMBERS = ["Small numbers.", "Every share comes with a 95% interval, and nothing is shown for fewer than 5 answers."];
@@ -64,7 +65,7 @@ export function mount(root, dataset) {
 
   root.append(
     el("p", { text: openingFor(meta) }),
-    el("ul", { class: "method-list" }, points.map(([lead, rest]) => el("li", {}, el("strong", { text: `${lead} ` }), rest))),
+    el("ul", { class: "method-list" }, points.map(([lead, rest], index) => el("li", {}, bullet(80 + index), el("strong", { text: `${lead} ` }), rest))),
     el("p", { class: "aside", text: `Number of ${say.many} who gave a price for each item. ${counts}.` }),
   );
   if (meta.kind !== "sample" && meta.survey) {

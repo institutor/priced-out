@@ -5,6 +5,9 @@
 // gave a price for every line that is ticked. Otherwise one line could show a
 // bigger share than "at least one line" does.
 import { el } from "./dom.js";
+import { button, ink, path, perforation, seedOf, underlined } from "./ink.js";
+import { tickBox } from "./doodles.js";
+import * as sketch from "../lib/sketch.js";
 import { sharesAt, outOfAny, answeredAll } from "../lib/curve.js";
 import { money, pct } from "../lib/format.js";
 import { maxPriceOf } from "./priceCheck.js";
@@ -54,7 +57,10 @@ export function mount(root, dataset, state) {
     });
     line.lost = el("span");
     line.node = el("div", { class: "receipt-line" },
-      el("div", { class: "top" }, el("label", {}, line.toggle, item.short), el("span", { class: "price" }, "$", line.input)),
+      el("div", { class: "top" },
+        el("label", {}, line.toggle, tickBox(seedOf(`tick ${item.id}`)), item.short),
+        el("span", { class: "price" }, "$", underlined(line.input, `receipt ${item.id}`)),
+      ),
       el("div", { class: "lost" }, el("span", { text: "lost at this line" }), line.lost),
     );
     return line;
@@ -104,26 +110,35 @@ export function mount(root, dataset, state) {
   });
   update();
 
+  // The slip is a sheet torn off at both ends, with a pen line round it and
+  // torn lines across it.
+  const rule = (name) => perforation(el("div", { class: "rule" }), `receipt ${name}`);
+  const sheet = el("div", { class: "receipt" },
+    el("h3", { text: "Your club" }),
+    el("p", { class: "serial", text: "Member's copy" }),
+    rule("top"),
+    lines.map((line) => line.node),
+    rule("middle"),
+    el("div", { class: "total" }, el("span", { text: "A year in this club" }), total),
+    el("div", { class: "total" }, el("span", { text: "Priced out of at least one line" }), anyLine),
+    note,
+    el("p", { class: "receipt-note", text: source }),
+    rule("bottom"),
+    el("p", { class: "sign-off", text: "The copy the treasurer never gets." }),
+  );
+  ink(sheet, (width, height) => path(
+    sketch.slip(1, 1, width - 2, height - 2, { seed: seedOf("slip"), tooth: 13, depth: 7, rough: 0.8 }),
+    "slip",
+  ));
+
   root.append(
     el("div", { class: "receipt-layout" },
       el("div", { class: "receipt-copy" },
         el("p", { text: "Dues are rarely the whole price. Add up what a year in your club costs, and see who is gone by the end of it." }),
         el("p", { class: "aside", text: "Change a price, or untick a line to take it off. A person counts once, however many lines they are priced out of." }),
-        el("button", { class: "button", type: "button", text: "Print this receipt", onclick: () => window.print() }),
+        button({ onclick: () => window.print() }, "Print this receipt"),
       ),
-      el("div", { class: "receipt" },
-        el("h3", { text: "Your club" }),
-        el("p", { class: "serial", text: "Member's copy" }),
-        el("hr"),
-        lines.map((line) => line.node),
-        el("hr"),
-        el("div", { class: "total" }, el("span", { text: "A year in this club" }), total),
-        el("div", { class: "total" }, el("span", { text: "Priced out of at least one line" }), anyLine),
-        note,
-        el("p", { class: "receipt-note", text: source }),
-        el("hr"),
-        el("p", { class: "sign-off", text: "The copy the treasurer never gets." }),
-      ),
+      sheet,
     ),
   );
 }
