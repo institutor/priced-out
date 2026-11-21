@@ -1485,6 +1485,79 @@ input:focus-visible + .tick {
   margin-bottom: 3.25rem;
 }
 
+/* What to take to the board: the page's answer on a card. */
+.note {
+  max-width: 46rem;
+  margin: 1.75rem 0 0;
+  /* The right side and the foot leave room for the card's shading. */
+  padding: 1.5rem 2.2rem 2rem 1.7rem;
+}
+
+.note-edge {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.note-shade {
+  stroke: var(--ink-soft);
+  stroke-width: 1;
+}
+
+.note-head {
+  padding-bottom: 0.9rem;
+  margin-bottom: 1.1rem;
+}
+
+.note-title {
+  font: 900 clamp(1.5rem, 2.8vw, 2rem)/1.1 var(--font-display);
+  letter-spacing: 0.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.note-label {
+  font: 400 0.95rem/1.4 var(--font-receipt);
+  color: var(--mark-2);
+  margin: 0.3rem 0 0;
+  max-width: none;
+}
+
+.note-rule {
+  stroke: var(--mark-2);
+  stroke-width: 1.8;
+}
+
+.note-lines {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+}
+
+.note-line {
+  display: grid;
+  grid-template-columns: 12.5rem minmax(0, 1fr);
+  gap: 0.1rem 1.4rem;
+}
+
+.note-line dt {
+  font-weight: 700;
+}
+
+.note-line dd {
+  margin: 0;
+}
+
+.note-source {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  margin: 1.25rem 0 0;
+  max-width: none;
+}
+
+.note-actions {
+  margin-top: 1.5rem;
+}
+
 .story {
   margin: 0;
   padding: 0.3rem 0 0.3rem 1.7rem;
@@ -1856,6 +1929,14 @@ input:focus-visible + .tick {
 
   .round-bar {
     grid-column: 1 / -1;
+  }
+
+  .note {
+    padding: 1.2rem 1.7rem 1.6rem 1.2rem;
+  }
+
+  .note-line {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

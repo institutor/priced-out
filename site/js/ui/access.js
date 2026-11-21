@@ -4,8 +4,7 @@
 import { el, sentence } from "./dom.js";
 import { circled, marked, wipe } from "./ink.js";
 import { sharesAt, maxPriceFor, accessTier, waysToPrice } from "../lib/curve.js";
-import { money, people } from "../lib/format.js";
-import { phrase } from "./priceCheck.js";
+import { money, people, phrase } from "../lib/format.js";
 import { voice } from "../lib/voice.js";
 
 const ACCESS_TARGET = 0.05;

@@ -6,15 +6,13 @@ import { art, blank, button, drawWhenSeen, highlight, ink, path, seat, seedOf, s
 import { doodle } from "./doodles.js";
 import * as sketch from "../lib/sketch.js";
 import { sharesAt, curve } from "../lib/curve.js";
-import { money, pct, people } from "../lib/format.js";
+import { money, pct, people, phrase } from "../lib/format.js";
 import { renderCurve } from "./chart.js";
 import { voice } from "../lib/voice.js";
 
-const PHRASES = { dues: "semester of dues", formal: "formal ticket", trip: "weekend trip" };
 // The price each item opens at when it is picked.
 export const START_PRICE = { dues: 30, formal: 45, trip: 180 };
 
-export const phrase = (item) => PHRASES[item.id] ?? item.short.toLowerCase();
 export const maxPriceOf = (item) => item.max - item.step;
 
 function snap(value, item) {

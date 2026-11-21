@@ -13,6 +13,7 @@ import * as access from "./ui/access.js";
 import * as fixes from "./ui/fixes.js";
 import * as pledges from "./ui/pledges.js";
 import * as receipt from "./ui/receipt.js";
+import * as note from "./ui/note.js";
 import * as said from "./ui/said.js";
 import * as yours from "./ui/yours.js";
 import * as why from "./ui/why.js";
@@ -128,14 +129,14 @@ async function start() {
       }, 400);
     });
 
+    const linkFor = mine ? null : (next) => new URL(addressOf(next), window.location.href).href;
     banner.mount(document.getElementById("banner"), dataset);
-    priceCheck.mount(document.getElementById("price-check"), dataset, state, {
-      linkFor: mine ? null : (next) => new URL(addressOf(next), window.location.href).href,
-    });
+    priceCheck.mount(document.getElementById("price-check"), dataset, state, { linkFor });
     access.mount(bodyOf("access"), dataset, state);
     fixes.mount(bodyOf("fixes"), dataset, state);
     pledges.mount(bodyOf("pledges"), dataset, state);
     receipt.mount(bodyOf("receipt"), dataset, state);
+    note.mount(bodyOf("plan"), dataset, state, { linkFor });
     if (dataset.meta.kind === "simulated") {
       // What an invented person says they once told a friend is not evidence
       // of anything, so that section is left out for a simulated panel.

@@ -42,6 +42,12 @@ const STROKES = {
     sketch.line(17, 20.5, 31, 20.5, { seed: seed + 3, rough: 0.5, passes: 1 }),
     sketch.line(17, 27, 26, 27, { seed: seed + 4, rough: 0.5, passes: 1 }),
   ],
+  // A paper plane: the note that gets sent on.
+  plane: (seed) => [
+    sketch.polygon([[44, 7], [4, 21], [20, 28.5], [29, 43]], { seed, rough: 0.8 }),
+    sketch.line(43, 8, 20.5, 28.5, { seed: seed + 1, rough: 0.5, passes: 1 }),
+    sketch.polyline([[20.5, 29], [21, 39.5], [25.5, 35.5]], { seed: seed + 2, rough: 0.4, passes: 1 }),
+  ],
   // A speech bubble: what they said instead.
   bubble: (seed) => [
     sketch.polygon([[6, 9], [42, 9], [42, 32], [22, 32], [13, 41], [14.5, 32], [6, 32]], { seed, rough: 0.9 }),
