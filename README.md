@@ -50,11 +50,12 @@ answers.
   personas stand in for one club, and show it working from end to end.
 
 So the site is a working product on simulated input, not a finding about students. It says
-so in a banner on every screen, in every sentence that quotes a number, and on the printed
-receipt. The survey is live and the same code reads real answers the moment there are any
-(see [Rebuild the data](#rebuild-the-data-from-a-flashpoint-export)).
+so in a banner on every screen, in every sentence that quotes a number, on the printed
+receipt and in the note it writes for a club's board. The survey is live, and the page reads
+a club's own answers as soon as there are any: a treasurer loads the export in the browser
+and every number becomes their members' (see [Run it for your own club](#run-it-for-your-own-club)).
 
-## Try it yourself, in two minutes
+## Try it yourself, in a few minutes
 
 Nothing to install. Open **https://institutor.github.io/priced-out/** and:
 
@@ -66,16 +67,28 @@ Nothing to install. Open **https://institutor.github.io/priced-out/** and:
    still lose no more than 1 in 10.
 3. **Make it your club.** Change the item to a weekend trip, or the 60 to your own club's
    size. Every section below follows: what a lower access price brings back, which fix
-   won, and how many empty seats members' own pledges would pay for.
+   won, and how many empty seats members' own pledges would pay for. The address follows
+   what you set, so any view can be sent as a link, like
+   [a formal at $30](https://institutor.github.io/priced-out/?item=formal&price=30&club=60&answer=1).
 4. **Build a year.** In the receipt, change a price or untick a line and watch "priced out
    of at least one line" move. **Print this receipt** gives a member's copy.
-5. **See the survey.** [Open it](https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a)
+5. **Take it to the board.** "What to take to your board" puts the answer on one card with
+   a button that copies it. Under it is the same decision as a message for members, worded
+   for the fix that came out on top.
+6. **Load a club.** Under "Run it for your own club", press **Load a made-up club**. Every
+   number on the page changes to those of 36 invented members, the banner says so, and a
+   different fix wins. This is what a treasurer sees after loading their own export.
+7. **See the survey.** [Open it](https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a)
    to read the questions the personas were asked. It is the survey Flashpoint built and
    hosts.
 
+A **Contents** tab in the corner of the screen jumps between the parts of the page.
+
 To check the working instead of the page:
 
-- `npm test` runs the 119 tests on the rules behind every number ([Run it](#run-it)).
+- `npm test` runs the 178 tests on the rules behind every number ([Run it](#run-it)).
+- `node scripts/evaluate.mjs` runs the page's rules on 2,000 made-up clubs whose true
+  answer is known ([Checked against a known answer](#checked-against-a-known-answer)).
 - [`briefs/`](briefs) and [`replies/`](replies) hold everything sent to and received from
   Flashpoint, each paid reply with its payment receipt.
 
@@ -86,8 +99,9 @@ One page, in the order a treasurer would use it.
 1. **Price check.** Fill in the line "A *formal ticket* at $*45* in a club of *60*", guess
    how many would skip it, then see the answer: a room of seats that empties, the share
    behind it with a 95% interval, and the whole curve from $0 up.
-2. **What it would take.** The highest price that loses no more than 1 in 10, and what a
-   lower access price would bring back, in people and in dollars.
+2. **What it would take.** The highest price that loses no more than 1 in 10, what a lower
+   access price would bring back, in people and in dollars, and one small table of the
+   same thing priced three ways: as it is, one lower price for everyone, and two prices.
 3. **The fix they picked.** Six ways to offer a lower price (sliding scale, waiver on
    request, open waiver code, pay what you can, paid-forward tickets, discount draw),
    ranked by a trade-off question.
@@ -96,11 +110,23 @@ One page, in the order a treasurer would use it.
    how many empty seats the pool pays for.
 5. **The receipt for a year in your club.** Dues, formal and trip on one printable slip,
    with the share lost at each line and at any line.
-6. **What these numbers are, and what they are not.** Who answered, and what the numbers
+6. **What to take to your board.** The answer in five lines on a card that can be copied,
+   which says under its title and in its last line whose answers it rests on. Under it,
+   the same decision as a message a treasurer can send to members.
+7. **What these numbers are, and what they are not.** Who answered, and what the numbers
    can't tell you.
+8. **Run it for your own club.** Send the survey, export the answers, load the file. The
+   page reads the export in the browser and uploads nothing. The survey's nine questions
+   can be read in place, a made-up club is there to try it with, and a table says how many
+   answers are enough.
+9. **Why this exists.** The story at the top of this file, and four published findings
+   about real students and families.
+10. **How the survey was made.** What Flashpoint built, what it corrected, the four runs
+    that came back empty, and what each call cost.
 
-A seventh section, what priced-out students said at the time, is built and tested but is
-shown only when the answers come from people. An invented person's excuse is not evidence.
+One more section, what priced-out students said at the time, is built and tested but is
+shown only when the answers are not from AI personas. An invented person's excuse is not
+evidence.
 
 ## How it uses Flashpoint
 
@@ -194,6 +220,62 @@ evidence about students and no price should be set from them.
 - 97 of 120 said they would add something to their own ticket to cover someone else. 66 of
   those said only if enough other members did the same.
 
+## Checked against a known answer
+
+The simulated panel cannot show that the page's arithmetic is right, because nobody knows
+what the right answer for that panel is. So the page was also run on clubs whose answer is
+known. [`scripts/evaluate.mjs`](scripts/evaluate.mjs) writes 2,000 made-up clubs, drawn
+from a made-up population of 20,000 members whose true share priced out is known exactly.
+Each club's file goes through the same code that reads a real export, and what the page
+would say is set against the truth.
+
+| Members who answer | Half the clubs were within | Nine in ten were within | 95% interval held the truth | Nine-in-ten price within one step |
+|---|---|---|---|---|
+| 10 | 10 points | 27 points | 94% | 69% |
+| 20 | 8 points | 18 points | 96% | 82% |
+| 40 | 5 points | 12 points | 97% | 93% |
+| 80 | 4 points | 10 points | 94% | 98% |
+| 160 | 3 points | 7 points | 95% | 99% |
+
+The distances are in percentage points, between the share the page said would skip at a
+price and the true share. A step is one notch of the price slider, $5 or $10. So 20
+answers give a rough picture and 80 a close one, and the page says so under "How many
+answers are enough?".
+
+This checks the reading of a file, the counting, the intervals and the rule for the
+nine-in-ten price. It cannot check whether what people say in a survey is what they later
+do, or whether AI personas resemble students. A test reruns the whole check and fails if
+the figures the page shows no longer match ([`test/evaluate.test.mjs`](test/evaluate.test.mjs)).
+
+## Run it for your own club
+
+The page reads a Flashpoint export itself. Under **Run it for your own club**:
+
+1. Send your members [the survey](https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a).
+2. Export the answers from Flashpoint as one CSV file.
+3. Press **Choose your file**.
+
+The file is read on that device by [`site/js/ingest/club.js`](site/js/ingest/club.js) and
+is not uploaded. The page is laid out again on the club's answers, and the banner, every
+sentence and the note for the board say whose answers they are.
+
+- It reads a file that a spreadsheet has saved again: semicolons or tabs between cells, a
+  `sep=` first line, other line ends, one heading row instead of two.
+- A row from an AI persona is never counted as a member, and a file with only persona rows
+  is labelled simulated.
+- When it can't read a file it says which column or which row is the problem, and nothing
+  on the page changes.
+- While a club's file is loaded the address names no view. A link could not carry the
+  file, so whoever opened it would see the simulated students at the club's price.
+
+No export to hand? **Load a made-up club** reads
+[`site/data/example-club.csv`](site/data/example-club.csv): 36 invented members, written
+by [`scripts/make-example.mjs`](scripts/make-example.mjs), with every number labelled as
+made up.
+
+What a club can't do alone yet is step 2. The live survey sits in my Flashpoint account,
+so I run the export (see [Limits](#limits)).
+
 ## Run it
 
 Needs Node 22 or newer. The site and the tests use no packages.
@@ -284,8 +366,12 @@ build need no key.
   an "early results" banner on every screen.
 - People are whole: "19 of your 60" is the share times the club size, rounded, and the
   dollar figures and pledge rounds are worked out from those whole people.
+- The note for the board and the message for members add no figure of their own. Each
+  repeats what the page works out above it, and tests check that they agree at every price.
+- A tie is never reported as a winner. Where two fixes share the top score, both are
+  named and the page does not pick one.
 
-The rules live in `site/js/lib/` and are covered by the tests in `test/` (119 tests).
+The rules live in `site/js/lib/` and are covered by the tests in `test/` (178 tests).
 
 ## Privacy
 
@@ -297,6 +383,9 @@ The rules live in `site/js/lib/` and are covered by the tests in `test/` (119 te
   into totals or dropped before the file is written. A test checks the published file for
   exactly this.
 - Raw exports stay in `data/raw/`, which is git-ignored.
+- A file a club loads into the page stays on that device. The page keeps each row's prices
+  and pledge, with nothing beside them to say whose they are, and forgets them when it is
+  closed or reloaded.
 
 ## Limits
 
@@ -304,9 +393,11 @@ The rules live in `site/js/lib/` and are covered by the tests in `test/` (119 te
   a student on a tight budget.
 - With real answers, students who open a link in a group chat would still not be a random
   sample of the campus, and what people say they would do can differ from what they do.
-- A club can't yet run it alone. The survey lives in my Flashpoint account, so swapping
-  the stand-in for a real club means I export that club's answers and rebuild the page
-  with one command.
+- A club can't yet run it fully alone. The page reads a club's export in the browser, but
+  the live survey sits in my Flashpoint account, so I still have to run that export and
+  send the club its file. A copy of the survey for each club is the next thing to build.
+- The check against made-up clubs tests the page's counting. It says nothing about
+  whether people do what they say they would.
 - It is not a way to find the highest price people will tolerate, and it can't tell you
   why one particular member said they were busy.
 
@@ -425,14 +516,20 @@ the two method papers at the end are listed from their records.
 
 ```
 site/                 the page: index.html, css/, js/, data/dataset.json
-site/js/lib/          the rules (curve, pledge cascade, intervals, wording), shared with Node,
-                      and sketch.js and figure.js, the geometry every drawing is made from
+site/js/lib/          the rules (curve, pledge cascade, intervals, wording, the note for the
+                      board in plan.js, the message for members in announce.js, the view
+                      in the address in link.js), shared with Node, and sketch.js and
+                      figure.js, the geometry every drawing is made from
 site/js/ui/           one module per section of the page, plus the title page (cover.js and
-                      scene.js, its strip of stick figures) and the pen that draws under
-                      and over the page (ink.js, doodles.js)
-scripts/              build-data (export to dataset), make-sample, dev server
+                      scene.js, its strip of stick figures), the contents tab and the pen
+                      that draws under and over the page (ink.js, doodles.js)
 site/js/ingest/       CSV reader, Flashpoint export reader, MaxDiff scoring, aggregation:
-                      the page and the build script both read an export with these
+                      the page and the build script both read an export with these.
+                      club.js is the reader the page uses for a club's own file
+scripts/              build-data (export to dataset), evaluate (the check against made-up
+                      clubs), make-example (the made-up club), make-sample, dev server
+site/data/            dataset.json (the published answers), evaluation.json (what the check
+                      found), example-club.csv (the made-up club)
 test/                 node:test suites
 briefs/, replies/     everything sent to and received from Flashpoint
 flashpoint.mjs        the MCP client that pays per call (the organizers' starter, unchanged)
@@ -476,6 +573,15 @@ Times are Eastern.
   sideways, and took both out again within the hour; those commits are still in the
   history. Added the step-by-step guide for judges and this log. Looked up published
   sources for the claims the project makes and listed them under Sources.
+
+  From about 5:20am, on my instruction to keep improving every part of the site, Claude
+  Code worked for several hours without me at the keyboard. In that stretch the page
+  learned to read a club's own export in the browser, with a made-up club to try it on.
+  The item, price and club size went into the address, so a view can be shared. "What it
+  would take" got its table of one thing priced three ways. The page gained the note for
+  the board, the message for members, the parts on why this exists and how the survey was
+  made, the check against 2,000 made-up clubs, and the contents tab. The changes were then
+  read through again for mistakes, and the ones found were fixed.
 
 ## Outside resources
 
