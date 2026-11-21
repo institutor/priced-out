@@ -103,6 +103,16 @@ export function drawWhenSeen(node, { lasts = 2600 } = {}) {
   watcher.observe(node);
 }
 
+// Keeps a small drawing shivering, like frames of a hand-drawn film, for as
+// long as it is on screen.
+export function shiverWhileSeen(node) {
+  if (typeof IntersectionObserver === "undefined") return node;
+  new IntersectionObserver((entries) => {
+    for (const entry of entries) node.classList.toggle("shiver", entry.isIntersecting);
+  }).observe(node);
+  return node;
+}
+
 // One seat in the room. "go" is coloured in, "stretched" is highlighted,
 // "out" is an empty dashed outline. An emptying seat starts coloured in and
 // has its colour rubbed out.

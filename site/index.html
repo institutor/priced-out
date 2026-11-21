@@ -30,6 +30,22 @@
         filter: url(#boil-3);
       }
     }
+
+    .shiver {
+      animation: shiver 0.66s steps(1) infinite;
+    }
+
+    @keyframes shiver {
+      0% {
+        filter: url(#shiver-1);
+      }
+      33% {
+        filter: url(#shiver-2);
+      }
+      66% {
+        filter: url(#shiver-3);
+      }
+    }
   </style>
   <script>document.documentElement.classList.add("js");</script>
 </head>
@@ -48,6 +64,19 @@
     <filter id="boil-3" x="-4%" y="-8%" width="108%" height="116%">
       <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="31" result="noise"/>
       <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <!-- The same again, finer and fainter, for the small drawings. -->
+    <filter id="shiver-1" x="-12%" y="-12%" width="124%" height="124%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="1" seed="2" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="shiver-2" x="-12%" y="-12%" width="124%" height="124%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="1" seed="13" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="shiver-3" x="-12%" y="-12%" width="124%" height="124%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="1" seed="29" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </svg>
 

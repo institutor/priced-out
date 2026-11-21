@@ -1,7 +1,7 @@
 // The price check: a fill-in line (what, at what price, in how big a club),
 // a guess, then the answer as a room of seats and a curve.
 import { el, clear, sentence } from "./dom.js";
-import { art, blank, button, drawWhenSeen, highlight, ink, path, seat, seedOf } from "./ink.js";
+import { art, blank, button, drawWhenSeen, highlight, ink, path, seat, seedOf, shiverWhileSeen } from "./ink.js";
 import { doodle } from "./doodles.js";
 import * as sketch from "../lib/sketch.js";
 import { sharesAt, curve } from "../lib/curve.js";
@@ -138,7 +138,7 @@ export function mount(root, dataset, state) {
   const narrowScreen = window.matchMedia("(max-width: 40rem)");
 
   const opening = el("div", {},
-    doodle("tag"),
+    shiverWhileSeen(doodle("tag")),
     el("p", { class: "form-line" },
       "A ", highlight(el("span", { class: "pick" }, itemSizer, itemSelect), "item", { caret: true }),
       " at $", blank(priceInput, "price"), " in a club of ", blank(sizeInput, "size"), ".",

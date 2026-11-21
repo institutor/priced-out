@@ -2,7 +2,7 @@
 import { createState } from "./state.js";
 import { el } from "./ui/dom.js";
 import { doodle, mark } from "./ui/doodles.js";
-import { drawWhenSeen, perforation, redrawAll, underlineLastLine } from "./ui/ink.js";
+import { drawWhenSeen, perforation, redrawAll, shiverWhileSeen, underlineLastLine } from "./ui/ink.js";
 import * as cover from "./ui/cover.js";
 import * as banner from "./ui/banner.js";
 import * as priceCheck from "./ui/priceCheck.js";
@@ -30,7 +30,7 @@ function dress() {
     const heading = section.querySelector("h2");
     if (heading) {
       underlineLastLine(heading, section.id);
-      heading.prepend(doodle(heading.dataset.doodle));
+      heading.prepend(shiverWhileSeen(doodle(heading.dataset.doodle)));
       drawWhenSeen(heading);
     }
     const body = section.querySelector(".section-body");
@@ -39,7 +39,7 @@ function dress() {
 
   const footer = document.querySelector(".colophon-rule");
   const sign = footer.querySelector(".colophon-mark");
-  sign.append(mark(), el("span", { class: "wordmark" }, "Priced ", el("span", { class: "out", text: "Out" })));
+  sign.append(shiverWhileSeen(mark()), el("span", { class: "wordmark" }, "Priced ", el("span", { class: "out", text: "Out" })));
   footer.prepend(perforation(el("div", { class: "tear" }), "footer"));
   drawWhenSeen(sign);
 
