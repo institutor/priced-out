@@ -14,7 +14,9 @@ Engineering & Product track.
 **Try it: https://institutor.github.io/priced-out/** · [Write-up](docs/submission/write-up.md) ·
 [The survey](https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a)
 
-![The price check: a formal ticket at $45 in a club of 60, with a banner saying the numbers come from simulated students](docs/screenshot.jpg)
+![The title page: a row of twelve seats, the last four rubbed out, over the words Priced Out, with a banner saying the numbers come from simulated students](docs/screenshot.jpg)
+
+![The price check: a formal ticket at $45 in a club of 60, drawn as a room of seats, 19 of them empty](docs/screenshot-answer.jpg)
 
 ## Read this first: the numbers are simulated
 
@@ -235,7 +237,7 @@ build need no key.
 - People are whole: "19 of your 60" is the share times the club size, rounded, and the
   dollar figures and pledge rounds are worked out from those whole people.
 
-The rules live in `site/js/lib/` and are covered by the tests in `test/` (93 tests).
+The rules live in `site/js/lib/` and are covered by the tests in `test/` (107 tests).
 
 ## Privacy
 
@@ -261,8 +263,10 @@ The rules live in `site/js/lib/` and are covered by the tests in `test/` (93 tes
 
 ```
 site/                 the page: index.html, css/, js/, data/dataset.json
-site/js/lib/          the rules (curve, pledge cascade, intervals, wording), shared with Node
-site/js/ui/           one module per section of the page
+site/js/lib/          the rules (curve, pledge cascade, intervals, wording), shared with Node,
+                      and sketch.js, the geometry every drawing on the page is made from
+site/js/ui/           one module per section of the page, plus the title page (cover.js)
+                      and the pen that draws under and over the page (ink.js, doodles.js)
 scripts/              build-data (export to dataset), make-sample, dev server
 scripts/lib/          CSV reader, Flashpoint export reader, MaxDiff scoring, aggregation
 test/                 node:test suites

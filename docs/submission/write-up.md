@@ -31,7 +31,7 @@ full curve from $0 up. Below that, it turns the problem into a decision:
 - a printable receipt for a whole year in the club, with the share lost at each line
 
 The site is static: plain HTML, CSS and JavaScript reading one JSON file. The rules behind
-the numbers are small pure functions with 93 tests.
+the numbers are small pure functions with 107 tests.
 
 ## How Flashpoint was used
 
