@@ -50,7 +50,7 @@ Every brief sent and every reply received is in this repository, with the paymen
 | Step | Sent | Flashpoint's reply | Cost |
 |---|---|---|---|
 | Design the survey | [`briefs/02-draft.txt`](briefs/02-draft.txt) | [`replies/02-draft.json`](replies/02-draft.json) | $0.50 |
-| Fix the sliders, publish, describe the export | [`briefs/03-publish.txt`](briefs/03-publish.txt) | pending | $0.50 |
+| Fix the sliders and get it ready to publish | [`briefs/03-publish.txt`](briefs/03-publish.txt) | [`replies/03-publish.json`](replies/03-publish.json) | $0.50 |
 
 What Flashpoint built from the first brief (13 blocks, validated with 0 errors):
 
@@ -72,8 +72,8 @@ What Flashpoint changed, and why it mattered:
   answer at a slider's maximum means "this much or more" and never counts as priced out.
 - The slider type can't show a dollar sign, so the question text carries "(in dollars)".
 - A slider nobody touches must not be stored as $0, which would read as "would skip it even
-  if it were free". The second brief asks Flashpoint to check this and swap in number inputs
-  if needed.
+  if it were free". Asked to check, Flashpoint found that an untouched slider does submit 0,
+  and replaced all six with plain number inputs that start empty and carry a $ sign.
 
 The site itself never calls Flashpoint. It is static, so nothing costs money or can fail
 while someone is looking at it.

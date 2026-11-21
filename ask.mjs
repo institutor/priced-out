@@ -90,7 +90,7 @@ unlock();
 const asText = typeof result === "string" ? result : JSON.stringify(result);
 const conversation_id = findKey(result, "conversation_id") ?? findInText(asText, "conversation_id") ?? state.conversation_id;
 const survey_id = findKey(result, "survey_id") ?? findInText(asText, "survey_id") ?? state.survey_id;
-fs.writeFileSync(stateFile, JSON.stringify({ conversation_id, survey_id }, null, 2));
+fs.writeFileSync(stateFile, JSON.stringify({ ...state, conversation_id, survey_id }, null, 2));
 
 console.log(typeof result === "string" ? result : JSON.stringify(result, null, 2));
 console.log(`\nSaved to replies/${name}.json`);
