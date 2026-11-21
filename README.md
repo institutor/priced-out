@@ -329,6 +329,40 @@ data/mapping.json     which export column is which question, and the MaxDiff des
 docs/                 design, build plan, submission write-up
 ```
 
+## Build week, day by day
+
+The build period ran from November 13 to 21, 2026. Nothing in this repository is older
+than that: its first file dates from November 18 and its first commit from November 20.
+Times are Eastern.
+
+- **Sun Nov 15.** Read the participant guide and the organizers' emails. Decided to work
+  alone, on software only, in the Engineering & Product track with Best Social Impact as
+  a second aim. Went through about twenty candidate problems with Claude Code and compared
+  them against both rubrics. Priced Out came out on top.
+- **Mon Nov 16.** Read the organizers' follow-up emails and listed what still had to be
+  set up before Flashpoint could be called.
+- **Wed Nov 18.** Set up the connection to Flashpoint: the organizers' starter client
+  ([`flashpoint.mjs`](flashpoint.mjs), copied unchanged from the hackathon setup manual),
+  its packages, and the wallet it pays from.
+- **Fri Nov 20.** Nearly all of the build, in one day (59 commits, throughout the day).
+  - Went back over the ideas and settled on Priced Out. Wrote the brief, and Flashpoint
+    drafted the survey from it.
+  - Wrote the design and the build plan, then the rules behind the numbers with their
+    tests, then the page section by section, the README and the first write-up.
+  - Flashpoint published the survey. I decided not to send it to real students, and had
+    Flashpoint generate a synthetic panel to answer it.
+  - The panel's runs kept ending at the first question. Finding out why, fixing the
+    survey and getting a complete run took about forty minutes and most of the paid
+    calls ([what I found](#what-i-found-out-about-the-synthetic-panel-runner)).
+  - Loaded the panel's answers into the site, rewrote the README and write-up to say the
+    numbers are simulated, and put the site online.
+  - Redrew the whole page by hand: a drawing library, the pen that draws under and over
+    the page, and a title page.
+- **Sat Nov 21.** In the early morning, redrew the title page as a strip of stick figures
+  drawn a stroke at a time. Tried a zoom on the title page and a section that scrolled
+  sideways, and took both out again within the hour; those commits are still in the
+  history. Added the step-by-step guide for judges and this log.
+
 ## AI tools used
 
 - **Flashpoint** (primary): designed, validated, hosted and published the survey, built
