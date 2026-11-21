@@ -4,6 +4,7 @@ import { el, clear, sentence } from "./dom.js";
 import { sharesAt, curve } from "../lib/curve.js";
 import { money, pct, people } from "../lib/format.js";
 import { renderCurve } from "./chart.js";
+import { voice } from "../lib/voice.js";
 
 const PHRASES = { dues: "semester of dues", formal: "formal ticket", trip: "weekend trip" };
 const START_PRICE = { dues: 30, formal: 45, trip: 180 };
@@ -19,6 +20,7 @@ function snap(value, item) {
 
 export function mount(root, dataset, state) {
   const { items, rows, rules } = dataset;
+  const say = voice(dataset.meta);
   const itemOf = (id) => items.find((item) => item.id === id);
   const curves = new Map();
   const curveOf = (item, source = rows, key = item.id) => {
@@ -180,12 +182,12 @@ export function mount(root, dataset, state) {
 
     // "Nobody" is only said when nobody surveyed gave that answer. A share
     // too small to make one whole person in this club is said as that.
-    if (shares.outCount === 0) verdict.textContent = `At ${money(price)}, nobody surveyed would skip it.`;
+    if (shares.outCount === 0) verdict.textContent = `At ${money(price)}, ${say.nobody} would skip it.`;
     else if (out === 0) verdict.textContent = `At ${money(price)}, fewer than 1 of your ${size} would skip it.`;
-    else verdict.textContent = `${out} of your ${size} would skip it and tell you something else.`;
+    else verdict.textContent = `${say.lead}${out} of your ${size} would skip it and tell you something else.`;
 
     clear(detail).append(...sentence(
-      "That is ", [pct(shares.out)], ` of the ${shares.n} students who answered. With a sample this size the true figure could be anywhere from ${pct(shares.outLow)} to ${pct(shares.outHigh)}.`,
+      "That is ", [pct(shares.out)], ` of the ${shares.n} ${say.many} who answered. ${say.range(pct(shares.outLow), pct(shares.outHigh))}`,
     ));
     if (shares.stretchedCount === 0) stretchedNote.textContent = "Nobody else said this price would be a stretch.";
     else if (stretched === 0) stretchedNote.textContent = "Fewer than 1 more would pay but find it a stretch.";
@@ -206,6 +208,7 @@ export function mount(root, dataset, state) {
       item,
       price,
       n: shares.n,
+      people: say.many,
       narrow: narrowScreen.matches,
       guess: guess && guess.itemId === itemId ? { price: guess.price, share: guess.count / guess.size } : null,
       synthetic: dataset.synthetic

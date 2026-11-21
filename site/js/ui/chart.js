@@ -29,7 +29,7 @@ function priceTicks(max, count) {
 
 const pathOf = (points) => points.map(([x, y], index) => `${index === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join("");
 
-export function renderCurve(root, { points, item, price, guess, n, synthetic, narrow = false }) {
+export function renderCurve(root, { points, item, price, guess, n, synthetic, narrow = false, people = "students" }) {
   clear(root);
   const { WIDTH, HEIGHT, INNER_WIDTH, INNER_HEIGHT } = frame(narrow);
   const maxPrice = points.at(-1).price;
@@ -40,7 +40,7 @@ export function renderCurve(root, { points, item, price, guess, n, synthetic, na
   const chart = svg("svg", {
     viewBox: `0 0 ${WIDTH} ${HEIGHT}`,
     role: "img",
-    "aria-label": `Share of students who would skip ${item.label.toLowerCase()} at each price from ${money(0)} to ${money(maxPrice)}. The numbers are in the table below the chart.`,
+    "aria-label": `Share of ${people} who would skip ${item.label.toLowerCase()} at each price from ${money(0)} to ${money(maxPrice)}. The numbers are in the table below the chart.`,
   });
 
   for (const share of [0, 0.25, 0.5, 0.75, 1]) {
@@ -167,7 +167,7 @@ export function renderCurve(root, { points, item, price, guess, n, synthetic, na
 
   root.append(
     el("p", { class: "chart-title", text: "Share who would skip it, by price" }),
-    el("p", { class: "chart-note", text: `${n} students answered for this item. The shaded band is the 95% interval.` }),
+    el("p", { class: "chart-note", text: `${n} ${people} answered for this item. The shaded band is the 95% interval.` }),
     chart,
     tooltip,
     el("details", { class: "table-view" }, el("summary", { text: "Show these numbers as a table" }), table),

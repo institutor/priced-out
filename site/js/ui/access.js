@@ -4,11 +4,13 @@ import { el, clear, sentence } from "./dom.js";
 import { sharesAt, maxPriceFor, accessTier } from "../lib/curve.js";
 import { money, people } from "../lib/format.js";
 import { phrase } from "./priceCheck.js";
+import { voice } from "../lib/voice.js";
 
 const ACCESS_TARGET = 0.05;
 
 export function mount(root, dataset, state) {
   const { items, rows, rules } = dataset;
+  const say = voice(dataset.meta);
 
   const statement = (figure, ...text) =>
     el("div", { class: "statement" }, el("span", { class: "figure", text: figure }), el("p", {}, text));
@@ -22,7 +24,7 @@ export function mount(root, dataset, state) {
       return statement("No price", `gets everyone in. Even free, more than 1 in 20 said they would skip a ${phrase(item)}, so for them the price is not the only thing in the way.`);
     }
     if (accessPrice >= price) {
-      return statement("No gap", `to close here. At ${money(price)} no more than 1 in 20 surveyed are left out.`);
+      return statement("No gap", `to close here. At ${money(price)} no more than 1 in 20 ${say.surveyed} are left out.`);
     }
     const tier = accessTier(rows, item, price, ACCESS_TARGET);
     const back = tier ? people(tier.regained, size) : 0;
@@ -61,7 +63,7 @@ export function mount(root, dataset, state) {
       el("div", { class: "statements" }, gentleStatement, accessStatement(item, price, size)),
       el("p", {
         class: "aside",
-        text: "The access price is the highest price that loses no more than 1 in 20. The sum assumes people who can pay the full price still do. Whether they would depends on how the lower price is offered, which is the next question.",
+        text: `${say.simulated ? "Both prices are worked out from the simulated students. " : ""}The access price is the highest price that loses no more than 1 in 20. The sum assumes people who can pay the full price still do. Whether they would depends on how the lower price is offered, which is the next question.`,
       }),
     );
   }

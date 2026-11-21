@@ -3,9 +3,11 @@ import { el, clear, sentence } from "./dom.js";
 import { sharesAt } from "../lib/curve.js";
 import { cascade, seatsCovered } from "../lib/pledge.js";
 import { money, people } from "../lib/format.js";
+import { voice } from "../lib/voice.js";
 
 export function mount(root, dataset, state) {
   const { items, rows, rules } = dataset;
+  const say = voice(dataset.meta);
   const pledges = rows.map((row) => row.pledge).filter((pledge) => Array.isArray(pledge));
   const willing = pledges.filter((pledge) => pledge[0] > 0);
   const conditional = willing.filter((pledge) => pledge[1] !== 0);
@@ -25,7 +27,7 @@ export function mount(root, dataset, state) {
     const covered = Math.min(left, seatsCovered(outcome.pool, price));
 
     root.append(el("p", {}, sentence(
-      "We asked: would you add a little to your own ticket so that a member who can't afford it could come? ",
+      `${say.asked}: would you add a little to your own ticket so that a member who can't afford it could come? `,
       [`${willing.length} of ${pledges.length}`], " said yes. ",
       [conditional.length], " of them said only if enough other members did the same.",
     )));
@@ -38,7 +40,7 @@ export function mount(root, dataset, state) {
     if (outcome.pledgers === 0) {
       const goFirst = willing.length - conditional.length;
       const why = goFirst === 0
-        ? "Nobody surveyed said they would go first, so the pledges never start."
+        ? `${say.Nobody} said they would go first, so the pledges never start.`
         : `${goFirst} of ${pledges.length} said they would give no matter what, but among the ${payers} of your ${size} who would pay ${money(price)} that comes to less than one person, so the pledges never start.`;
       root.append(el("p", { text: why }));
       return;
@@ -74,7 +76,7 @@ export function mount(root, dataset, state) {
     );
 
     if (left === 0) {
-      root.append(el("p", { text: `At ${money(price)} nobody surveyed is left out, so there is nothing to cover.` }));
+      root.append(el("p", { text: `At ${money(price)} ${say.nobody} is left out, so there is nothing to cover.` }));
     } else {
       const tickets = el("div", {
         class: "tickets",
@@ -93,7 +95,7 @@ export function mount(root, dataset, state) {
 
     root.append(el("p", {
       class: "aside",
-      text: "A pledge in a survey is a promise, not a payment. Amounts are what students said they would add, and an answer of $10 or more is counted as $10.",
+      text: `A pledge in a survey is a promise, not a payment. Amounts are what ${say.many} said they would add, and an answer of $10 or more is counted as $10.`,
     }));
   }
 

@@ -32,7 +32,15 @@ async function start() {
   fixes.mount(bodyOf("fixes"), dataset, state);
   pledges.mount(bodyOf("pledges"), dataset, state);
   receipt.mount(bodyOf("receipt"), dataset, state);
-  said.mount(bodyOf("said"), dataset, state);
+  if (dataset.meta.kind === "simulated") {
+    // What an invented person says they once told a friend is not evidence
+    // of anything, so that section is left out for a simulated panel.
+    document.getElementById("said").remove();
+    document.getElementById("fixes-title").textContent = "The fix the simulated students picked";
+    document.getElementById("method-title").textContent = "What these numbers are, and what they are not";
+  } else {
+    said.mount(bodyOf("said"), dataset, state);
+  }
   method.mount(bodyOf("method"), dataset, state);
 }
 

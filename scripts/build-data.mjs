@@ -7,7 +7,11 @@
 //   --out <file>              where to write (default site/data/dataset.json)
 //   --survey <id>             Flashpoint survey id, recorded in the dataset
 //   --from <date> --to <date> when answers were collected
-//   --synthetic <csv>         export of a Flashpoint synthetic-respondent run, kept apart and labelled
+//   --panel <reply.json>      the export is a Flashpoint synthetic panel run, not people. The file is
+//                             the reply saved when the panel ran (replies/…-panel-run.json). The
+//                             dataset is marked "simulated" and the site labels it on every screen.
+//   --synthetic <csv>         export of a Flashpoint synthetic-respondent run to draw beside real
+//                             answers, kept apart and labelled
 //   --fixes <json>            use MaxDiff scores computed by Flashpoint instead of scoring the export.
 //                             The file is {"n": 41, "scores": [{"id": "open", "score": 0.3, "low": 0.1, "high": 0.5}, ...]}
 //                             with one entry per fix id, and n the number of students who answered.
@@ -21,7 +25,7 @@ import { FIXES, ITEMS, MIN_CELL } from "./lib/vocab.mjs";
 
 const [input, ...rest] = process.argv.slice(2);
 if (!input || input.startsWith("--")) {
-  console.log("usage: node scripts/build-data.mjs <export.csv> [--survey id] [--from date] [--to date] [--mapping file] [--out file] [--synthetic csv] [--fixes json]");
+  console.log("usage: node scripts/build-data.mjs <export.csv> [--survey id] [--from date] [--to date] [--mapping file] [--out file] [--panel reply.json] [--synthetic csv] [--fixes json]");
   process.exit(1);
 }
 const options = {};
@@ -41,6 +45,35 @@ const meta = {
   collectedTo: options.to ?? null,
   builtAt: new Date().toISOString(),
 };
+
+// The first object anywhere in a value that has the given key.
+function findWith(value, key) {
+  if (value === null || typeof value !== "object") return null;
+  if (key in value) return value;
+  for (const child of Object.values(value)) {
+    const found = findWith(child, key);
+    if (found) return found;
+  }
+  return null;
+}
+
+if (options.panel) {
+  // Answers from AI personas are a different kind of thing from answers from
+  // students, and the dataset says so in its first field.
+  const made = findWith(JSON.parse(fs.readFileSync(options.panel, "utf8")), "inference_model");
+  if (!made) throw new Error(`${options.panel} does not look like a saved panel run: no inference_model in it.`);
+  meta.kind = "simulated";
+  meta.title = "AI-simulated students (Flashpoint synthetic panel)";
+  meta.source = "Flashpoint CSV export of a synthetic panel run";
+  meta.panel = {
+    name: made.panel_name ?? null,
+    size: made.panel_size ?? null,
+    model: made.inference_model,
+    calibration: made.calibration_version ?? null,
+    id: made.panel_id ?? null,
+    run: made.last_run_id ?? null,
+  };
+}
 
 const extras = {};
 if (options.synthetic) {

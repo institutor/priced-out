@@ -8,17 +8,22 @@ import { el } from "./dom.js";
 import { sharesAt, outOfAny, answeredAll } from "../lib/curve.js";
 import { money, pct } from "../lib/format.js";
 import { maxPriceOf } from "./priceCheck.js";
+import { voice } from "../lib/voice.js";
 
 const START_PRICE = { dues: 30, formal: 45, trip: 180 };
 
 export function mount(root, dataset, state) {
   const { items, rows, rules, meta } = dataset;
+  const say = voice(meta);
 
   // The slip says where its numbers come from, because a printed copy or a
   // screenshot leaves the banner at the top of the page behind.
   let source = "Sample data: these numbers are generated, not real responses.";
   if (meta.kind === "real") {
     source = `From an anonymous survey of ${meta.n} Columbia and Barnard students.`;
+  }
+  if (meta.kind === "simulated") {
+    source = `Simulated: these numbers come from ${meta.n} AI personas, not real students.`;
   }
 
   // The slip is built once and then updated in place, so the box being typed
@@ -74,11 +79,14 @@ export function mount(root, dataset, state) {
     const any = outOfAny(base, active);
     anyLine.textContent = enough ? pct(any.share) : "–";
     if (enough) {
-      note.textContent = `Worked out from the ${base.length} students who gave a price for every line. The true figure could be ${pct(any.low)} to ${pct(any.high)}.`;
+      // The slip is short on room, and for a simulated panel the line under
+      // this one already says what the numbers are.
+      const range = say.simulated ? "" : ` The true figure could be ${pct(any.low)} to ${pct(any.high)}.`;
+      note.textContent = `Worked out from the ${base.length} ${say.many} who gave a price for every line.${range}`;
     } else if (active.length === 0) {
       note.textContent = "Tick a line to add it up.";
     } else {
-      note.textContent = `Only ${base.length} students gave a price for every line, and nothing is shown under ${rules.minCell}.`;
+      note.textContent = `Only ${base.length} ${say.many} gave a price for every line, and nothing is shown under ${rules.minCell}.`;
     }
   }
 
