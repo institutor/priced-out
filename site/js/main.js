@@ -6,14 +6,12 @@ import { drawWhenSeen, perforation, redrawAll, shiverWhileSeen, underlineLastLin
 import * as cover from "./ui/cover.js";
 import * as banner from "./ui/banner.js";
 import * as priceCheck from "./ui/priceCheck.js";
-import * as walk from "./ui/walk.js";
 import * as access from "./ui/access.js";
 import * as fixes from "./ui/fixes.js";
 import * as pledges from "./ui/pledges.js";
 import * as receipt from "./ui/receipt.js";
 import * as said from "./ui/said.js";
 import * as method from "./ui/method.js";
-import { follow } from "./ui/scroll.js";
 
 const bodyOf = (id) => document.querySelector(`#${id} .section-body`);
 
@@ -68,7 +66,6 @@ async function start() {
   const state = createState({ itemId: "formal", price: 45, size: 60, revealed: false, guess: null });
   banner.mount(document.getElementById("banner"), dataset);
   priceCheck.mount(document.getElementById("price-check"), dataset, state);
-  walk.mount(document.getElementById("walk"), dataset, state);
   access.mount(bodyOf("access"), dataset, state);
   fixes.mount(bodyOf("fixes"), dataset, state);
   pledges.mount(bodyOf("pledges"), dataset, state);
@@ -86,11 +83,21 @@ async function start() {
   dress();
 
   // How far down the page you are, for the line the banner draws along its
-  // bottom edge.
-  follow(() => {
+  // bottom edge. It is worked out at most once a frame.
+  let waiting = false;
+  const read = () => {
+    waiting = false;
     const room = document.documentElement.scrollHeight - window.innerHeight;
     document.documentElement.style.setProperty("--read", room > 0 ? Math.min(1, window.scrollY / room).toFixed(4) : 0);
-  });
+  };
+  const later = () => {
+    if (waiting) return;
+    waiting = true;
+    window.requestAnimationFrame(read);
+  };
+  window.addEventListener("scroll", later, { passive: true });
+  window.addEventListener("resize", later);
+  read();
 }
 
 start();

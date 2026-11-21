@@ -96,27 +96,6 @@ export function maxPriceFor(rows, item, maxShareOut) {
   return best;
 }
 
-// A line of `count` people who stand for everyone that answered, in the
-// order they would step out as the price goes up. Person k is the respondent
-// a share (k + ½) / count of the way along that order, and what comes back
-// is the price at which each of them skips: Infinity for the ones who stay to
-// the top of the range. At any price the number who have stepped out is
-// within half a person of the share sharesAt() gives, times `count`.
-export function walkAway(rows, item, count = 20) {
-  const skips = [];
-  for (const row of rows) {
-    const pair = answeredPair(row, item);
-    if (pair) skips.push(thresholds(pair, item).skip);
-  }
-  if (skips.length === 0) return [];
-  skips.sort((a, b) => a - b);
-  const line = [];
-  for (let k = 0; k < count; k++) {
-    line.push(skips[Math.min(skips.length - 1, Math.floor(((k + 0.5) / count) * skips.length))]);
-  }
-  return line;
-}
-
 // Share of respondents priced out of at least one of several lines, among
 // those who answered every item listed.
 export function outOfAny(rows, lines) {
