@@ -83,7 +83,7 @@ while someone is looking at it.
 Needs Node 22 or newer. The site and the tests use no packages.
 
 ```bash
-git clone <this repository>
+git clone https://github.com/institutor/priced-out.git
 cd priced-out
 npm test
 npm run dev
