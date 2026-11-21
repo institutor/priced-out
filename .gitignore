@@ -3,3 +3,5 @@ node_modules
 .DS_Store
 data/raw/
 *.sending
+agent/recipients.txt
+agent/runs/fake-*/

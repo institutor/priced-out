@@ -1,0 +1,6 @@
+# Copy this file to agent/recipients.txt and put in the people to survey.
+# One person per line: Name, email
+# Only list people who agreed to hear from you. agent/recipients.txt is git-ignored.
+Tester One, you+1@example.com
+Tester Two, you+2@example.com
+Tester Three, you+3@example.com

@@ -58,6 +58,20 @@ The survey is live, and the page reads a club's own answers as soon as there are
 treasurer loads the export in the browser and every number becomes their members' (see
 [Run it for your own club](#run-it-for-your-own-club)).
 
+## MCP Challenge: an agent that does the research itself
+
+`agent/` holds a second tool, built for the MCP Challenge. You give it one objective and
+a list of people. It decides what survey to make, has Flashpoint build and email it,
+waits, reads the answers, writes follow-up questions from what it learned, runs a second
+round, and comes back with an answer. Nobody directs the steps.
+
+```bash
+node agent/agent.mjs "Find the ticket price for our spring formal that keeps the most members coming." --fake
+```
+
+`--fake` is a practice run: no emails, no credit. How it works, how to run it for real,
+and the run logs are in [agent/README.md](agent/README.md).
+
 ## Try it yourself, in a few minutes
 
 Nothing to install. Open **https://institutor.github.io/priced-out/** and:
@@ -351,6 +365,7 @@ Each script saves the reply to `replies/`, keeps the survey, conversation and pa
 | Name | Needed for | Example |
 |---|---|---|
 | `FLASHPOINT_WALLET_KEY` | Paid Flashpoint calls only | `0xYOUR_WALLET_PRIVATE_KEY` |
+| `ANTHROPIC_API_KEY` | The agent in `agent/` only | `sk-ant-YOUR_KEY` |
 | `PORT` | Optional port for `npm run dev` (default 4173) | `4173` |
 
 Copy `.env.example` to `.env`. `.env` is git-ignored. The site, the tests and the data
@@ -623,6 +638,9 @@ Nothing in this repository existed before the build period. What came from outsi
   The panel's answers were written by `gpt-5.4-mini`, the model Flashpoint ran it on.
 - **Claude Code** (Anthropic): wrote the code, tests and documents in this repository with
   me, as well as assisting in co-writing the briefs I sent to Flashpoint.
+
+- **Claude Sonnet 5.5** (Anthropic API): the model that makes the decisions inside the
+  agent in `agent/`. It reaches Flashpoint only through the Flashpoint MCP.
 
 No AI runs in the live site. Every respondent in the data is AI-generated, and the site
 says so wherever a number appears.
