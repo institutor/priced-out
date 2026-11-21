@@ -8,6 +8,7 @@ import { doodle, mark } from "./ui/doodles.js";
 import { drawWhenSeen, perforation, redrawAll, shiverWhileSeen, underlineLastLine, wipe } from "./ui/ink.js";
 import * as cover from "./ui/cover.js";
 import * as banner from "./ui/banner.js";
+import * as contents from "./ui/contents.js";
 import * as priceCheck from "./ui/priceCheck.js";
 import * as access from "./ui/access.js";
 import * as fixes from "./ui/fixes.js";
@@ -157,7 +158,7 @@ async function start() {
 
     const linkFor = mine ? null : (next) => new URL(addressOf(next), window.location.href).href;
     banner.mount(document.getElementById("banner"), dataset);
-    leave = priceCheck.mount(document.getElementById("price-check"), dataset, state, { linkFor });
+    const stops = [priceCheck.mount(document.getElementById("price-check"), dataset, state, { linkFor })];
     access.mount(bodyOf("access"), dataset, state);
     fixes.mount(bodyOf("fixes"), dataset, state);
     pledges.mount(bodyOf("pledges"), dataset, state);
@@ -176,6 +177,8 @@ async function start() {
     method.mount(bodyOf("method"), dataset, state, { evaluation });
     retitle(dataset.meta);
     dress();
+    stops.push(contents.mount(document.getElementById("contents")));
+    leave = () => stops.forEach((stop) => stop());
   }
 
   // After the page has been laid out again, the reader is put back where
