@@ -11,7 +11,8 @@ import { renderCurve } from "./chart.js";
 import { voice } from "../lib/voice.js";
 
 const PHRASES = { dues: "semester of dues", formal: "formal ticket", trip: "weekend trip" };
-const START_PRICE = { dues: 30, formal: 45, trip: 180 };
+// The price each item opens at when it is picked.
+export const START_PRICE = { dues: 30, formal: 45, trip: 180 };
 
 export const phrase = (item) => PHRASES[item.id] ?? item.short.toLowerCase();
 export const maxPriceOf = (item) => item.max - item.step;
@@ -22,7 +23,9 @@ function snap(value, item) {
   return Math.min(maxPriceOf(item), Math.max(0, stepped));
 }
 
-export function mount(root, dataset, state) {
+// `linkFor(view)` gives the address that opens the page on a view. With it,
+// the answer comes with a way to send exactly what is on screen to someone.
+export function mount(root, dataset, state, { linkFor = null } = {}) {
   const { items, rows, rules } = dataset;
   const say = voice(dataset.meta);
   const itemOf = (id) => items.find((item) => item.id === id);
@@ -126,11 +129,33 @@ export function mount(root, dataset, state) {
   const stretchedNote = el("p");
   const guessNote = el("p");
   const chartRoot = el("div", { class: "chart" });
+
+  // A link to this exact view, for a treasurer to send to the rest of the
+  // board. Where the browser will not copy for us, the address is written
+  // out to be copied by hand.
+  const copied = el("span", { class: "share-said", role: "status" });
+  const share = el("p", { class: "share", hidden: !linkFor },
+    el("button", {
+      class: "text-button",
+      type: "button",
+      text: "Copy a link to this view",
+      onclick: async () => {
+        const address = linkFor(state.get());
+        try {
+          await navigator.clipboard.writeText(address);
+          copied.textContent = "Link copied.";
+        } catch {
+          copied.textContent = address;
+        }
+      },
+    }),
+    copied,
+  );
   const answer = el("div", { "aria-live": "polite" }, verdict, detail, stretchedNote, guessNote);
   const result = el("div", {},
     el("div", { class: "result" },
       el("div", {}, seats, key),
-      el("div", {}, gate, answer),
+      el("div", {}, gate, answer, share),
     ),
     chartRoot,
   );
@@ -207,6 +232,8 @@ export function mount(root, dataset, state) {
     gate.hidden = answered;
     answer.hidden = !answered;
     key.hidden = !answered;
+    share.hidden = !answered || !linkFor;
+    copied.textContent = "";
     chartRoot.hidden = !answered;
     clear(gatePrompt).append(...sentence("Before you look: how many of these ", [size], " would skip it and tell you something else?"));
     const revealing = justRevealed;

@@ -1003,6 +1003,36 @@ td:first-child {
   text-align: left;
 }
 
+/* A small button that reads as a link: for things beside the main point. */
+.text-button {
+  padding: 0.35rem 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.text-button:hover {
+  color: var(--ink);
+}
+
+.share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.9rem;
+  margin: 1.25rem 0 0;
+}
+
+.share-said {
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
 /* What it would take ---------------------------------------------------- */
 
 .statements {

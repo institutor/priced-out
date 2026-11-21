@@ -1,5 +1,6 @@
 // Loads the survey dataset and mounts each section of the page.
 import { createState } from "./state.js";
+import { readLink, writeLink } from "./lib/link.js";
 import { el } from "./ui/dom.js";
 import { doodle, mark } from "./ui/doodles.js";
 import { drawWhenSeen, perforation, redrawAll, shiverWhileSeen, underlineLastLine } from "./ui/ink.js";
@@ -14,6 +15,9 @@ import * as said from "./ui/said.js";
 import * as method from "./ui/method.js";
 
 const bodyOf = (id) => document.querySelector(`#${id} .section-body`);
+
+// The view the page opens with when its address asks for nothing else.
+const START = { itemId: "formal", price: 45, size: 60, revealed: false };
 
 // The title page needs nothing from the survey, so it starts straight away.
 // Whatever happens to its drawing, the page underneath is shown.
@@ -63,9 +67,29 @@ async function start() {
     return;
   }
 
-  const state = createState({ itemId: "formal", price: 45, size: 60, revealed: false, guess: null });
+  // The page opens on the view its address asks for, and keeps the address
+  // in step with what is on screen, so the address bar is always a link to
+  // this view. It is written a moment after the last change: a browser only
+  // lets an address be rewritten so many times a minute, and dragging the
+  // price would use that up.
+  const state = createState({ ...readLink(window.location.search, dataset.items, START, priceCheck.START_PRICE), guess: null });
+  const addressOf = (view) => `${window.location.pathname}${writeLink(view, START)}`;
+  let writing = 0;
+  state.subscribe((view) => {
+    window.clearTimeout(writing);
+    writing = window.setTimeout(() => {
+      try {
+        window.history.replaceState(null, "", `${addressOf(view)}${window.location.hash}`);
+      } catch {
+        // The address stays as it was. The page works the same.
+      }
+    }, 400);
+  });
+
   banner.mount(document.getElementById("banner"), dataset);
-  priceCheck.mount(document.getElementById("price-check"), dataset, state);
+  priceCheck.mount(document.getElementById("price-check"), dataset, state, {
+    linkFor: (view) => new URL(addressOf(view), window.location.href).href,
+  });
   access.mount(bodyOf("access"), dataset, state);
   fixes.mount(bodyOf("fixes"), dataset, state);
   pledges.mount(bodyOf("pledges"), dataset, state);
@@ -81,6 +105,12 @@ async function start() {
   }
   method.mount(bodyOf("method"), dataset, state);
   dress();
+
+  // An address can point at one section. The sections were empty when the
+  // browser first went looking for it, so it is found again now they are not.
+  if (window.location.hash.length > 1) {
+    document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
+  }
 
   // How far down the page you are, for the line the banner draws along its
   // bottom edge. It is worked out at most once a frame.
