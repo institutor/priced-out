@@ -2337,4 +2337,45 @@ input:focus-visible + .tick {
   .receipt-line .lost {
     padding-left: 0;
   }
+
+  /* "Print the note" marks the page, and then the note for the board is
+     what prints, alone, in ink on white whatever the screen's theme. */
+  body[data-print="note"] {
+    --paper: #fff;
+    --ink: #1b1f6b;
+    --ink-soft: #4c5196;
+    --rule: #d5d8f0;
+    --mark-2: #b8456b;
+    background: #fff;
+    color: var(--ink);
+  }
+
+  body[data-print="note"] #receipt,
+  body[data-print="note"] #plan h2,
+  body[data-print="note"] #plan .section-body > :not(.note) {
+    display: none;
+  }
+
+  body[data-print="note"] main > section#plan {
+    display: block;
+  }
+
+  /* The card's pen lines were drawn for the screen's width. Paper is another
+     width, so there the card gets a plain ruled edge. */
+  body[data-print="note"] .note > .ink,
+  body[data-print="note"] .note-head > .ink {
+    display: none;
+  }
+
+  body[data-print="note"] .note {
+    max-width: 44rem;
+    margin: 0;
+    padding: 1.5rem 1.7rem;
+    border: 1.5px solid var(--ink);
+    break-inside: avoid;
+  }
+
+  body[data-print="note"] .note-head {
+    border-bottom: 1.5px solid var(--mark-2);
+  }
 }

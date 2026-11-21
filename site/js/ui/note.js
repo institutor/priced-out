@@ -151,6 +151,19 @@ export function mount(root, dataset, state, { linkFor = null } = {}) {
     },
   }, "Copy the note");
 
+  // Printing the page gives the receipt. This button prints the note alone:
+  // it marks the page for the print styles, and takes the mark off after.
+  const print = el("button", {
+    class: "text-button",
+    type: "button",
+    text: "Print the note",
+    onclick: () => {
+      document.body.dataset.print = "note";
+      window.addEventListener("afterprint", () => delete document.body.dataset.print, { once: true });
+      window.print();
+    },
+  });
+
   function render(view) {
     note = plan(dataset, view);
     wipe(body);
@@ -181,7 +194,7 @@ export function mount(root, dataset, state, { linkFor = null } = {}) {
   root.append(
     el("p", {}, opening(dataset.meta)),
     card,
-    el("p", { class: "share note-actions" }, copy, said),
+    el("p", { class: "share note-actions" }, copy, print, said),
     forMembers(dataset, state),
     afterBlock(dataset, state),
   );
