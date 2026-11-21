@@ -621,9 +621,11 @@ input.blank::-webkit-inner-spin-button {
   max-width: 46rem;
 }
 
+/* The question takes a row to itself; the guess and the button share the
+   next one. */
 .gate p {
   margin: 0;
-  flex: 1 1 22rem;
+  flex: 1 1 100%;
   font-size: 1.3rem;
   line-height: 1.35;
 }

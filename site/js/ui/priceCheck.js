@@ -1,5 +1,6 @@
-// The price check: a fill-in line (what, at what price, in how big a club),
-// a guess, then the answer as a room of seats and a curve.
+// The price check: a fill-in line (what, at what price, in how big a club)
+// and the club as a room of seats, every one of them taken. Then a guess,
+// and the answer: the seats that empty are rubbed out, and the curve is drawn.
 import { el, clear, sentence } from "./dom.js";
 import { art, blank, button, drawWhenSeen, highlight, ink, path, seat, seedOf, shiverWhileSeen } from "./ink.js";
 import { doodle } from "./doodles.js";
@@ -125,10 +126,11 @@ export function mount(root, dataset, state) {
   const stretchedNote = el("p");
   const guessNote = el("p");
   const chartRoot = el("div", { class: "chart" });
-  const result = el("div", { hidden: true },
+  const answer = el("div", { "aria-live": "polite" }, verdict, detail, stretchedNote, guessNote);
+  const result = el("div", {},
     el("div", { class: "result" },
       el("div", {}, seats, key),
-      el("div", { "aria-live": "polite" }, verdict, detail, stretchedNote, guessNote),
+      el("div", {}, gate, answer),
     ),
     chartRoot,
   );
@@ -137,7 +139,7 @@ export function mount(root, dataset, state) {
   let justRevealed = false;
   const narrowScreen = window.matchMedia("(max-width: 40rem)");
 
-  const opening = el("div", {},
+  const opening = el("div", { class: "opening" },
     shiverWhileSeen(doodle("tag")),
     el("p", { class: "form-line" },
       "A ", highlight(el("span", { class: "pick" }, itemSizer, itemSelect), "item", { caret: true }),
@@ -148,12 +150,17 @@ export function mount(root, dataset, state) {
   root.append(
     opening,
     el("div", { class: "price-slider" }, rail, el("div", { class: "ends" }, sliderLow, sliderHigh)),
-    gate,
     tooFew,
     result,
   );
 
-  function renderSeats(counts, size) {
+  // The room is only drawn again when it would look different, so dragging
+  // the price before the answer is shown leaves it alone.
+  let drawnRoom = "";
+  function renderSeats(counts, size, emptying) {
+    const room = [size, counts.go, counts.stretched, counts.out].join(" ");
+    if (room === drawnRoom && !emptying) return;
+    drawnRoom = room;
     clear(seats);
     // Smaller seats for bigger clubs, so the room stays about the same size.
     let seatSize = "0.95rem";
@@ -168,17 +175,12 @@ export function mount(root, dataset, state) {
       let kind = "out";
       if (index < counts.go) kind = "go";
       else if (index < counts.go + counts.stretched) kind = "stretched";
-      const glyph = seat(kind, 700 + index, { emptying: justRevealed && kind === "out" });
+      const glyph = seat(kind, 700 + index, { emptying: emptying && kind === "out" });
       const node = el("span", { class: kind === "go" ? "seat" : `seat ${kind}` }, glyph);
       if (kind === "out") node.style.setProperty("--i", outIndex++);
       seats.append(node);
     }
-    seats.setAttribute(
-      "aria-label",
-      `${size} seats: ${counts.go} would go, ${counts.stretched} would go but feel stretched, ${counts.out} would skip it.`,
-    );
-    seats.classList.toggle("emptying", justRevealed);
-    justRevealed = false;
+    seats.classList.toggle("emptying", emptying);
   }
 
   function render({ itemId, price, size, revealed, guess }) {
@@ -200,16 +202,32 @@ export function mount(root, dataset, state) {
     const notEnough = shares.n < rules.minCell;
     tooFew.hidden = !notEnough;
     tooFew.textContent = `Not enough answers for this yet: ${shares.n} so far, and nothing is shown under ${rules.minCell}.`;
-    gate.hidden = revealed || notEnough;
-    result.hidden = !revealed || notEnough;
-    clear(gatePrompt).append(...sentence("Before you look: how many of the ", [size], " would skip it and tell you something else?"));
-    if (!revealed || notEnough) return;
+    const answered = revealed && !notEnough;
+    result.hidden = notEnough;
+    gate.hidden = answered;
+    answer.hidden = !answered;
+    key.hidden = !answered;
+    chartRoot.hidden = !answered;
+    clear(gatePrompt).append(...sentence("Before you look: how many of these ", [size], " would skip it and tell you something else?"));
+    const revealing = justRevealed;
+    justRevealed = false;
+    if (notEnough) return;
+    if (!answered) {
+      // Until the answer is asked for, everyone has a seat.
+      renderSeats({ go: size, stretched: 0, out: 0 }, size, false);
+      seats.setAttribute("aria-label", `${size} seats, one for each member of the club. All of them are taken.`);
+      return;
+    }
 
     // The curve draws itself when the answer is first shown, and only then.
-    result.classList.toggle("drawing", justRevealed);
+    result.classList.toggle("drawing", revealing);
     const out = people(shares.out, size);
     const stretched = Math.min(size - out, people(shares.stretched, size));
-    renderSeats({ go: size - out - stretched, stretched, out }, size);
+    renderSeats({ go: size - out - stretched, stretched, out }, size, revealing);
+    seats.setAttribute(
+      "aria-label",
+      `${size} seats: ${size - out - stretched} would go, ${stretched} would go but feel stretched, ${out} would skip it.`,
+    );
 
     // "Nobody" is only said when nobody surveyed gave that answer. A share
     // too small to make one whole person in this club is said as that.
