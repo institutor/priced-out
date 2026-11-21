@@ -1,57 +1,52 @@
 {
-  "_note": "Maps Flashpoint's CSV export onto the survey's fields. The column names below are placeholders written before the first real export existed: after exporting, replace each with the real column header (a unique part of the header is enough). Answer texts must match what the survey shows respondents.",
+  "_note": "Maps Flashpoint's CSV export onto the survey's fields. Column names are the ones in the second header row of the export (see headerRow). Answer texts are the ones the survey shows respondents. The MaxDiff designs are the ones Flashpoint reported for question Q7 (replies/21-export.json): for each design number, the four options on each of the six screens, in the order shown.",
+  "headerRow": 2,
+  "source": { "column": "Source", "synthetic": "synthetic" },
   "exclude": [],
   "columns": {
-    "year": "Year",
-    "officer": "Officer",
+    "year": "S1",
+    "officer": "Q2",
     "prices": {
-      "dues": {
-        "stretch": "Dues stretch",
-        "skip": "Dues skip"
-      },
-      "formal": {
-        "stretch": "Formal stretch",
-        "skip": "Formal skip"
-      },
-      "trip": {
-        "stretch": "Trip stretch",
-        "skip": "Trip skip"
-      }
+      "dues": { "stretch": "DUES_A", "skip": "DUES_B" },
+      "formal": { "stretch": "FORMAL_A", "skip": "FORMAL_B" },
+      "trip": { "stretch": "TRIP_A", "skip": "TRIP_B" }
     },
-    "guess": "Guess",
-    "skipped": "Skipped",
-    "said": "Said",
-    "pledgeAmount": "Pledge amount",
-    "pledgeThreshold": "Pledge threshold",
+    "guess": "Q4",
+    "skipped": "Q5",
+    "said": {
+      "truth": "Q6/I said it cost too much",
+      "busy": "Q6/I said I was busy",
+      "exam": "Q6/I said I had work or an exam",
+      "plans": "Q6/I said I had other plans",
+      "uninterested": "Q6/I said I was not interested",
+      "silent": "Q6/I said nothing and just did not go",
+      "other": "Q6/Something else"
+    },
+    "pledgeAmount": "Q8",
+    "pledgeThreshold": "Q8B",
     "maxdiff": {
-      "tasks": 5,
-      "shown": "MD{n} shown",
-      "best": "MD{n} best",
-      "worst": "MD{n} worst"
+      "tasks": 6,
+      "design": "Q7/Design",
+      "best": "Q7/Set_{n}_Most",
+      "worst": "Q7/Set_{n}_Least",
+      "designs": {
+        "1": [["open", "sliding", "request", "forward"], ["forward", "pwyc", "open", "draw"], ["request", "pwyc", "draw", "sliding"], ["draw", "forward", "open", "request"], ["forward", "sliding", "open", "pwyc"], ["draw", "pwyc", "sliding", "request"]],
+        "2": [["request", "open", "forward", "pwyc"], ["draw", "sliding", "open", "request"], ["pwyc", "draw", "sliding", "forward"], ["draw", "open", "request", "forward"], ["draw", "pwyc", "open", "sliding"], ["forward", "pwyc", "request", "sliding"]],
+        "3": [["open", "request", "sliding", "pwyc"], ["forward", "draw", "open", "sliding"], ["forward", "request", "pwyc", "draw"], ["request", "sliding", "forward", "pwyc"], ["open", "pwyc", "request", "draw"], ["draw", "sliding", "open", "forward"]],
+        "4": [["forward", "pwyc", "sliding", "request"], ["open", "draw", "request", "forward"], ["sliding", "open", "draw", "pwyc"], ["sliding", "draw", "request", "open"], ["pwyc", "draw", "forward", "request"], ["forward", "open", "pwyc", "sliding"]],
+        "5": [["open", "sliding", "pwyc", "draw"], ["forward", "sliding", "request", "draw"], ["pwyc", "request", "forward", "open"], ["request", "forward", "open", "draw"], ["sliding", "pwyc", "forward", "open"], ["pwyc", "sliding", "draw", "request"]],
+        "6": [["request", "forward", "open", "sliding"], ["open", "pwyc", "draw", "request"], ["sliding", "pwyc", "forward", "draw"], ["open", "draw", "pwyc", "sliding"], ["sliding", "draw", "request", "forward"], ["open", "request", "pwyc", "forward"]],
+        "7": [["request", "pwyc", "draw", "open"], ["sliding", "forward", "pwyc", "request"], ["open", "sliding", "forward", "draw"], ["sliding", "forward", "draw", "request"], ["open", "forward", "pwyc", "sliding"], ["draw", "request", "open", "pwyc"]],
+        "8": [["draw", "sliding", "request", "open"], ["request", "forward", "pwyc", "sliding"], ["draw", "open", "pwyc", "forward"], ["open", "forward", "request", "draw"], ["draw", "open", "sliding", "pwyc"], ["sliding", "forward", "pwyc", "request"]],
+        "9": [["sliding", "request", "open", "draw"], ["forward", "pwyc", "open", "request"], ["forward", "sliding", "draw", "pwyc"], ["sliding", "open", "forward", "pwyc"], ["draw", "request", "forward", "pwyc"], ["sliding", "open", "request", "draw"]],
+        "10": [["open", "draw", "sliding", "pwyc"], ["forward", "draw", "pwyc", "request"], ["sliding", "open", "forward", "request"], ["open", "request", "sliding", "pwyc"], ["open", "forward", "request", "draw"], ["pwyc", "forward", "draw", "sliding"]]
+      }
     }
   },
   "answers": {
-    "separator": ";",
     "screenOut": "I am not a Columbia or Barnard student",
-    "officer": {
-      "Yes": true,
-      "No": false
-    },
-    "skipped": {
-      "Never": "never",
-      "Once or twice": "once",
-      "Several times": "several",
-      "Prefer not to say": "preferNot"
-    },
-    "said": {
-      "I said it cost too much": "truth",
-      "I said I was busy": "busy",
-      "I said I had work or an exam": "exam",
-      "I said I had other plans": "plans",
-      "I said I was not interested": "uninterested",
-      "I said nothing and just did not go": "silent",
-      "Something else": "other"
-    },
+    "officer": { "Yes": true, "No": false },
+    "skipped": { "Never": "never", "Once or twice": "once", "Several times": "several", "Prefer not to say": "preferNot" },
     "fixes": {
       "Sliding scale": "sliding",
       "Waiver on request": "request",
@@ -60,14 +55,7 @@
       "Paid-forward tickets": "forward",
       "Discount draw": "draw"
     },
-    "pledgeAmount": {
-      "No": 0,
-      "Yes, $1": 1,
-      "Yes, $2": 2,
-      "Yes, $3": 3,
-      "Yes, $5": 5,
-      "Yes, $10 or more": 10
-    },
+    "pledgeAmount": { "No": 0, "Yes, $1": 1, "Yes, $2": 2, "Yes, $3": 3, "Yes, $5": 5, "Yes, $10 or more": 10 },
     "pledgeThreshold": {
       "No, I would do it anyway": 0,
       "Only if at least 5 others did": 5,

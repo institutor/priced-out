@@ -117,9 +117,16 @@ function resolveColumns(headers, columns) {
     );
   }
   if (columns.maxdiff) {
+    // The options on each screen come either from a column that lists them
+    // or from a design: a numbered plan, kept in the mapping, of which options
+    // each screen shows. Flashpoint exports the design number.
+    const design = columns.maxdiff.design ? findColumn(headers, columns.maxdiff.design, "MaxDiff design") : null;
     for (let n = 1; n <= columns.maxdiff.tasks; n++) {
       const name = (template) => template.replace("{n}", String(n));
       resolved.maxdiff.push({
+        set: n,
+        design,
+        designs: columns.maxdiff.designs ?? null,
         shown: columns.maxdiff.shown ? findColumn(headers, name(columns.maxdiff.shown), `MaxDiff ${n} shown`) : null,
         best: findColumn(headers, name(columns.maxdiff.best), `MaxDiff ${n} best`),
         worst: findColumn(headers, name(columns.maxdiff.worst), `MaxDiff ${n} worst`),
@@ -139,19 +146,38 @@ function readSaid(row, column, answers, separator) {
     .map(([id]) => id);
 }
 
+// The options one screen showed, looked up from the respondent's design number.
+function shownByDesign(row, task) {
+  const number = String(row[task.design] ?? "").trim();
+  const sets = task.designs?.[number];
+  if (!sets) throw unknown(task.design, row[task.design]);
+  const shown = sets[task.set - 1];
+  const known = FIXES.map((fix) => fix.id);
+  if (!Array.isArray(shown) || shown.some((id) => !known.includes(id))) {
+    throw new Error(`The mapping's design ${number} has no usable list of options for set ${task.set}.`);
+  }
+  return shown;
+}
+
 function readMaxDiff(row, tasks, answers, separator) {
   const allIds = FIXES.map((fix) => fix.id);
   const result = [];
   for (const task of tasks) {
     if (isBlank(row[task.best]) || isBlank(row[task.worst])) continue;
-    const shown = task.shown
-      ? splitList(row[task.shown], separator).map((part) => codeByPrefix(part, answers.fixes, task.shown))
-      : allIds;
-    result.push({
-      shown,
-      best: codeByPrefix(row[task.best], answers.fixes, task.best),
-      worst: codeByPrefix(row[task.worst], answers.fixes, task.worst),
-    });
+    let shown = allIds;
+    if (task.design) shown = shownByDesign(row, task);
+    else if (task.shown) shown = splitList(row[task.shown], separator).map((part) => codeByPrefix(part, answers.fixes, task.shown));
+    const best = codeByPrefix(row[task.best], answers.fixes, task.best);
+    const worst = codeByPrefix(row[task.worst], answers.fixes, task.worst);
+    if (task.design) {
+      // A pick from outside the screen means the design in the mapping is not
+      // the one the survey used, and every score built on it would be wrong.
+      const where = `design ${String(row[task.design]).trim()}, set ${task.set}`;
+      if (!shown.includes(best)) throw new Error(`Column "${task.best}" holds "${row[task.best]}", which ${where} did not show.`);
+      if (!shown.includes(worst)) throw new Error(`Column "${task.worst}" holds "${row[task.worst]}", which ${where} did not show.`);
+      if (best === worst) throw new Error(`Column "${task.worst}" holds the same option as most and least likely in ${where}.`);
+    }
+    result.push({ shown, best, worst });
   }
   return result;
 }
@@ -165,9 +191,14 @@ function readPledge(row, columns, answers) {
   return [amount, threshold];
 }
 
-export function normalizeExport(objects, mapping, report = {}) {
+// One export can hold answers from people and answers from a Flashpoint
+// synthetic panel (AI personas). They are never read together: `synthetic`
+// says which of the two this reading is of, and the other kind is set aside
+// and counted. The default is people, so a persona can only reach a dataset
+// when the caller asks for personas by name.
+export function normalizeExport(objects, mapping, report = {}, { synthetic = false } = {}) {
   const perItem = () => Object.fromEntries(ITEMS.map((item) => [item.id, 0]));
-  Object.assign(report, { rows: objects.length, excluded: 0, screenedOut: 0, noAnswers: 0, zeroSkip: perItem(), aboveMax: perItem() });
+  Object.assign(report, { rows: objects.length, otherSource: 0, excluded: 0, screenedOut: 0, noAnswers: 0, zeroSkip: perItem(), aboveMax: perItem() });
   if (objects.length === 0) return [];
 
   const headers = Object.keys(objects[0]);
@@ -178,9 +209,19 @@ export function normalizeExport(objects, mapping, report = {}) {
     column: findColumn(headers, rule.column, "exclude rule"),
     values: rule.values,
   }));
+  const source = mapping.source
+    ? { column: findColumn(headers, mapping.source.column, "source"), synthetic: mapping.source.synthetic }
+    : null;
+  if (synthetic && !source) {
+    throw new Error("The mapping has no \"source\" entry, so the rows of a synthetic panel cannot be told from people.");
+  }
 
   const respondents = [];
   for (const row of objects) {
+    if (source && sameText(row[source.column] ?? "", source.synthetic) !== synthetic) {
+      report.otherSource += 1;
+      continue;
+    }
     if (excluded.some((rule) => rule.values.some((value) => sameText(value, row[rule.column] ?? "")))) {
       report.excluded += 1;
       continue;

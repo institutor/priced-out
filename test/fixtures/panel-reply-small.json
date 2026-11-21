@@ -1,0 +1,18 @@
+{
+  "sent": {
+    "action": "run"
+  },
+  "receipts": [],
+  "result": {
+    "structuredContent": {
+      "run": {
+        "panel_id": "panel-test",
+        "panel_name": "Test personas",
+        "panel_size": 5,
+        "inference_model": "test-model",
+        "calibration_version": "uncalibrated",
+        "last_run_id": "run-test"
+      }
+    }
+  }
+}

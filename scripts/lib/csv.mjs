@@ -55,13 +55,20 @@ export function parseCsv(text) {
 // Turns [header, ...rows] into objects keyed by the header. Short rows are
 // padded with empty strings. A header that repeats gets " (2)", " (3)" added,
 // so no column is lost.
-export function toObjects(rows) {
+//
+// Flashpoint's export has two header rows: the first names each question and
+// is blank under a question's further columns, the second names every column.
+// headerRow says which row to use (counting from 1); rows above it are dropped.
+export function toObjects(rows, headerRow = 1) {
   if (rows.length === 0) return [];
+  if (rows.length < headerRow) {
+    throw new Error(`The CSV has ${rows.length} row(s), so there is no header row ${headerRow}.`);
+  }
   const seen = new Map();
-  const header = rows[0].map((name) => {
+  const header = rows[headerRow - 1].map((name) => {
     const count = (seen.get(name) ?? 0) + 1;
     seen.set(name, count);
     return count === 1 ? name : `${name} (${count})`;
   });
-  return rows.slice(1).map((row) => Object.fromEntries(header.map((name, index) => [name, row[index] ?? ""])));
+  return rows.slice(headerRow).map((row) => Object.fromEntries(header.map((name, index) => [name, row[index] ?? ""])));
 }

@@ -10,6 +10,8 @@
 //   --panel <reply.json>      the export is a Flashpoint synthetic panel run, not people. The file is
 //                             the reply saved when the panel ran (replies/…-panel-run.json). The
 //                             dataset is marked "simulated" and the site labels it on every screen.
+//                             Only the export's synthetic rows are read. Without this option only
+//                             the rows from people are read, so the two are never mixed.
 //   --synthetic <csv>         export of a Flashpoint synthetic-respondent run to draw beside real
 //                             answers, kept apart and labelled
 //   --fixes <json>            use MaxDiff scores computed by Flashpoint instead of scoring the export.
@@ -32,9 +34,16 @@ const options = {};
 for (let i = 0; i < rest.length; i += 2) options[rest[i].replace(/^--/, "")] = rest[i + 1];
 
 const mapping = JSON.parse(fs.readFileSync(options.mapping ?? "data/mapping.json", "utf8"));
-const read = (file, report) => normalizeExport(toObjects(parseCsv(fs.readFileSync(file, "utf8"))), mapping, report);
+// One export can hold people and personas. Each reading takes one kind only.
+const read = (file, report, synthetic) => normalizeExport(
+  toObjects(parseCsv(fs.readFileSync(file, "utf8")), mapping.headerRow ?? 1),
+  mapping,
+  report,
+  { synthetic },
+);
+const simulated = Boolean(options.panel);
 const report = {};
-const respondents = read(input, report);
+const respondents = read(input, report, simulated);
 
 const meta = {
   kind: "real",
@@ -79,7 +88,7 @@ const extras = {};
 if (options.synthetic) {
   extras.synthetic = {
     label: "AI-simulated students (Flashpoint synthetic panel). Not real people.",
-    respondents: read(options.synthetic),
+    respondents: read(options.synthetic, {}, true),
   };
 }
 
@@ -106,6 +115,10 @@ fs.writeFileSync(out, `${JSON.stringify(dataset)}\n`);
 
 console.log(`Wrote ${out}`);
 console.log(`  rows in the export: ${report.rows}`);
+if (report.otherSource > 0) {
+  const what = simulated ? "from people, not the panel" : "from a simulated panel, not people";
+  console.log(`  set aside: ${report.otherSource} ${what}`);
+}
 console.log(`  left out: ${report.excluded} excluded by the mapping, ${report.screenedOut} screened out, ${report.noAnswers} answered nothing after the first question`);
 for (const item of ITEMS) {
   if (report.zeroSkip[item.id] > 0) console.log(`  ${item.id}: ${report.zeroSkip[item.id]} skip price(s) of 0 read as no answer`);
