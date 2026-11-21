@@ -29,7 +29,7 @@ Engineering & Product track.
 
 ![The price check: a formal ticket at $45 in a club of 60, drawn as a room of seats, 19 of them empty](docs/screenshot-answer.jpg)
 
-![The note for the board: a card headed “A formal ticket at $45, in a club of 60” and labelled “simulated students, not real answers”, with five lines on who the price leaves out, the price that keeps nine in ten, two prices or one, how to offer a lower price and what members would cover themselves, and a last line saying where the numbers come from](docs/screenshot-note.jpg)
+![The note for the board: a card headed “A formal ticket at $45, in a club of 60” and labelled “simulated students, not real answers”, with six lines on who the price leaves out, the price that keeps nine in ten, two prices or one, the room for error, how to offer a lower price and what members would cover themselves, and a last line saying where the numbers come from](docs/screenshot-note.jpg)
 
 ## Read this first: the numbers are simulated
 
@@ -118,7 +118,7 @@ One page, in the order a treasurer would use it.
    how many empty seats the pool pays for.
 5. **The receipt for a year in your club.** Dues, formal and trip on one printable slip,
    with the share lost at each line and at any line.
-6. **What to take to your board.** The answer in five lines on a card that can be copied,
+6. **What to take to your board.** The answer in six lines on a card that can be copied,
    which says under its title and in its last line whose answers it rests on. Under it,
    the same decision as a message a treasurer can send to members.
 7. **What these numbers are, and what they are not.** Who answered, and what the numbers

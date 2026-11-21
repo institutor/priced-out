@@ -21,11 +21,12 @@ test("the note repeats the figures the page shows for the opening view", () => {
   const note = plan(published, view);
   assert.equal(note.title, "A formal ticket at $45, in a club of 60");
   assert.equal(note.enough, true);
-  assert.deepEqual(note.lines.map((line) => line.key), ["out", "gentle", "ways", "fix", "pledges"]);
+  assert.deepEqual(note.lines.map((line) => line.key), ["out", "gentle", "ways", "room", "fix", "pledges"]);
   assert.match(textOf(note, "out"), /^About 19 of 60 would skip it and tell you something else\. That is 31% of those who answered, and it could be anywhere from 24% to 40%\.$/);
   assert.equal(textOf(note, "gentle"), "$30 or less. At $45 you are $15 over it.");
   assert.match(textOf(note, "ways"), /adding a \$20 price for those who need it brings about 16 more and takes in about \$320 more/);
-  assert.match(textOf(note, "ways"), /still do\. Up to 12 of the 41 who would pay \$45 could take the \$20 price instead before the club takes in less than it does now\. One price/);
+  assert.match(textOf(note, "ways"), /as long as those who can pay the full price still do\. One price/);
+  assert.equal(textOf(note, "room"), "Up to 12 of the 41 who would pay $45 could take the $20 price instead before the club takes in less than it does now.");
   assert.match(textOf(note, "ways"), /One price of \$30 for everyone brings 13 more and takes in \$225 less\./);
   assert.match(textOf(note, "fix"), /^Open waiver code came out on top of the six ways shown\. .* Waiver on request came last\.$/);
   assert.match(textOf(note, "pledges"), /^33 of the 41 who pay would add about \$148 between them, enough for 3 of the 19 empty seats\./);
@@ -88,6 +89,7 @@ test("a price nobody skips at says so and drops the lines that have nothing to a
   assert.equal(textOf(note, "out"), "Nobody who answered would skip it at $0.");
   assert.equal(textOf(note, "pledges"), null);
   assert.equal(textOf(note, "ways"), null);
+  assert.equal(textOf(note, "room"), null);
   assert.match(textOf(note, "gentle"), /At \$0 you are inside it\.$/);
 });
 

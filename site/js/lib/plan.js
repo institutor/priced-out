@@ -86,8 +86,6 @@ function twoPricesOrOne(rows, item, price, size) {
     const second = two.accessPrice === 0 ? "a free place" : `a ${money(two.accessPrice)} price`;
     const takes = change > 0 ? `takes in about ${money(change)} more` : "costs the club nothing it was getting";
     said.push(`Keeping ${money(price)} and adding ${second} for those who need it brings about ${two.there - now.there} more and ${takes}, as long as those who can pay the full price still do.`);
-    const spare = roomSaid(roomForTwo(ways), price);
-    if (spare) said.push(spare);
   }
   if (lower) {
     const change = lower.taken - now.taken;
@@ -141,6 +139,7 @@ export function plan(dataset, { itemId, price, size }) {
     { key: "out", lead: "Who it leaves out.", text: leftOut(shares, price, size, out) },
     { key: "gentle", lead: "The price that keeps nine in ten.", text: nineInTen(rows, item, price) },
     { key: "ways", lead: "Two prices or one.", text: twoPricesOrOne(rows, item, price, size) },
+    { key: "room", lead: "Room for error.", text: roomSaid(roomForTwo(waysToPrice(rows, item, price, size)), price) },
     { key: "fix", lead: "How to offer a lower price.", text: howToOffer(fixes) },
     { key: "pledges", lead: "What members would cover themselves.", text: coveredByMembers(rows, rules, price, size, out) },
   ].filter((line) => line.text !== null);
