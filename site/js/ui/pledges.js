@@ -1,5 +1,12 @@
 // "I will if you will": would members' own pledges cover the empty seats?
-import { el, clear, sentence } from "./dom.js";
+import { el, sentence } from "./dom.js";
+import { drawnIn, ink, path, seat, seedOf, wipe } from "./ink.js";
+import { swatch } from "./doodles.js";
+import * as sketch from "../lib/sketch.js";
+
+// How close the shading lines are for each round of pledges: the first to
+// give are shaded darkest, each later round a little lighter.
+const SHADING = [3.2, 5, 7.5, 11];
 import { sharesAt } from "../lib/curve.js";
 import { cascade, seatsCovered } from "../lib/pledge.js";
 import { money, people } from "../lib/format.js";
@@ -13,7 +20,7 @@ export function mount(root, dataset, state) {
   const conditional = willing.filter((pledge) => pledge[1] !== 0);
 
   function render({ itemId, price, size }) {
-    clear(root);
+    wipe(root);
     const item = items.find((candidate) => candidate.id === itemId);
     const shares = sharesAt(rows, item, price);
     if (pledges.length < rules.minCell || shares.n < rules.minCell) {
@@ -54,20 +61,32 @@ export function mount(root, dataset, state) {
       const joined = total - previous;
       previous = total;
       if (joined <= 0) return;
-      const segment = el("span", { class: `round-${Math.min(index + 1, 4)}` });
+      const gap = SHADING[Math.min(index, SHADING.length - 1)];
+      const segment = el("span", {});
+      segment.dataset.gap = gap;
       segment.style.flexGrow = joined;
       const label = index === 0 ? `${joined} give no matter what` : `${joined} more join once ${outcome.steps[index - 1]} have`;
       segment.title = label;
       bar.append(segment);
-      key.append(el("li", {}, el("span", { class: `swatch round-${Math.min(index + 1, 4)}` }), label));
+      key.append(el("li", {}, swatch(gap, 60 + index), label));
     });
     const rest = payers - outcome.pledgers;
     if (rest > 0) {
-      const segment = el("span", { class: "rest", title: `${rest} add nothing` });
+      const segment = el("span", { title: `${rest} add nothing` });
       segment.style.flexGrow = rest;
       bar.append(segment);
-      key.append(el("li", {}, el("span", { class: "swatch rest" }), `${rest} add nothing`));
+      key.append(el("li", {}, swatch(0, 70, "rest"), `${rest} add nothing`));
     }
+    // The spans above set how wide each part is and carry its label. The
+    // drawing follows them: an outline for each, shaded where people give.
+    const parts = [...bar.children];
+    ink(bar, (width, height) => parts.flatMap((part, index) => {
+      const seed = seedOf(`pledge ${index}`);
+      const outline = sketch.blob(part.offsetLeft, 2, part.offsetWidth, height - 4, { seed, rough: 0.7, round: 0.15 });
+      if (!part.dataset.gap) return [path(outline, "round-line rest")];
+      const shading = sketch.hatch(part.offsetLeft + 1, 3, part.offsetWidth - 2, height - 6, { seed: seed + 1, gap: Number(part.dataset.gap), rough: 0.7 });
+      return [...drawnIn(shading, "round-fill", { from: index * 3 }), path(outline, "round-line")];
+    }));
     bar.setAttribute("aria-label", `Of the ${payers} who would pay ${money(price)}, ${outcome.pledgers} would add to their ticket.`);
     root.append(
       el("p", {}, sentence(`Scaled to the ${payers} of your ${size} who would pay ${money(price)}, `, [outcome.pledgers], " would chip in:")),
@@ -83,7 +102,10 @@ export function mount(root, dataset, state) {
         role: "img",
         "aria-label": `${covered} of the ${left} empty seats are covered by pledges.`,
       });
-      for (let seat = 0; seat < left; seat++) tickets.append(el("span", { class: seat < covered ? "ticket covered" : "ticket" }));
+      for (let index = 0; index < left; index++) {
+        const kind = index < covered ? "stretched" : "out";
+        tickets.append(el("span", { class: `seat ${kind}` }, seat(kind, 900 + index)));
+      }
       root.append(
         tickets,
         el("p", {}, sentence(

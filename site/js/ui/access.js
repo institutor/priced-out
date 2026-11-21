@@ -1,6 +1,7 @@
 // What it would take: the price that keeps nearly everyone in, and what an
 // access price would bring back.
-import { el, clear, sentence } from "./dom.js";
+import { el, sentence } from "./dom.js";
+import { circled, wipe } from "./ink.js";
 import { sharesAt, maxPriceFor, accessTier } from "../lib/curve.js";
 import { money, people } from "../lib/format.js";
 import { phrase } from "./priceCheck.js";
@@ -12,8 +13,9 @@ export function mount(root, dataset, state) {
   const { items, rows, rules } = dataset;
   const say = voice(dataset.meta);
 
-  const statement = (figure, ...text) =>
-    el("div", { class: "statement" }, el("span", { class: "figure", text: figure }), el("p", {}, text));
+  // Each figure is circled, the way a number that matters gets circled.
+  const statement = (name, figure, ...text) =>
+    el("div", { class: "statement" }, circled(el("span", { class: "figure", text: figure }), name), el("p", {}, text));
 
   // The access price is the highest price that loses no more than 1 in 20.
   // There are four different things to say about it, and only one of them is
@@ -21,30 +23,30 @@ export function mount(root, dataset, state) {
   function accessStatement(item, price, size) {
     const accessPrice = maxPriceFor(rows, item, ACCESS_TARGET);
     if (accessPrice === null) {
-      return statement("No price", `gets everyone in. Even free, more than 1 in 20 said they would skip a ${phrase(item)}, so for them the price is not the only thing in the way.`);
+      return statement("access", "No price", `gets everyone in. Even free, more than 1 in 20 said they would skip a ${phrase(item)}, so for them the price is not the only thing in the way.`);
     }
     if (accessPrice >= price) {
-      return statement("No gap", `to close here. At ${money(price)} no more than 1 in 20 ${say.surveyed} are left out.`);
+      return statement("access", "No gap", `to close here. At ${money(price)} no more than 1 in 20 ${say.surveyed} are left out.`);
     }
     const tier = accessTier(rows, item, price, ACCESS_TARGET);
     const back = tier ? people(tier.regained, size) : 0;
     if (back === 0) {
-      return statement(money(accessPrice), `is the access price, but in a club of ${size} the difference from ${money(price)} comes to less than one person.`);
+      return statement("access", money(accessPrice), `is the access price, but in a club of ${size} the difference from ${money(price)} comes to less than one person.`);
     }
     if (accessPrice === 0) {
-      return statement("Free", sentence(
+      return statement("access", "Free", sentence(
         `is the only price at which no more than 1 in 20 skip it. Waiving the ${money(price)} for those who need it brings back about `,
         [back], ` of your ${size}, and costs the club nothing it was getting.`,
       ));
     }
-    return statement(money(accessPrice), sentence(
+    return statement("access", money(accessPrice), sentence(
       "as an access price brings back about ", [back], ` of your ${size}. At ${money(price)} they were paying nothing, so that is about `,
       [money(back * accessPrice)], " more for the club, not less.",
     ));
   }
 
   function render({ itemId, price, size }) {
-    clear(root);
+    wipe(root);
     const item = items.find((candidate) => candidate.id === itemId);
     const shares = sharesAt(rows, item, price);
     if (shares.n < rules.minCell) {
@@ -53,10 +55,10 @@ export function mount(root, dataset, state) {
     }
 
     const gentle = maxPriceFor(rows, item, 0.1);
-    let gentleStatement = statement("No price", `keeps 9 in 10. Even free, more than 1 in 10 said they would skip a ${phrase(item)}.`);
+    let gentleStatement = statement("gentle", "No price", `keeps 9 in 10. Even free, more than 1 in 10 said they would skip a ${phrase(item)}.`);
     if (gentle !== null) {
       const where = gentle >= price ? `At ${money(price)} you are inside that.` : `You are at ${money(price)}.`;
-      gentleStatement = statement(money(gentle), `is the most a ${phrase(item)} can cost and still lose no more than 1 in 10. ${where}`);
+      gentleStatement = statement("gentle", money(gentle), `is the most a ${phrase(item)} can cost and still lose no more than 1 in 10. ${where}`);
     }
 
     root.append(

@@ -5,18 +5,28 @@
 // what such students told people; they say nothing about how likely any one
 // person's "I'm busy" is to be about money.
 import { el, svg, sentence } from "./dom.js";
+import { drawnIn, ink, path, seedOf } from "./ink.js";
+import * as sketch from "../lib/sketch.js";
 import { sharesAt } from "../lib/curve.js";
 
 function saidBars(said) {
   const ranked = [...said.options].sort((a, b) => b.count - a.count);
   const longest = Math.max(1, ranked[0].count);
-  return el("ul", { class: "bar-list" }, ranked.map((option) => {
-    const bar = el("span", { class: "simple-bar" });
-    bar.style.width = `${(option.count / longest) * 100}%`;
+  return el("ul", { class: "bar-list" }, ranked.map((option, order) => {
     const detail = `${option.label}: ${option.count} of ${said.n}`;
+    const seed = seedOf(`said ${option.id}`);
+    const track = el("span", { class: "track", title: detail, role: "img", "aria-label": detail });
+    ink(track, (width, height) => {
+      const length = Math.max(2, (option.count / longest) * width);
+      return [
+        drawnIn(sketch.hatch(0, 3, length, height - 6, { seed, gap: 4.5, rough: 0.8 }), "bar-hatch", { from: order * 2 }),
+        path(sketch.blob(0, 3, length, height - 6, { seed: seed + 1, rough: 0.7, round: 0.15 }), "bar-line"),
+        path(sketch.line(0, -5, 0, height + 5, { seed: seed + 2, rough: 0.6, passes: 1 }), "zero-line"),
+      ];
+    });
     return el("li", { class: "bar-row" },
       el("span", { class: "bar-name", text: option.label }),
-      el("span", { class: "track", title: detail, role: "img", "aria-label": detail }, bar),
+      track,
       el("span", { class: "bar-value", text: `${option.count}` }),
     );
   }));
