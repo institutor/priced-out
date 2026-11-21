@@ -12,7 +12,8 @@ couldn't pay. Because, you know, if thirty students pay twenty dollars for an ev
 that's actually more money netted than fifteen students paying thirty dollars.
 
 Students who can't afford a club's dues, formal or trip rarely say so. They say they're
-busy, and stop showing up. The people setting the price never find out.
+busy, and stop showing up. The people setting the price never find out. Published work
+on both points is listed under [Sources](#sources).
 
 Priced Out is a calculator for club treasurers. It takes a survey that asks students for
 the price at which that happens, and gives the treasurer the answer before the price is
@@ -309,6 +310,117 @@ The rules live in `site/js/lib/` and are covered by the tests in `test/` (119 te
 - It is not a way to find the highest price people will tolerate, and it can't tell you
   why one particular member said they were busy.
 
+## Sources
+
+Published work behind the claims this project makes. None of it is data from this
+project: every number on the site comes from the simulated panel. The sources were found
+and checked with Claude Code's web search on November 21. For the journal articles and
+the thesis that check covered the abstract only, apart from the school meals study, and
+the two method papers at the end are listed from their records.
+
+**Cost keeps students out of activities.**
+
+- C.S. Mott Children's Hospital National Poll on Children's Health,
+  [*Pay-to-Participate: Limiting School Activities for Lower-Income Students*](https://www.mottpoll.org/sites/default/files/documents/101716_paytoparticipate_0.pdf),
+  vol. 27, issue 5, October 17, 2016. A national poll of parents. In households earning
+  under $60,000, 27% said cost had cut their child's participation, against 12% of
+  households earning more. 24% of students from those lower-income households were in no
+  sport, arts group or club at all, against 11%.
+- Snellman, Silva, Frederick and Putnam,
+  ["The Engagement Gap: Social Mobility and Extracurricular Participation among American Youth"](https://doi.org/10.1177/0002716214548398),
+  *ANNALS of the American Academy of Political and Social Science* 657(1), 2015, pp.
+  194–207. Four national surveys of high school students show the gap between social
+  classes in clubs and sports widening since the 1970s. The authors name pay-to-play
+  fees among the causes.
+- Lasch,
+  [*Money Matters: Financial Constraints among Low-Income Students at Selective Colleges and Universities*](https://knowledge.uchicago.edu/record/13554),
+  MA thesis, University of Chicago, 2018. From a survey and interviews: even students on
+  generous financial aid said money affected which clubs and activities they took part in.
+- The Hope Center for Student Basic Needs, Temple University,
+  [*2023–2024 Student Basic Needs Survey Report*](https://hope.temple.edu/2023-2024-student-basic-needs-survey-report),
+  February 2025. Of 74,350 students at 91 colleges in 16 states, 59% faced food or
+  housing insecurity in at least one form. It covers the colleges that took part, not a
+  national sample.
+
+**Students who can't pay rarely say so.**
+
+- Zelizer and Gaydosh,
+  ["Class on Campus"](https://paw.princeton.edu/article/essay-class-campus),
+  *Princeton Alumni Weekly*, January 9, 2019. From interviews with 59 Princeton students:
+  low-income students often turned down dinners and trips they couldn't afford, and some
+  gave another reason, such as being tired or having work to do.
+- Chin, Jeffries and Thompson,
+  ["The Impact of Downward Classism on Social Class Concealment among College Students Who Are Low-Income"](https://doi.org/10.1353/csd.2024.a929245),
+  *Journal of College Student Development* 65(3), 2024, pp. 316–320. A daily diary study
+  of how often low-income students hide their class background from higher-status peers.
+
+**What it costs, at Columbia and in Science Olympiad.**
+
+- Daffey,
+  ["The Room Where It Happens"](https://www.theblueandwhite.org/post/the-room-where-it-happens),
+  *The Blue and White* (Columbia's undergraduate magazine), May 19, 2025. On club sports
+  at Columbia: membership costs up to $925 a semester on one team, regionals and
+  nationals are often paid out of pocket, and the governing board can set aside only
+  $2,000 of $19,000 for first-generation and low-income students.
+- Mihelich,
+  ["Maryland high school makes first trip to National Science Olympiad Tournament"](https://www.aaas.org/membership/stemedu/maryland-high-school-makes-first-trip-national-science-olympiad-tournament),
+  AAAS, June 11, 2012. One team's costs: $1,500 for a trip to Philadelphia and about
+  $9,000 for nationals. The coach says families in that area could absorb the travel,
+  and that he isn't sure how the team would manage otherwise.
+
+**Asking for help is the hard part.**
+
+- C.S. Mott Children's Hospital National Poll on Children's Health,
+  [*Pay-to-Participate: Impact on School Activities*](https://www.mottpoll.org/sites/default/files/documents/031819_PayToParticipate.pdf),
+  vol. 33, issue 5, March 18, 2019. 29% of parents said school activities cost more than
+  they expected, but only 7% had ever asked for a waiver or scholarship. 19% didn't know
+  how to ask, and 5% were not comfortable asking. It bears on the fix that came last in
+  the simulated panel, a waiver you have to ask the treasurer for.
+- Zuercher and eight others,
+  ["The Benefits and Challenges of Providing School Meals during the First Year of California's Universal School Meal Policy as Reported by School Foodservice Professionals"](https://doi.org/10.3390/nu16121812),
+  *Nutrients* 16(12), 2024, article 1812. A comparison from school meals, not club fees.
+  After California made meals free for every student, 64% of the 430 school food
+  services surveyed reported more students eating them, and 31% reported less stigma.
+
+**"I will if you will."**
+
+- Fischbacher, Gächter and Fehr,
+  ["Are People Conditionally Cooperative? Evidence from a Public Goods Experiment"](https://doi.org/10.1016/S0165-1765%2801%2900394-9),
+  *Economics Letters* 71(3), 2001, pp. 397–404. In an experiment about paying into a
+  shared pot, half the participants gave more the more others gave, and about a third
+  gave nothing. That is the behaviour the pledge section asks about.
+
+**Why every number here is labelled simulated.**
+
+- Bisbee, Clinton, Dorff, Kenkel and Larson,
+  ["Synthetic Replacements for Human Survey Data? The Perils of Large Language Models"](https://doi.org/10.1017/pan.2024.5),
+  *Political Analysis* 32(4), 2024, pp. 401–416. A language model answering as survey
+  respondents came close to the real averages, but its answers varied less than real
+  ones, led to different statistical conclusions, and shifted with small changes in
+  wording and over three months.
+- Pew Research Center,
+  ["Can AI Stand In for Human Survey-Takers? Not Really"](https://www.pewresearch.org/data-labs/2026/09/30/can-ai-stand-in-for-human-survey-takers-not-really/),
+  September 30, 2026. AI respondents built to mirror real panel members were off by 12
+  percentage points on average across nearly 300 questions. On nearly half the questions
+  at least one answer was never chosen by any of them.
+- Murphy, Allen, Stevens and Weatherhead,
+  ["A Meta-analysis of Hypothetical Bias in Stated Preference Valuation"](https://doi.org/10.1007/s10640-004-3332-z),
+  *Environmental and Resource Economics* 30(3), 2005, pp. 313–325. Across 28 studies,
+  what people said they would pay ran above what they actually paid, with a median ratio
+  of 1.35. Real members' answers would carry this problem too.
+
+**Methods.**
+
+- Wilson,
+  ["Probable Inference, the Law of Succession, and Statistical Inference"](https://doi.org/10.1080/01621459.1927.10502953),
+  *Journal of the American Statistical Association* 22(158), 1927, pp. 209–212. The 95%
+  interval shown beside each share.
+- Finn and Louviere,
+  ["Determining the Appropriate Response to Evidence of Public Concern: The Case of Food Safety"](https://doi.org/10.1177/074391569201100202),
+  *Journal of Public Policy & Marketing* 11(2), 1992, pp. 12–25. An early paper on
+  best-worst scaling, the kind of trade-off question (MaxDiff) used to rank the six
+  fixes.
+
 ## What's where
 
 ```
@@ -361,7 +473,22 @@ Times are Eastern.
 - **Sat Nov 21.** In the early morning, redrew the title page as a strip of stick figures
   drawn a stroke at a time. Tried a zoom on the title page and a section that scrolled
   sideways, and took both out again within the hour; those commits are still in the
-  history. Added the step-by-step guide for judges and this log.
+  history. Added the step-by-step guide for judges and this log. Looked up published
+  sources for the claims the project makes and listed them under Sources.
+
+## Outside resources
+
+Nothing in this repository existed before the build period. What came from outside:
+
+- **The organizers' starter client.** [`flashpoint.mjs`](flashpoint.mjs) is copied
+  unchanged from the hackathon setup manual. It needs four npm packages: `@x402/evm`,
+  `@x402/fetch`, `undici` and `viem`. Nothing else in the repository is installed
+  from outside: the site uses no library or framework, and the tests use Node's own
+  test runner.
+- **Typefaces.** The site loads four from Google Fonts: Atkinson Hyperlegible, Atkinson
+  Hyperlegible Mono, Londrina Solid and Londrina Sketch.
+- **Published sources**, listed under [Sources](#sources).
+- **Flashpoint and Claude Code**, described below.
 
 ## AI tools used
 
