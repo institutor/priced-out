@@ -1,7 +1,7 @@
 // MaxDiff scoring by counts: for each option, how often it was picked as best
 // minus how often as worst, over how often it was shown. Ranges from -1 to 1.
-import { quantile } from "../../site/js/lib/stats.js";
-import { mulberry32 } from "./rng.mjs";
+import { quantile } from "../lib/stats.js";
+import { mulberry32 } from "./rng.js";
 
 export function scoreMaxDiff(respondents, fixIds) {
   const tallies = new Map(fixIds.map((id) => [id, { id, best: 0, worst: 0, shown: 0 }]));

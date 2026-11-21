@@ -4,8 +4,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { parseCsv, toObjects } from "../scripts/lib/csv.mjs";
-import { normalizeExport } from "../scripts/lib/flashpoint-export.mjs";
+import { parseCsv, toObjects } from "../site/js/ingest/csv.js";
+import { normalizeExport } from "../site/js/ingest/flashpoint-export.js";
 
 const fixture = (name) => new URL(`./fixtures/${name}`, import.meta.url);
 const mapping = JSON.parse(fs.readFileSync(fixture("mapping-small.json"), "utf8"));

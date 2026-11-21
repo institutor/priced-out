@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { makeSampleRespondents, SAMPLE_META } from "../scripts/make-sample.mjs";
-import { buildDataset } from "../scripts/lib/aggregate.mjs";
-import { ITEMS, FIXES, PLEDGE_AMOUNTS, PLEDGE_THRESHOLDS } from "../scripts/lib/vocab.mjs";
+import { buildDataset } from "../site/js/ingest/aggregate.js";
+import { ITEMS, FIXES, PLEDGE_AMOUNTS, PLEDGE_THRESHOLDS } from "../site/js/ingest/vocab.js";
 
 test("the same seed gives the same respondents", () => {
   assert.deepEqual(makeSampleRespondents(20, 5), makeSampleRespondents(20, 5));

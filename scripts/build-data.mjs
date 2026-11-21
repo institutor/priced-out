@@ -3,7 +3,7 @@
 //   node scripts/build-data.mjs data/raw/export.csv --survey <id> --from 2026-11-20 --to 2026-11-21
 //
 // Options:
-//   --mapping <file>          column and answer mapping (default data/mapping.json)
+//   --mapping <file>          column and answer mapping (default site/data/mapping.json)
 //   --out <file>              where to write (default site/data/dataset.json)
 //   --survey <id>             Flashpoint survey id, recorded in the dataset
 //   --from <date> --to <date> when answers were collected
@@ -20,10 +20,10 @@
 //
 // The raw export stays in data/raw/, which is not committed.
 import fs from "node:fs";
-import { parseCsv, toObjects } from "./lib/csv.mjs";
-import { normalizeExport } from "./lib/flashpoint-export.mjs";
-import { buildDataset } from "./lib/aggregate.mjs";
-import { FIXES, ITEMS, MIN_CELL } from "./lib/vocab.mjs";
+import { parseCsv, toObjects } from "../site/js/ingest/csv.js";
+import { normalizeExport } from "../site/js/ingest/flashpoint-export.js";
+import { buildDataset } from "../site/js/ingest/aggregate.js";
+import { FIXES, ITEMS, MIN_CELL } from "../site/js/ingest/vocab.js";
 
 const [input, ...rest] = process.argv.slice(2);
 if (!input || input.startsWith("--")) {
@@ -33,7 +33,7 @@ if (!input || input.startsWith("--")) {
 const options = {};
 for (let i = 0; i < rest.length; i += 2) options[rest[i].replace(/^--/, "")] = rest[i + 1];
 
-const mapping = JSON.parse(fs.readFileSync(options.mapping ?? "data/mapping.json", "utf8"));
+const mapping = JSON.parse(fs.readFileSync(options.mapping ?? "site/data/mapping.json", "utf8"));
 // One export can hold people and personas. Each reading takes one kind only.
 const read = (file, report, synthetic) => normalizeExport(
   toObjects(parseCsv(fs.readFileSync(file, "utf8")), mapping.headerRow ?? 1),

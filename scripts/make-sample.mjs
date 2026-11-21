@@ -6,9 +6,9 @@
 // use. Nothing generated here may be reported as a finding.
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { mulberry32, shuffle } from "./lib/rng.mjs";
-import { buildDataset } from "./lib/aggregate.mjs";
-import { ITEMS, FIXES } from "./lib/vocab.mjs";
+import { mulberry32, shuffle } from "../site/js/ingest/rng.js";
+import { buildDataset } from "../site/js/ingest/aggregate.js";
+import { ITEMS, FIXES } from "../site/js/ingest/vocab.js";
 
 export const SAMPLE_META = {
   kind: "sample",

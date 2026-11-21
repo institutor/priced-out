@@ -1,5 +1,5 @@
 // The layout Flashpoint's CSV export really has, read with the mapping the
-// build really uses (data/mapping.json). The fixture is hand-written: two
+// build really uses (site/data/mapping.json). The fixture is hand-written: two
 // header rows, one column per Q6 option, a MaxDiff design number in place of
 // the options shown.
 import test from "node:test";
@@ -8,11 +8,11 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { parseCsv, toObjects } from "../scripts/lib/csv.mjs";
-import { normalizeExport } from "../scripts/lib/flashpoint-export.mjs";
+import { parseCsv, toObjects } from "../site/js/ingest/csv.js";
+import { normalizeExport } from "../site/js/ingest/flashpoint-export.js";
 
 const root = new URL("..", import.meta.url);
-const mapping = JSON.parse(fs.readFileSync(new URL("data/mapping.json", root), "utf8"));
+const mapping = JSON.parse(fs.readFileSync(new URL("site/data/mapping.json", root), "utf8"));
 const rows = parseCsv(fs.readFileSync(new URL("test/fixtures/export-flashpoint.csv", root), "utf8"));
 const objects = toObjects(rows, mapping.headerRow);
 

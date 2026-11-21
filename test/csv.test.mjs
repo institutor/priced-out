@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseCsv, toObjects } from "../scripts/lib/csv.mjs";
-import { mulberry32, shuffle } from "../scripts/lib/rng.mjs";
+import { parseCsv, toObjects } from "../site/js/ingest/csv.js";
+import { mulberry32, shuffle } from "../site/js/ingest/rng.js";
 
 test("parseCsv handles quotes, commas and doubled quotes", () => {
   const rows = parseCsv('a,b,c\n"x, y","say ""hi""",z\n');

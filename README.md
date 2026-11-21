@@ -234,7 +234,7 @@ from people are read. The script prints how many rows it set aside and why, and 
 a clear message if a column is missing, an answer isn't one it knows, or a MaxDiff pick
 isn't on the screen its design says was shown.
 
-[`data/mapping.json`](data/mapping.json) says which export column is which question, and
+[`site/data/mapping.json`](site/data/mapping.json) says which export column is which question, and
 holds the ten MaxDiff designs.
 
 To go back to generated sample data: `npm run sample`.
@@ -431,13 +431,14 @@ site/js/ui/           one module per section of the page, plus the title page (c
                       scene.js, its strip of stick figures) and the pen that draws under
                       and over the page (ink.js, doodles.js)
 scripts/              build-data (export to dataset), make-sample, dev server
-scripts/lib/          CSV reader, Flashpoint export reader, MaxDiff scoring, aggregation
+site/js/ingest/       CSV reader, Flashpoint export reader, MaxDiff scoring, aggregation:
+                      the page and the build script both read an export with these
 test/                 node:test suites
 briefs/, replies/     everything sent to and received from Flashpoint
 flashpoint.mjs        the MCP client that pays per call (the organizers' starter, unchanged)
 ask.mjs, panel.mjs    send one brief to the survey agent, run the synthetic panel
 go.mjs                the publish, run and export steps in order
-data/mapping.json     which export column is which question, and the MaxDiff designs
+site/data/mapping.json  which export column is which question, and the MaxDiff designs
 docs/                 design, build plan, submission write-up
 ```
 

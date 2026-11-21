@@ -1,14 +1,14 @@
 // The only file that knows what Flashpoint's CSV export looks like.
 //
 // Every column name and every answer text comes from a mapping file
-// (data/mapping.json), so adapting to the real export means editing that
+// (site/data/mapping.json), so adapting to the real export means editing that
 // file, not this code. Anything unexpected throws with the column and value
 // named, because a silently misread answer would end up on the site as a
 // finding.
 //
 // normalizeExport takes an optional `report` object and fills it with counts
 // of the rows and answers it set aside, so the build can print them.
-import { FIXES, ITEMS } from "./vocab.mjs";
+import { FIXES, ITEMS } from "./vocab.js";
 
 const isBlank = (value) => value === undefined || value === null || String(value).trim() === "";
 const sameText = (a, b) => String(a).trim().toLowerCase() === String(b).trim().toLowerCase();

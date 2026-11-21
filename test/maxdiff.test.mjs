@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { scoreMaxDiff, bootstrapMaxDiff } from "../scripts/lib/maxdiff.mjs";
+import { scoreMaxDiff, bootstrapMaxDiff } from "../site/js/ingest/maxdiff.js";
 
 const ids = ["a", "b", "c", "d", "never"];
 const person = (tasks) => ({ maxdiff: tasks });

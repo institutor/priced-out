@@ -5,9 +5,9 @@
 // their own content, so their order says nothing about who answered when.
 // Anything based on fewer than MIN_CELL respondents is left out here, so it
 // cannot leak through the page source either.
-import { quantile } from "../../site/js/lib/stats.js";
-import { ITEMS, FIXES, SAID, MIN_CELL, PILOT_N, GUESS } from "./vocab.mjs";
-import { scoreMaxDiff, bootstrapMaxDiff } from "./maxdiff.mjs";
+import { quantile } from "../lib/stats.js";
+import { ITEMS, FIXES, SAID, MIN_CELL, PILOT_N, GUESS } from "./vocab.js";
+import { scoreMaxDiff, bootstrapMaxDiff } from "./maxdiff.js";
 
 const isMissing = (value) => value === null || value === undefined;
 

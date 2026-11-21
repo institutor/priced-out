@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildDataset } from "../scripts/lib/aggregate.mjs";
-import { ITEMS, FIXES, SAID, MIN_CELL } from "../scripts/lib/vocab.mjs";
+import { buildDataset } from "../site/js/ingest/aggregate.js";
+import { ITEMS, FIXES, SAID, MIN_CELL } from "../site/js/ingest/vocab.js";
 
 const base = {
   year: "Sophomore",
