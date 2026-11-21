@@ -33,7 +33,7 @@ export function mount(root, dataset) {
     root.append(strip(
       "banner",
       "Simulated students. ",
-      `Every number here comes from ${meta.n} AI personas that Flashpoint generated and ran through the survey. No real student was asked, and nothing here is a finding about real students.`,
+      `Every number here comes from ${meta.n} AI personas that Flashpoint generated. No real student was asked.`,
       `${meta.n} AI personas answered, not real students.`,
     ));
     return;
