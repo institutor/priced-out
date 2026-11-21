@@ -281,13 +281,47 @@ h2 {
   padding-block: clamp(1.5rem, 5vh, 3.5rem) clamp(2.5rem, 8vh, 5rem);
 }
 
+.cover-seats {
+  width: min(100%, 50rem, 100svh);
+  margin-bottom: clamp(0.75rem, 3vh, 1.75rem);
+}
+
 .cover-room {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: clamp(0.2rem, 0.9vw, 0.65rem);
-  width: min(100%, 50rem, 100svh);
   padding-inline: 1%;
-  margin-bottom: clamp(0.75rem, 3vh, 1.75rem);
+}
+
+/* What the empty seats said, in the other pen, with an arrow down to them. */
+.excuse {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 0.35rem;
+  max-width: none;
+  margin: 0 0 0.3rem;
+  padding-right: 8%;
+  color: var(--mark-2);
+}
+
+.excuse-words {
+  font: 400 clamp(1.3rem, 2.7vw, 1.8rem)/1 var(--font-display);
+  letter-spacing: 0.02em;
+  margin-bottom: 1.15rem;
+  transform: rotate(-3deg);
+  transform-origin: right bottom;
+}
+
+.excuse-arrow {
+  flex: none;
+  width: clamp(2.1rem, 4.2vw, 2.9rem);
+  height: auto;
+}
+
+.excuse-arrow path {
+  stroke: var(--mark-2);
+  stroke-width: 2.6;
 }
 
 .cover-room .seat {
@@ -426,18 +460,21 @@ h2 {
 }
 
 .cover.play .title-rule,
+.cover.play .excuse-arrow .draw,
 .cover.play .cover-arrow .draw {
   animation: draw-on 0.45s ease-out both;
   animation-delay: var(--wait, 0ms);
 }
 
+.cover.play .excuse-words,
 .cover.play .cover-note,
 .cover.play .cover-go > a {
   animation: ink-in 0.5s ease-out both;
   animation-delay: var(--wait, 0ms);
 }
 
-.cover.offstage .boil {
+.cover.offstage .boil,
+.cover.offstage .shiver {
   animation-play-state: paused;
 }
 

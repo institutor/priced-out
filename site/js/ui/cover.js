@@ -1,7 +1,8 @@
 // The title page. A row of seats is coloured in, the title is pencilled a
 // letter at a time and inked over, and as "Out" goes down the last seats in
-// the row are rubbed out. Everything it draws is decoration: the heading, the
-// note and the link are plain HTML and are there without it.
+// the row are rubbed out. A note in the other pen says what the people who
+// had them said. Everything it draws is decoration: the heading, the note
+// and the link are plain HTML and are there without it.
 import { el, svg } from "./dom.js";
 import { art, drawnIn, inkButton, seat } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
@@ -10,7 +11,10 @@ const SEATS = 12;
 const LEAVING = 4;
 
 // When each part of the drawing starts, in milliseconds.
-const AT = { seats: 150, title: 650, out: 1650, leave: 2350, rule: 2700, note: 3000, go: 3250, settled: 4300 };
+const AT = { seats: 150, title: 650, out: 1650, leave: 2350, rule: 2700, excuse: 2950, note: 3000, go: 3250, settled: 4300 };
+
+// What the empty seats said.
+const EXCUSE = "“busy that night”";
 
 // The lettering needs its two typefaces before it can be measured. If they
 // never arrive the title is drawn in whatever the browser falls back to.
@@ -38,6 +42,17 @@ function drawRoom(room) {
     if (leaving) holder.style.setProperty("--leave", `${AT.leave + (index - (SEATS - LEAVING)) * 130}ms`);
     room.append(holder);
   }
+}
+
+// The excuse is written above the seats that empty, with an arrow down to
+// them.
+function drawExcuse(seats) {
+  const pointer = art("excuse-arrow", 44, 46, drawnIn(sketch.arrow(6, 5, 30, 41, { seed: 31, head: 11, rough: 1.1, bend: -0.3 }), ""));
+  pointer.querySelectorAll("path").forEach((stroke, index) => wait(stroke, AT.excuse + 350 + index * 200));
+  const words = wait(el("span", { class: "excuse-words", text: EXCUSE }), AT.excuse);
+  const note = el("p", { class: "excuse" }, words, pointer);
+  seats.prepend(note);
+  return note;
 }
 
 // Each letter is its own piece of text, so each can be drawn in turn. The
@@ -79,6 +94,7 @@ function drawTitle(title) {
 }
 
 export async function mount(root) {
+  const seats = root.querySelector(".cover-seats");
   const room = root.querySelector(".cover-room");
   const title = root.querySelector(".title");
   const note = root.querySelector(".cover-note");
@@ -87,6 +103,7 @@ export async function mount(root) {
 
   await lettersReady();
   drawRoom(room);
+  const excuse = seats ? drawExcuse(seats) : null;
   const stage = drawTitle(title);
 
   if (note) wait(note, AT.note);
@@ -106,6 +123,7 @@ export async function mount(root) {
   window.setTimeout(() => {
     stage.classList.add("boil");
     room.classList.add("boil");
+    excuse?.classList.add("shiver");
   }, AT.settled);
   if (typeof IntersectionObserver !== "undefined") {
     new IntersectionObserver((entries) => {
