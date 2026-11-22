@@ -62,6 +62,7 @@ test("the bill adds up to what was spent", async () => {
 
 test("the header says when a run is practice", () => {
   const head = { objective: "o", people: 3, cap: 8, model: "m", orders: ["One."], stamp: "now" };
-  assert.match(logHeader({ ...head, fake: true, practiceCommander: true }), /practice run with a fake Flashpoint[\s\S]*canned practice replies/);
-  assert.doesNotMatch(logHeader({ ...head, fake: false, practiceCommander: false }), /practice|canned/);
+  assert.match(logHeader({ ...head, mode: "fake", practiceCommander: true }), /practice run with a fake Flashpoint[\s\S]*canned practice replies/);
+  assert.match(logHeader({ ...head, mode: "practice" }), /invented every answer/);
+  assert.doesNotMatch(logHeader({ ...head, mode: "real", practiceCommander: false }), /practice|canned/);
 });

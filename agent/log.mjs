@@ -12,9 +12,14 @@ function receipt(step, what) {
 
 const ACTIONS = { design: "write or change the survey", publish: "publish the survey", send: "email the survey", results: "read results", other: "a message" };
 
-export function logHeader({ objective, people, cap, model, orders, fake, practiceCommander, stamp }) {
+const PRACTICE_NOTE = {
+  fake: " (practice run with a fake Flashpoint: no real survey, no real answers)",
+  practice: " (practice run: an AI stand-in played Flashpoint and invented every answer. No real survey, no real people.)",
+};
+
+export function logHeader({ objective, people, cap, model, orders, mode = "real", practiceCommander, stamp }) {
   const lines = [
-    `# Mission log ${stamp}${fake ? " (practice run with a fake Flashpoint: no real survey, no real answers)" : ""}`,
+    `# Mission log ${stamp}${PRACTICE_NOTE[mode] ?? ""}`,
     "",
     `**Mission from the commander:** ${objective}`,
     "",

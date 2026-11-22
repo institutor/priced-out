@@ -5,3 +5,4 @@ data/raw/
 *.sending
 agent/recipients.txt
 agent/runs/fake-*/
+agent/runs/practice-*/

@@ -2,7 +2,9 @@
 // comes to you, the commander, only when your standing orders say so.
 //
 //   node agent/agent.mjs "<mission>"            real run: emails real people, spends credit
-//   node agent/agent.mjs "<mission>" --fake     practice run: no emails, no credit
+//   node agent/agent.mjs "<mission>" --practice practice run: an AI stand-in plays Flashpoint and
+//                                               invents the answers. No emails, no credit.
+//   node agent/agent.mjs "<mission>" --fake     the same with fixed canned replies (used by the tests)
 //
 //   --cap 8            most the run may spend on Flashpoint, in USDC (default 8)
 //   --recipients file  who to survey, one "Name, email" per line (default agent/recipients.txt)
@@ -15,6 +17,7 @@ import readline from "node:readline";
 import Anthropic from "@anthropic-ai/sdk";
 import { runAgent, makeRedactor, DEFAULT_ORDERS } from "./loop.mjs";
 import { fakeFlashpoint } from "./fake-flashpoint.mjs";
+import { practiceWriter, PRACTICE_TAG } from "./practice-writer.mjs";
 import { logEntry, logHeader, logFooter, shortLine } from "./log.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -24,7 +27,8 @@ const flag = (name) => {
   const at = argv.indexOf(name);
   return at === -1 ? undefined : argv[at + 1];
 };
-const fake = argv.includes("--fake");
+const mode = argv.includes("--practice") ? "practice" : argv.includes("--fake") ? "fake" : "real";
+const fake = mode !== "real"; // nothing real is sent or paid
 const objective = argv.find((arg, i) => !arg.startsWith("--") && !valueFlags.includes(argv[i - 1]));
 const cap = Number(flag("--cap") ?? 8);
 const recipientsFile = flag("--recipients") ?? new URL("agent/recipients.txt", root);
@@ -32,7 +36,7 @@ const ordersFile = flag("--orders") ?? new URL("agent/orders.md", root);
 const atDesk = Boolean(process.stdin.isTTY);
 
 if (!objective || !(cap > 0)) {
-  console.log('usage: node agent/agent.mjs "<mission>" [--fake] [--cap 8] [--recipients file] [--orders file]');
+  console.log('usage: node agent/agent.mjs "<mission>" [--practice | --fake] [--cap 8] [--recipients file] [--orders file]');
   process.exit(1);
 }
 if (!fake && !atDesk) {
@@ -108,7 +112,7 @@ async function llm({ system, tools, messages }) {
 }
 
 const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-const runDir = new URL(`agent/runs/${fake ? "fake-" : ""}${stamp}/`, root);
+const runDir = new URL(`agent/runs/${fake ? `${mode}-` : ""}${stamp}/`, root);
 fs.mkdirSync(runDir, { recursive: true });
 const logFile = new URL("log.md", runDir);
 
@@ -278,7 +282,7 @@ async function wait(minutes) {
 // ---- The log ----
 
 const steps = [];
-const head = { objective: redact(objective), model, fake, cap, orders, people: recipients.length, stamp, practiceCommander: !atDesk };
+const head = { objective: redact(objective), model, mode, cap, orders, people: recipients.length, stamp, practiceCommander: !atDesk };
 
 function record(step) {
   steps.push(step);
@@ -291,14 +295,21 @@ function record(step) {
 fs.writeFileSync(logFile, logHeader(head));
 
 console.log(`Mission: ${objective}`);
-console.log(`${recipients.length} people on the list. Cap $${cap.toFixed(2)}. ${fake ? "PRACTICE RUN: fake Flashpoint, nothing is sent or paid." : "REAL RUN: this emails the people on the list and spends credit."}`);
+console.log(`${recipients.length} people on the list. Cap $${cap.toFixed(2)}. ${{ real: "REAL RUN: this emails the people on the list and spends credit.", practice: "PRACTICE RUN: an AI stand-in plays Flashpoint and invents the answers. Nothing is sent or paid.", fake: "PRACTICE RUN: canned fake Flashpoint. Nothing is sent or paid." }[mode]}`);
 console.log(`Standing orders:\n${orders.map((order) => `  - ${order}`).join("\n")}\n`);
 
 let flashpoint;
 let before = null;
 let balanceOf = null;
-if (fake) {
+if (mode === "fake") {
   flashpoint = fakeFlashpoint();
+} else if (mode === "practice") {
+  // A small, fast model plays Flashpoint and the people who answer.
+  const ask = async (system, prompt) => {
+    const reply = await client.messages.create({ model: process.env.PRACTICE_MODEL ?? "claude-haiku-5-5", max_tokens: 4000, system, messages: [{ role: "user", content: prompt }] });
+    return reply.content.filter((block) => block.type === "text").map((block) => block.text).join("").trim();
+  };
+  flashpoint = fakeFlashpoint({ writer: practiceWriter({ ask }), tag: PRACTICE_TAG });
 } else {
   const real = await realFlashpoint();
   flashpoint = real.flashpoint;
@@ -325,4 +336,5 @@ if (!answer) {
   process.exit(1);
 }
 rule("The agent's answer");
-console.log(`\nRecommendation: ${answer.recommendation}\n\nEvidence: ${answer.evidence}\n\nBetween rounds: ${answer.learned_between_rounds}\n\nLimits: ${answer.limits}\n\nSpent $${spent.toFixed(2)} of $${cap.toFixed(2)}. Full log: ${logFile.pathname}`);
+const board = answer.scoreboard.map((row) => `  Round ${row.round}: ${row.question}\n    people said: ${row.people_said}\n    agent ${row.agent}, AI personas ${row.personas}, commander ${row.commander}`).join("\n");
+console.log(`\nRecommendation: ${answer.recommendation}\n\nEvidence: ${answer.evidence}\n\nScoreboard:\n${board || "  (no envelope was opened)"}\n\nBetween rounds: ${answer.learned_between_rounds}\n\nLimits: ${answer.limits}\n\nSpent $${spent.toFixed(2)} of $${cap.toFixed(2)}. Full log: ${logFile.pathname}`);

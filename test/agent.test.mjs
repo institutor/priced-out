@@ -219,3 +219,23 @@ test("the redactor removes listed and unlisted addresses", () => {
   const redact = makeRedactor(recipients);
   assert.equal(redact("to ben@example.com and x.y@z.co"), "to [recipient 2] and [email]");
 });
+
+test("the practice writer plays Flashpoint without ever seeing an address", async () => {
+  const { practiceWriter, PRACTICE_TAG } = await import("../agent/practice-writer.mjs");
+  const prompts = [];
+  const askModel = async (system, prompt) => { prompts.push(prompt); return `written ${prompts.length}`; };
+  const flashpoint = fakeFlashpoint({ writer: practiceWriter({ ask: askModel }), tag: PRACTICE_TAG });
+  const { commander } = desk();
+  const out = await run([
+    ask("Make a panel from {{RECIPIENTS}} and ask about price", "design"),
+    { name: "rehearse_on_personas", input: { audience: "members", how_many: 5, why: "w", could_change: "c" } },
+    ask("Show the persona rehearsal results", "results"),
+    seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), open(), finish,
+  ], { flashpoint, commander });
+  assert.doesNotMatch(prompts.join("\n"), /@example\.com/);
+  assert.match(prompts[0], /Invent exactly 2 members/);
+  for (const step of kinds(out, "flashpoint")) assert.ok(step.reply.startsWith(PRACTICE_TAG));
+  assert.match(kinds(out, "flashpoint")[0].reply, /Drafted survey 1\.\n\nwritten 2\nIt is not published/);
+  assert.equal(kinds(out, "opened").length, 1);
+  assert.equal(prompts.length, 6, "cast, draft, persona answers, persona results, people's answers, results");
+});
