@@ -42,5 +42,8 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
+      # GitHub can take a moment to list the upload. Without the wait the
+      # deploy step sometimes finds no artifact and fails.
+      - run: sleep 30
       - id: deployment
         uses: actions/deploy-pages@v4
