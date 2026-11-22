@@ -89,14 +89,20 @@ never prints a key or an address:
 node agent/check.mjs
 ```
 
-**A real run.** It emails the people on the list and spends Flashpoint credit:
+**A real run.** It emails the people on the list and spends Flashpoint credit. Before each
+send you see the survey and the exact message the agent would send to Flashpoint. Only a
+plain `yes` sends it. Anything else, such as "ok but change question 2", stops the send
+and goes back to the agent as your reason:
 
 ```bash
 node agent/agent.mjs "Figure out the best event to put on for our club next spring."
 ```
 
 **A real run, hands-off.** You give the objective and walk away. The agent sends without
-asking you, as long as the survey passes the code's send checks (see Safeguards):
+asking you, as long as the survey passes the code's send checks (see Safeguards). The
+checks read Flashpoint's whole reply, so they are strict: a long reply, or one that only
+mentions a word like "email address", can hold a send that a person would have let
+through. For a first real run, stay at the keyboard:
 
 ```bash
 node agent/agent.mjs "Figure out the best event to put on for our club next spring." --hands-off
@@ -110,6 +116,9 @@ node agent/agent.mjs "Figure out the best event to put on for our club next spri
 | `--quiet 3` | Practice only: 3 of the invented people do not answer the first survey until they are reminded, so you can watch the agent meet a low response. | 0 |
 | `--cap 9` | The most the run may spend on Flashpoint, in USDC | 9 |
 | `--emails 2` | The most emails anyone on the list may get, reminders included | 2 |
+
+An option the agent does not know stops it before anything starts, so a typing mistake
+in `--practice` cannot begin a real run. A value goes after a space: `--cap 5`.
 | `--recipients file` | Who to survey, one `Name, email` per line | `agent/recipients.txt` |
 | `--orders file` | Your standing orders, one `- order` per line | `agent/orders.md` |
 | `--resume folder` | Carry on a real run that was stopped | off |
@@ -221,7 +230,8 @@ that the step could change. If it cannot name one, it is told to skip the step.
 These are rules in the code. They hold whatever the model says.
 
 - **No email without a yes, or a check.** The code refuses any send until the envelope is
-  sealed and you have seen the survey and typed yes. In hands-off mode the code checks
+  sealed and you have seen the survey and typed a plain yes. An edit to the survey, or
+  putting it live, takes the approval away, so the send is asked for again. In hands-off mode the code checks
   the survey itself instead, and holds the send if any check fails:
   - Flashpoint showed the whole survey, and nothing changed after that.
   - It is short: about 10 questions at most, and about 5 for a follow-up.
