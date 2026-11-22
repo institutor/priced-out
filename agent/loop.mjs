@@ -298,14 +298,17 @@ export function asksToSend(message) {
 //                                         Leave it out and nobody is at the desk: questions go unanswered and no email is sent.
 //   wait(minutes)                      -> resolves when the wait is over, with anything the commander typed meanwhile
 //   record(step)                       -> called for every step, already redacted
-export async function runAgent({ objective, recipients, cap, orders = DEFAULT_ORDERS, llm, flashpoint, commander = null, wait, record = () => {} }) {
+//   save(snapshot)                     -> called whenever the mission's state changes, so a stopped run can be resumed
+//   resume                             -> a snapshot from an earlier save: the mission carries on from there
+export async function runAgent({ objective, recipients, cap, orders = DEFAULT_ORDERS, llm, flashpoint, commander = null, wait, record = () => {}, save = () => {}, resume = null }) {
   const fp = typeof flashpoint === "function" ? { survey: flashpoint } : flashpoint;
   const redact = makeRedactor(recipients);
   const tools = TOOLS.filter((tool) => (tool.name !== "rehearse_on_personas" || fp.rehearse) && (tool.name !== "make_deck" || fp.deck));
   const system = systemPrompt({ people: recipients.length, cap, orders, canRehearse: Boolean(fp.rehearse), canDeck: Boolean(fp.deck) });
-  const messages = [{ role: "user", content: `Mission from the commander: ${redact(objective)}` }];
+  let messages = [{ role: "user", content: `Mission from the commander: ${redact(objective)}` }];
   const steps = [];
-  const given = [objective]; // everything the agent was told, for the number check
+  let stepsBefore = 0; // steps taken before a resume, so the numbering carries on
+  let given = [objective]; // everything the agent was told, for the number check
   let spent = 0;
   let answer = null;
   let nudges = 0;
@@ -318,6 +321,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   let lastReply = "";
   let approved = false; // the commander approved emailing this survey
   let sent = false;
+  let sendUnsure = false; // a send was tried and nobody knows whether it went out
   let readAfterSend = false;
   let envelope = null; // { hash, content }
   let opened = false;
@@ -327,13 +331,22 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   const DEBRIEF_FIRST = "Not yet: you opened an envelope and have not debriefed it. Call debrief first.";
 
   const note = (step) => {
-    const kept = { n: steps.length + 1, at: new Date().toISOString(), ...step };
+    const kept = { n: stepsBefore + steps.length + 1, at: new Date().toISOString(), ...step };
     steps.push(kept);
     record(kept);
   };
   const left = () => `Budget left: $${(cap - spent).toFixed(2)} of $${cap.toFixed(2)}.`;
   const overBudget = (price) => spent + price > cap + 1e-9;
   const hear = async (request) => redact((await commander(request)) ?? "").trim();
+
+  // Everything needed to carry the mission on later. `done` holds the results of the
+  // tool calls in the last message that have finished; a call with no result was in
+  // progress when the snapshot was taken.
+  const snapshot = (done) => ({
+    version: 1, savedAt: new Date().toISOString(), messages, done, given, spent, nudges, steps: stepsBefore + steps.length,
+    survey: { round, started, draft, changes, lastReply, approved, sent, sendUnsure, readAfterSend, envelope, opened, debriefed, challenged },
+    flashpoint: fp.state ? fp.state() : null,
+  });
 
   // The one order the code enforces itself: no email without a sealed envelope and the commander's yes.
   async function sendGate(input) {
@@ -365,7 +378,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     if (newSurvey && envelope && readAfterSend && !opened) return { text: "Not yet: this round's results are in and its envelope is still sealed. Open it and debrief before you start another round.", failed: true };
     if (newSurvey && started) {
       round += 1;
-      started = false; draft = ""; changes = []; lastReply = ""; approved = false; sent = false; readAfterSend = false; envelope = null; opened = false; debriefed = false;
+      started = false; draft = ""; changes = []; lastReply = ""; approved = false; sent = false; sendUnsure = false; readAfterSend = false; envelope = null; opened = false; debriefed = false;
     }
     // A bare "confirm" does whatever Flashpoint last offered. Unless that was plainly
     // publishing and nothing else, treat it as a send, whatever the model called it.
@@ -387,7 +400,10 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
         else if (input.action === "design" && !/\breply\b.*\bconfirm\b/i.test(text.slice(-200)) ) changes.push(text);
       }
       if (sent && (!sending || input.action === "results")) readAfterSend = true;
-      if (sending) sent = true;
+      if (sending) { sent = true; sendUnsure = false; }
+      // After a send whose outcome was not known, the agent asks Flashpoint where the survey
+      // stands. Once it has, the round can go on to its results without emailing people twice.
+      else if (sendUnsure && ["results", "other"].includes(input.action ?? "other")) { sent = true; sendUnsure = false; }
       // A changed survey is a different survey: the commander approves it again.
       else if (input.action === "design" && !sent) approved = false;
       note({ kind: "flashpoint", round, action: input.action ?? "other", why: input.why, couldChange: input.could_change ?? "", message: redact(message), reply: text, receipts: reply.receipts ?? [], price: PRICES.survey, spent });
@@ -397,6 +413,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       if (charged) spent += PRICES.survey;
       const text = redact(err?.message ?? err);
       note({ kind: "flashpoint-failed", round, why: input.why, message: redact(message), error: text, charged, spent });
+      if (sending) sendUnsure = true;
       const unsure = sending ? " This step would have emailed people and its outcome is not known: ask Flashpoint for the survey's status before you try again, so that nobody is emailed twice." : "";
       return { text: `Flashpoint did not complete this step${charged ? ", but it was charged" : ", and it was not charged"}: ${text}${unsure}\n\n${left()}`, failed: true };
     }
@@ -529,6 +546,42 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     return { text: `There is no tool called ${name}.`, failed: true };
   }
 
+  if (resume) {
+    ({ messages, given, spent, nudges } = resume);
+    stepsBefore = resume.steps;
+    ({ round, started, draft, changes, lastReply, approved, sent, readAfterSend, envelope, opened, debriefed, challenged } = resume.survey);
+    sendUnsure = resume.survey.sendUnsure === true;
+    if (fp.restore) fp.restore(resume.flashpoint);
+    const hours = (Date.now() - new Date(resume.savedAt).getTime()) / 3600000;
+    const away = hours >= 1 ? `about ${Math.round(hours)} hour${Math.round(hours) === 1 ? "" : "s"}` : `about ${Math.max(1, Math.round(hours * 60))} minutes`;
+    // Any tool call that had no result yet was cut off. Tell the agent, so that it
+    // checks before repeating something that costs money or emails people.
+    const last = messages[messages.length - 1];
+    const calls = last.role === "assistant" ? last.content.filter((block) => block.type === "tool_use") : [];
+    const done = resume.done ?? [];
+    const cutOff = calls.filter((call) => !done.some((result) => result.tool_use_id === call.id));
+    // A paid step that was cut off is counted as paid: the budget must never be understated.
+    const priceOf = { ask_flashpoint: PRICES.survey, rehearse_on_personas: PRICES.rehearsal, make_deck: PRICES.deck };
+    for (const call of cutOff) {
+      spent += priceOf[call.name] ?? 0;
+      if (call.name === "ask_flashpoint" && envelope && !sent) sendUnsure = true;
+    }
+    note({ kind: "resumed", away, cutOff: cutOff.map((call) => call.name), spent });
+    if (calls.length > 0) {
+      const results = calls.map((call) => done.find((result) => result.tool_use_id === call.id) ?? {
+        type: "tool_result", tool_use_id: call.id,
+        content: call.name === "wait_for_replies"
+          ? `The mission was paused during this wait and has now been resumed, after ${away}. ${left()}`
+          : `The mission was stopped while this step was in progress and has now been resumed, after ${away}. Whether the step happened is not known, so its price has been counted as spent. If it would have cost money or emailed people, ask Flashpoint for the survey's status before you repeat it. ${left()}`,
+        ...(call.name === "wait_for_replies" ? {} : { is_error: true }),
+      });
+      messages.push({ role: "user", content: results });
+    } else if (last.role === "assistant") {
+      messages.push({ role: "user", content: `The mission was stopped and has now been resumed, after ${away}. Carry on. ${left()}` });
+    }
+    save(snapshot(null));
+  }
+
   for (let turn = 0; turn < MAX_TURNS && answer === null; turn++) {
     const response = await llm({ system, tools, messages });
     if (response.stop_reason === "refusal") throw new Error("The model declined to continue.");
@@ -548,12 +601,15 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
 
     // One at a time and in order: these steps depend on each other and cost money.
     const results = [];
+    save(snapshot(results));
     for (const call of calls) {
       const skip = answer !== null;
       const result = skip ? { text: "Skipped: the mission had already finished.", failed: true } : await useTool(call.name, call.input ?? {});
       results.push({ type: "tool_result", tool_use_id: call.id, content: result.text, ...(result.failed ? { is_error: true } : {}) });
+      save(snapshot(results));
     }
     messages.push({ role: "user", content: results });
+    save(snapshot(null));
   }
 
   return { answer, spent, steps };

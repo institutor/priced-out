@@ -9,6 +9,7 @@
 //   --cap 8            most the run may spend on Flashpoint, in USDC (default 8)
 //   --recipients file  who to survey, one "Name, email" per line (default agent/recipients.txt)
 //   --orders file      your standing orders, one "- order" per line (default agent/orders.md)
+//   --resume folder    carry on a real run that was stopped, from its folder under agent/runs/
 //
 // Needs FLASHPOINT_WALLET_KEY and ANTHROPIC_API_KEY in .env (see .env.example).
 // Everything the agent decides is saved under agent/runs/<time>/, with emails removed.
@@ -22,21 +23,38 @@ import { logEntry, logHeader, logFooter, shortLine } from "./log.mjs";
 
 const root = new URL("../", import.meta.url);
 const argv = process.argv.slice(2);
-const valueFlags = ["--cap", "--recipients", "--orders"];
+const valueFlags = ["--cap", "--recipients", "--orders", "--resume"];
 const flag = (name) => {
   const at = argv.indexOf(name);
   return at === -1 ? undefined : argv[at + 1];
 };
 const mode = argv.includes("--practice") ? "practice" : argv.includes("--fake") ? "fake" : "real";
 const fake = mode !== "real"; // nothing real is sent or paid
-const objective = argv.find((arg, i) => !arg.startsWith("--") && !valueFlags.includes(argv[i - 1]));
-const cap = Number(flag("--cap") ?? 8);
+// A stopped real run can be carried on from its folder: the mission, the orders,
+// the cap and everything the agent had learned come from there.
+const resumeDir = flag("--resume") ? new URL(`${flag("--resume").replace(/\/?$/, "/")}`, `file://${process.cwd()}/`) : null;
+let resumed = null;
+if (resumeDir) {
+  const stateFile = new URL("state.json", resumeDir);
+  const stepsFile = new URL("steps.json", resumeDir);
+  if (mode !== "real" || !fs.existsSync(stateFile) || !fs.existsSync(stepsFile)) {
+    console.log("Only a real run can be resumed, from a folder that holds its state.json and steps.json. Nothing was sent or paid.");
+    process.exit(1);
+  }
+  resumed = { state: JSON.parse(fs.readFileSync(stateFile, "utf8")), head: JSON.parse(fs.readFileSync(stepsFile, "utf8")) };
+  if (resumed.head.steps.some((step) => step.kind === "finish")) {
+    console.log("That run already finished. Nothing was sent or paid.");
+    process.exit(1);
+  }
+}
+const objective = resumed ? resumed.head.objective : argv.find((arg, i) => !arg.startsWith("--") && !valueFlags.includes(argv[i - 1]));
+const cap = Number(flag("--cap") ?? resumed?.head.cap ?? 8);
 const recipientsFile = flag("--recipients") ?? new URL("agent/recipients.txt", root);
 const ordersFile = flag("--orders") ?? new URL("agent/orders.md", root);
 const atDesk = Boolean(process.stdin.isTTY);
 
 if (!objective || !(cap > 0)) {
-  console.log('usage: node agent/agent.mjs "<mission>" [--practice | --fake] [--cap 8] [--recipients file] [--orders file]');
+  console.log('usage: node agent/agent.mjs "<mission>" [--practice | --fake] [--cap 8] [--recipients file] [--orders file]\n       node agent/agent.mjs --resume agent/runs/<folder>');
   process.exit(1);
 }
 if (!fake && !atDesk) {
@@ -88,7 +106,7 @@ function readOrders(file) {
 }
 
 const recipients = readRecipients(recipientsFile);
-const orders = readOrders(ordersFile);
+const orders = resumed ? resumed.head.orders : readOrders(ordersFile);
 const redact = makeRedactor(recipients);
 
 const apiKey = readEnv("ANTHROPIC_API_KEY");
@@ -111,8 +129,8 @@ async function llm({ system, tools, messages }) {
   });
 }
 
-const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-const runDir = new URL(`agent/runs/${fake ? `${mode}-` : ""}${stamp}/`, root);
+const stamp = resumed ? resumed.head.stamp : new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+const runDir = resumeDir ?? new URL(`agent/runs/${fake ? `${mode}-` : ""}${stamp}/`, root);
 fs.mkdirSync(runDir, { recursive: true });
 const logFile = new URL("log.md", runDir);
 
@@ -212,12 +230,14 @@ async function wait(minutes) {
   if (fake) return "";
   rule(`Waiting up to ${minutes} min for answers`);
   console.log("  Answer the survey in your inbox. Press Enter to go on, or type a note for the agent first.");
+  if (mode === "real") console.log(`  To come back later, stop with Ctrl+C and run: node agent/agent.mjs --resume ${runFolder}`);
   return typed("\n  you > ", { timeoutMs: minutes * 60 * 1000 });
 }
 
 // ---- The log ----
 
-const steps = [];
+const steps = resumed ? resumed.head.steps : [];
+const runFolder = `agent/runs/${runDir.pathname.replace(/\/$/, "").split("/").pop()}`;
 const head = { objective: redact(objective), model, mode, cap, orders, people: recipients.length, stamp, practiceCommander: !atDesk };
 
 function record(step) {
@@ -228,7 +248,12 @@ function record(step) {
   printStep(shortLine(step));
 }
 
-fs.writeFileSync(logFile, logHeader(head));
+if (resumed) fs.appendFileSync(logFile, "---\n\n*The mission was stopped here and carried on later.*\n\n");
+else fs.writeFileSync(logFile, logHeader(head));
+
+// The whole state of the mission, saved after every step, so a stopped run can be resumed.
+// It holds the full conversation, so it is git-ignored.
+const save = (snapshot) => fs.writeFileSync(new URL("state.json", runDir), JSON.stringify(snapshot));
 
 console.log(`Mission: ${objective}`);
 console.log(`${recipients.length} people on the list. Cap $${cap.toFixed(2)}. ${{ real: "REAL RUN: this emails the people on the list and spends credit.", practice: "PRACTICE RUN: an AI stand-in plays Flashpoint and invents the answers. Nothing is sent or paid.", fake: "PRACTICE RUN: canned fake Flashpoint. Nothing is sent or paid." }[mode]}`);
@@ -257,7 +282,7 @@ if (mode === "fake") {
   }
 }
 
-const { answer, spent } = await runAgent({ objective, recipients, cap, orders, llm, flashpoint, commander, wait, record });
+const { answer, spent } = await runAgent({ objective, recipients, cap, orders, llm, flashpoint, commander, wait, record, save, resume: resumed?.state ?? null });
 
 let wallet = null;
 if (balanceOf) {

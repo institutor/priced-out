@@ -345,3 +345,80 @@ test("a round cannot be abandoned with its results read and its envelope sealed"
   await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), commander: desk().commander, wait: async () => {} });
   assert.match(seen[6], /envelope is still sealed/);
 });
+
+// A run that is stopped part-way: the promise it returns never settles, like a
+// process that was killed. `until` resolves when the run has reached the stop.
+const never = () => new Promise(() => {});
+const copy = (value) => JSON.parse(JSON.stringify(value));
+
+test("a mission stopped during a wait carries on where it left off", async () => {
+  const flashpoint = fakeFlashpoint();
+  const saved = [];
+  let reached;
+  const until = new Promise((resolve) => { reached = resolve; });
+  const first = scripted([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), pause]);
+  runAgent({ objective: "o", recipients, cap: 8, llm: first.llm, flashpoint, commander: desk({ guess: "nearly all" }).commander, wait: () => { reached(); return never(); }, save: (s) => saved.push(copy(s)) });
+  await until;
+
+  const state = saved[saved.length - 1];
+  assert.equal(state.spent, 3 * PRICES.survey);
+  assert.equal(state.survey.sent, true);
+
+  const { commander, asked } = desk();
+  const second = scripted([ask("Show the results", "results"), open(), debrief(), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm: second.llm, flashpoint, commander, wait: async () => {}, resume: state });
+
+  assert.match(second.seen[0], /paused during this wait and has now been resumed/);
+  assert.deepEqual(out.steps[0].cutOff, ["wait_for_replies"]);
+  assert.equal(out.steps[0].kind, "resumed");
+  assert.equal(out.steps[0].n, state.steps + 1, "step numbers carry on");
+  assert.equal(out.spent, 4 * PRICES.survey, "what was spent before the stop still counts");
+  assert.equal(kinds(out, "opened")[0].rows[0].commander, "nearly all", "the commander's sealed guess survived the stop");
+  assert.equal(asked.length, 0, "nothing is approved or sent a second time");
+  assert.ok(out.answer);
+});
+
+test("a mission stopped in the middle of a send is told the outcome is not known", async () => {
+  const fake = fakeFlashpoint();
+  const saved = [];
+  let reached;
+  const until = new Promise((resolve) => { reached = resolve; });
+  // The connection hangs on the third message, which is the send.
+  let messages = 0;
+  const hanging = { ...fake, survey: (args) => { messages += 1; if (messages === 3) { reached(); return never(); } return fake.survey(args); } };
+  const first = scripted([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send")]);
+  runAgent({ objective: "o", recipients, cap: 8, llm: first.llm, flashpoint: hanging, commander: desk().commander, wait: async () => {}, save: (s) => saved.push(copy(s)) });
+  await until;
+
+  const state = saved[saved.length - 1];
+  const second = scripted([ask("What is the status of the survey?", "other"), ask("Show the results", "results"), open(), debrief(), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm: second.llm, flashpoint: fake, commander: desk().commander, wait: async () => {}, resume: state });
+
+  assert.match(second.seen[0], /Whether the step happened is not known/);
+  assert.match(second.seen[0], /ask Flashpoint for the survey's status before you repeat it/);
+  assert.deepEqual(out.steps[0].cutOff, ["ask_flashpoint"]);
+  assert.equal(out.spent, 5 * PRICES.survey, "two paid steps before the stop, the cut-off send counted to be safe, two after");
+  assert.equal(kinds(out, "send-approved").length, 0, "nobody is emailed a second time");
+  assert.equal(kinds(out, "opened").length, 1, "once Flashpoint has said where the survey stands, the round can finish");
+});
+
+test("a mission stopped between steps resumes without inventing a result", async () => {
+  const flashpoint = fakeFlashpoint();
+  const saved = [];
+  const first = scripted([ask("Write a survey", "design"), seal()]);
+  let turns = 0;
+  const stopping = async (args) => { turns += 1; if (turns === 3) return never(); return first.llm(args); };
+  let reached;
+  const until = new Promise((resolve) => { reached = resolve; });
+  runAgent({ objective: "o", recipients, cap: 8, llm: async (args) => { if (turns === 2) reached(); return stopping(args); }, flashpoint, commander: desk().commander, wait: async () => {}, save: (s) => saved.push(copy(s)) });
+  await until;
+
+  const state = saved[saved.length - 1];
+  assert.equal(state.done, null);
+  const before = state.messages.length;
+  const second = scripted([finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm: second.llm, flashpoint, commander: desk().commander, wait: async () => {}, resume: state });
+  assert.deepEqual(out.steps[0].cutOff, []);
+  assert.equal(JSON.parse(second.seen[0]).length, before, "no message is added when nothing was cut off");
+  assert.equal(state.survey.envelope !== null, true, "the sealed envelope is in the saved state");
+});

@@ -62,6 +62,21 @@ node agent/agent.mjs "Find the ticket price for our spring formal that keeps the
 While the agent waits for answers, answer the survey in your inbox and press Enter. You
 can also type a note first, and the agent will read it. The wait ends by itself too.
 
+### Stopping and coming back
+
+People can take hours to answer. You do not have to keep the agent running. Stop it with
+Ctrl+C at any point, and carry on later from the run's folder:
+
+```bash
+node agent/agent.mjs --resume agent/runs/<folder>
+```
+
+The agent picks up with everything it knew: the survey, the sealed envelope, your
+guesses, and what it has spent. The log gets a "resumed" step. If it was stopped in the
+middle of a paid step, that step is counted as paid to be safe, and the agent is told to
+ask Flashpoint where the survey stands before it repeats anything, so nobody is emailed
+twice. Only real runs can be resumed.
+
 ## Standing orders
 
 Orders are rules, not steps. They are in [`orders.md`](orders.md), and you can change them:

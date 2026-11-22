@@ -7,3 +7,4 @@ agent/recipients.txt
 agent/runs/fake-*/
 agent/runs/practice-*/
 agent/runs/*/raw/
+agent/runs/*/state.json

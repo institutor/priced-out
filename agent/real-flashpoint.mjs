@@ -134,5 +134,9 @@ export function realFlashpoint({ connect, callTool, keepRaw = () => {}, saveFile
     throw failure(`Flashpoint returned no deck: ${short(result)}`, charged);
   }
 
-  return { survey, rehearse, deck };
+  // Which conversation and survey the agent is in the middle of, so a stopped run can carry on.
+  const state = () => ({ ...ids });
+  const restore = (saved) => { ids = { ...(saved ?? {}) }; };
+
+  return { survey, rehearse, deck, state, restore };
 }
