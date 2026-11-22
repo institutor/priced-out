@@ -12,7 +12,7 @@ test("the notebook gives back the newest lessons and nothing else", () => {
   const text = "# Title\n\nSome words.\n\n## a\n\nMission: x\n\n- one\n- two\n\n## b\n\n- three\n";
   assert.deepEqual(lessonsIn(text), ["one", "two", "three"]);
   assert.deepEqual(lessonsIn(text, 2), ["two", "three"]);
-  assert.match(lessonEntry({ stamp: "s", objective: "o", lessons: ["a\nb"] }), /## s\n\nMission: o\n\n- a b\n/);
+  assert.match(lessonEntry({ stamp: "s", objective: "o", lessons: ["a\nb"] }), /## s\n\nObjective: o\n\n- a b\n/);
 });
 
 test("real and practice missions keep separate notebooks", () => {

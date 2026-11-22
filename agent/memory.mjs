@@ -17,7 +17,7 @@ export function readLessons(mode, file = fileOf(mode)) {
 }
 
 export function lessonEntry({ stamp, objective, lessons }) {
-  return `\n## ${stamp}\n\nMission: ${objective}\n\n${lessons.map((lesson) => `- ${lesson.replace(/\s+/g, " ")}`).join("\n")}\n`;
+  return `\n## ${stamp}\n\nObjective: ${objective}\n\n${lessons.map((lesson) => `- ${lesson.replace(/\s+/g, " ")}`).join("\n")}\n`;
 }
 
 export function writeLessons(mode, entry, file = fileOf(mode)) {

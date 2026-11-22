@@ -162,7 +162,8 @@ their own notebook, which is not in the repository, so an invented answer can ne
 teach a real run anything.
 
 You can follow the notebook across the five practice runs in [examples/](examples/),
-in the order they were run:
+in the order they were run. The practice notebook itself, as those runs left it, is
+[examples/practice-notebook.md](examples/practice-notebook.md).
 
 | Run | What it started with | What happened |
 |---|---|---|
