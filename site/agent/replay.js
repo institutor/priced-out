@@ -703,7 +703,13 @@ async function start() {
     if (["answer", "how", "rules", "run"].includes(to) || to.startsWith("part-")) watch.showAll();
   });
   const asked = new URLSearchParams(window.location.search);
-  if (asked.has("present") || asked.has("play")) stage.open(present.screenIn(window.location.hash, stage.count()), asked.has("play"));
+  if (asked.has("present") || asked.has("play")) {
+    // "?present#glance" opens on the screen that part of the page is on.
+    const named = window.location.hash.length > 1 ? document.getElementById(window.location.hash.slice(1)) : null;
+    const slide = named ? named.closest("[data-slide]") ?? named.querySelector("[data-slide]") : null;
+    const at = slide ? [...document.querySelectorAll("[data-slide]")].indexOf(slide) : -1;
+    stage.open(at >= 0 ? at : present.screenIn(window.location.hash, stage.count()), asked.has("play"));
+  }
 
   // The hand lettering can arrive after the first drawing. When it does the
   // words move, and the lines drawn under them are drawn again.
