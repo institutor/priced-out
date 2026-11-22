@@ -45,6 +45,14 @@ email and spends no Flashpoint credit. It needs only `ANTHROPIC_API_KEY`:
 node agent/agent.mjs "Find the ticket price for our spring formal that keeps the most members coming." --practice
 ```
 
+Before a real run, check that everything is ready. The check is free: it signs in to
+Flashpoint, reads the wallet balance and asks the model one word. It sends nothing and
+never prints a key or an address:
+
+```bash
+node agent/check.mjs
+```
+
 A real run. It emails the people on the list and spends Flashpoint credit:
 
 ```bash
@@ -58,6 +66,7 @@ node agent/agent.mjs "Find the ticket price for our spring formal that keeps the
 | `--cap 8` | The most the run may spend on Flashpoint, in USDC | 8 |
 | `--recipients file` | Who to survey, one `Name, email` per line | `agent/recipients.txt` |
 | `--orders file` | Your standing orders, one `- order` per line | `agent/orders.md` |
+| `--resume folder` | Carry on a real run that was stopped | off |
 
 While the agent waits for answers, answer the survey in your inbox and press Enter. You
 can also type a note first, and the agent will read it. The wait ends by itself too.
@@ -151,6 +160,7 @@ agent's that the step could change. If it cannot name one, it is told to skip th
 | `loop.mjs` | The agent loop: its tools, its instructions, the send gate, the envelope, the budget cap and the email redaction. It touches no network and no keyboard. |
 | `log.mjs` | Turns the steps into the mission log. |
 | `summary.mjs` | Turns the steps into a one-page summary of what the agent decided. |
+| `check.mjs` | The free check before a real run. |
 | `fake-flashpoint.mjs` | The stand-in Flashpoint: the same draft, confirm, send, results steps as the real one. |
 | `practice-writer.mjs` | For `--practice`: a small AI model writes the stand-in's survey text and invents the answers. |
 | `orders.md` | The standing orders. |
