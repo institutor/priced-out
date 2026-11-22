@@ -71,6 +71,8 @@ to the list, reads the answers, runs a follow-up round on what it learned, and c
 with a recommendation. It comes to you when one of your standing orders says so, or when
 only you can know something. With `--hands-off` it does not come to you at all.
 
+<p align="center"><img src="docs/agent-loop.svg" alt="The agent's loop: one objective in; it writes a survey, seals its guess, sends it out, opens the envelope and decides; then another round, or the answer." width="520"></p>
+
 Before each survey goes out, the agent seals a guess of what people will say. You can
 seal one too. When the real answers are in, the envelope is opened, and whatever was
 guessed wrong is what the next round asks about.

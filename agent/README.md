@@ -9,6 +9,8 @@ email, and a budget. Through the Flashpoint MCP it decides what survey to make, 
 to the list, reads the answers, runs a follow-up round on what it learned, and comes back
 with a recommendation.
 
+<p align="center"><img src="../docs/agent-loop.svg" alt="The agent's loop: one objective in; it writes a survey, seals its guess, sends it out, opens the envelope and decides; then another round, or the answer." width="520"></p>
+
 | | In the example run |
 |---|---|
 | **The objective given** | "Figure out the best event to put on for our club next spring." |

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 380" width="520" height="380" role="img" aria-label="The agent's loop: one objective in; it writes a survey, seals its guess, sends it out, opens the envelope and decides; then another round, or the answer.">
+<rect width="520" height="380" fill="#fcfcfe"/>
+<text x="300" y="24" text-anchor="middle" font-family="'Londrina Solid','Arial Narrow','Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="700" fill="#4c5196">one objective</text>
+<path d="M299.3,32.4Q298.9,47.6 300,63.6" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M302.8,56L300,63.6" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M294.6,56.7L300,63.6" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M353,125.8Q365.2,128.9 372.5,139.8" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M370.9,129.3L372.5,139.8" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M363,134.2L372.5,139.8" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M421.2,208.8Q433.4,260.4 411,308.8" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M419.7,302.8L411,308.8" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M411,298.5L411,308.8" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M325.6,340.2Q302,348.5 276.6,340.1" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M283.3,348.3L276.6,340.1" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M287,338.6L276.6,340.1" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M172.8,309.6Q144,268.6 144.4,219.3" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M140.8,229.1L144.4,219.3" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M150.2,227.8L144.4,219.3" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M184,159.5Q201.8,136.9 231.2,131" fill="none" stroke="#b8456b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M221.1,128.2L231.2,131" fill="none" stroke="#b8456b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M222.9,136.6L231.2,131" fill="none" stroke="#b8456b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M218.7,68.7Q299.7,68.6 380.7,68.2Q385.2,68.2 385.2,72.7Q384.1,87.1 385.2,101.6Q385.2,106.1 380.6,106.1Q299.2,106 217.8,106.7Q213.3,106.7 213.4,102.2Q214.4,87.8 214,73.3Q214.1,68.7 218.7,68.7Z" fill="#fcfcfe" stroke="none"/>
+<path d="M214.1,68.5C284.9,68.5 313.9,69.9 385.7,68.3" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M385.4,68.3C385.3,82.1 387.1,95.1 386.5,107.4" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M388.8,106.4C329.1,108 272.4,106.5 212.8,107.7" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M214.6,109.5C214.9,95.8 213.7,82 214.2,67.9" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="300" y="95" text-anchor="middle" font-family="'Londrina Solid','Arial Narrow','Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="700" fill="#1b1f6b">writes a survey</text>
+<path d="M343.5,158.9Q425,160.1 506.5,158.7Q511,158.7 511,163.3Q509.7,177.8 510.5,192.3Q510.4,196.9 505.9,196.8Q424.9,196.9 343.9,196.1Q339.3,196.1 339.3,191.6Q337.8,177.5 339,163.4Q338.9,158.9 343.5,158.9Z" fill="#fcfcfe" stroke="none"/>
+<path d="M337.8,158C411.5,157.3 461.4,157.9 513,158.1" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M510.4,157.6C509.8,172 510.1,182.8 511.3,197.4" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M513.7,197.3C438.7,197.9 389.3,195.5 338.6,196.1" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M339.3,197.8C338.2,181.5 339.6,172.4 338.9,158.5" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="425" y="185" text-anchor="middle" font-family="'Londrina Solid','Arial Narrow','Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="700" fill="#1b1f6b">seals its guess</text>
+<path d="M340.5,320.8Q407.7,319.6 474.9,320.9Q479.4,320.9 479.4,325.5Q479.6,340.1 479.1,354.7Q479.1,359.3 474.5,359.3Q408.1,359.4 341.8,358.7Q337.2,358.6 337,354.1Q336,339.8 336.1,325.4Q335.9,320.8 340.5,320.8Z" fill="#fcfcfe" stroke="none"/>
+<path d="M335.4,321.6C383.9,320.8 425.5,320.5 480.7,320.1" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M479.6,320C480.3,333.7 480.1,348.2 480,358.8" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M482.1,360C437.8,360.2 391.1,358.7 333.5,358.2" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M337.1,360.1C336.5,343.4 336.7,336.2 336.9,320.7" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="408" y="347" text-anchor="middle" font-family="'Londrina Solid','Arial Narrow','Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="700" fill="#1b1f6b">sends it out</text>
+<path d="M86.4,320.4Q182.3,319.7 278.3,320.8Q282.9,320.8 282.8,325.4Q281.2,339.4 282.2,353.6Q282.1,358.1 277.6,358.2Q182.3,358.7 86.9,359Q82.4,359 82.3,354.5Q80.7,339.7 81.9,324.9Q81.8,320.4 86.4,320.4Z" fill="#fcfcfe" stroke="none"/>
+<path d="M80.6,319.8C164.8,322 226.9,321.6 284.7,321.1" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M282.9,321C282.6,335.6 282.6,343.2 282.9,358.4" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M283.9,360.2C206.8,358.8 139.5,358.1 81.2,358.4" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M80.9,358.6C81.4,345.9 82.1,333.5 81.6,319.7" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="182" y="347" text-anchor="middle" font-family="'Londrina Solid','Arial Narrow','Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="700" fill="#1b1f6b">opens the envelope</text>
+<path d="M92.3,170.4Q135.2,169.7 178.1,170.4Q182.7,170.4 182.6,175Q181.7,189.9 182,204.9Q181.9,209.5 177.3,209.5Q134.4,208.4 91.6,209.1Q87,209.1 87.1,204.5Q86.8,189.8 87.6,175Q87.7,170.4 92.3,170.4Z" fill="#fcfcfe" stroke="none"/>
+<path d="M85.5,170.3C120.3,169.6 150.4,169.1 183.4,170.4" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M182.5,170C182.2,185.6 182.6,198.4 182.2,209.3" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M184.5,208.4C154.3,208.9 126,209.4 87.4,208.3" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M87.1,210.9C87.4,196.4 86.6,183 86.9,170.2" fill="none" stroke="#1b1f6b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="135" y="197" text-anchor="middle" font-family="'Londrina Solid','Arial Narrow','Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="700" fill="#1b1f6b">decides</text>
+<text x="290" y="238" text-anchor="middle" font-family="'Londrina Solid','Arial Narrow','Helvetica Neue',Arial,sans-serif" font-size="23" font-weight="700" fill="#3a3fc4">what it guessed wrong</text>
+<text x="290" y="266" text-anchor="middle" font-family="'Londrina Solid','Arial Narrow','Helvetica Neue',Arial,sans-serif" font-size="23" font-weight="700" fill="#3a3fc4">is what it asks next</text>
+<text x="112" y="120" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="15" fill="#b8456b">another round</text>
+<path d="M78.6,196.1Q83.1,230.4 61.6,256.4" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M71.3,252.5L61.6,256.4" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M64.1,247.5L61.6,256.4" fill="none" stroke="#1b1f6b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12.3,293.7C52.1,294 85.8,293.4 112,293.2" fill="none" stroke="#b8456b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M105.3,297.7C76.8,296.9 55.3,297.5 31.9,298" fill="none" stroke="#b8456b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="62" y="284" text-anchor="middle" font-family="'Londrina Solid','Arial Narrow','Helvetica Neue',Arial,sans-serif" font-size="23" font-weight="700" fill="#3a3fc4">the answer</text>
+</svg>
