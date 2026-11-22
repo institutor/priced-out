@@ -733,6 +733,13 @@ code {
   font-weight: 900;
 }
 
+.m-look-why {
+  margin: -0.3rem 0 0.7rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  font-style: italic;
+}
+
 .m-look-now {
   margin: 0.2rem 0 0.8rem;
   font-size: 0.95rem;

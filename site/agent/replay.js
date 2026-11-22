@@ -437,7 +437,9 @@ function drawGlance(body, run) {
       ["People said", short(round.said, 100)],
     ]),
     round.move ? el("p", { class: "m-look-move" }, "So it chose ", circled(el("strong", { text: round.move }), `look ${round.round}`)) : null,
-    round.now ? el("p", { class: "m-look-now" }, el("strong", { text: "Its answer now: " }), short(round.now, 140)) : round.why ? el("p", { class: "m-foot", text: short(round.why, 120) }) : null,
+    // Its reason, in its own words: why another round, or why this was enough.
+    round.why ? el("p", { class: "m-look-why", text: `\u201c${short(round.why, 130)}\u201d` }) : null,
+    round.now ? el("p", { class: "m-look-now" }, el("strong", { text: "Its answer now: " }), short(round.now, 140)) : null,
     round.part > 0 ? el("p", {}, el("a", { class: "m-jump", href: `#part-${round.part}`, text: `See round ${round.round}` })) : null,
   ), `look ${round.round}`));
   if (look.answer) {
