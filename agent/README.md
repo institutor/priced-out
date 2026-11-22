@@ -84,7 +84,8 @@ The agent picks up with everything it knew: the survey, the sealed envelope, you
 guesses, and what it has spent. The log gets a "resumed" step. If it was stopped in the
 middle of a paid step, that step is counted as paid to be safe, and the agent is told to
 ask Flashpoint where the survey stands before it repeats anything, so nobody is emailed
-twice. Only real runs can be resumed.
+twice. A run can only be carried on with the same recipient list it started with, and a
+practice run can never be carried on as a real one.
 
 ## Standing orders
 

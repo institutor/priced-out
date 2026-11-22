@@ -14,7 +14,9 @@
 // Needs FLASHPOINT_WALLET_KEY and ANTHROPIC_API_KEY in .env (see .env.example).
 // Everything the agent decides is saved under agent/runs/<time>/, with emails removed.
 import fs from "node:fs";
+import path from "node:path";
 import readline from "node:readline";
+import { createHash } from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { runAgent, makeRedactor, DEFAULT_ORDERS } from "./loop.mjs";
 import { fakeFlashpoint } from "./fake-flashpoint.mjs";
@@ -38,11 +40,16 @@ let resumed = null;
 if (resumeDir) {
   const stateFile = new URL("state.json", resumeDir);
   const stepsFile = new URL("steps.json", resumeDir);
-  if (mode !== "real" || !fs.existsSync(stateFile) || !fs.existsSync(stepsFile)) {
+  if (mode === "practice" || !fs.existsSync(stateFile) || !fs.existsSync(stepsFile)) {
     console.log("Only a real run can be resumed, from a folder that holds its state.json and steps.json. Nothing was sent or paid.");
     process.exit(1);
   }
   resumed = { state: JSON.parse(fs.readFileSync(stateFile, "utf8")), head: JSON.parse(fs.readFileSync(stepsFile, "utf8")) };
+  // A run is carried on as what it was. A practice folder must never become a real run.
+  if (resumed.head.mode !== mode) {
+    console.log(`That folder holds a ${resumed.head.mode === "real" ? "real" : "practice"} run, so it cannot be carried on as a ${mode === "real" ? "real" : "practice"} one. Nothing was sent or paid.`);
+    process.exit(1);
+  }
   if (resumed.head.steps.some((step) => step.kind === "finish")) {
     console.log("That run already finished. Nothing was sent or paid.");
     process.exit(1);
@@ -50,7 +57,8 @@ if (resumeDir) {
 }
 const objective = resumed ? resumed.head.objective : argv.find((arg, i) => !arg.startsWith("--") && !valueFlags.includes(argv[i - 1]));
 const cap = Number(flag("--cap") ?? resumed?.head.cap ?? 8);
-const recipientsFile = flag("--recipients") ?? new URL("agent/recipients.txt", root);
+// A resumed run reads the list it started with, unless told otherwise.
+const recipientsFile = flag("--recipients") ?? resumed?.state.list?.file ?? new URL("agent/recipients.txt", root);
 const ordersFile = flag("--orders") ?? new URL("agent/orders.md", root);
 const atDesk = Boolean(process.stdin.isTTY);
 
@@ -107,6 +115,16 @@ function readOrders(file) {
 }
 
 const recipients = readRecipients(recipientsFile);
+// The saved conversation calls people "[recipient 1]", "[recipient 2]" and so on. If the list
+// changed while the run was stopped, those would now point at different people.
+const list = {
+  file: typeof recipientsFile === "string" ? path.resolve(recipientsFile) : recipientsFile.pathname,
+  mark: createHash("sha256").update(recipients.map((person) => `${person.name}\n${person.email}`).join("\n")).digest("hex"),
+};
+if (resumed && resumed.state.list && resumed.state.list.mark !== list.mark) {
+  console.log("The recipient list is not the one this run started with, so it cannot be carried on. Nothing was sent or paid.");
+  process.exit(1);
+}
 const orders = resumed ? resumed.head.orders : readOrders(ordersFile);
 const redact = makeRedactor(recipients);
 
@@ -175,6 +193,9 @@ function typed(prompt, { timeoutMs = 0 } = {}) {
       done(text.trim());
     });
     rl.on("close", () => done("")); // Ctrl+D counts as an empty reply
+    // Ctrl+C at a prompt stops the run. Without this, readline would close the prompt
+    // and the run would carry on as if Enter had been pressed.
+    rl.on("SIGINT", stopNow);
     rl.setPrompt(prompt);
     rl.prompt();
   });
@@ -243,6 +264,15 @@ const steps = resumed ? resumed.head.steps : [];
 const runFolder = `agent/runs/${runDir.pathname.replace(/\/$/, "").split("/").pop()}`;
 const head = { objective: redact(objective), model, mode, cap, orders, people: recipients.length, stamp, practiceCommander: !atDesk };
 
+// Ctrl+C. It is handled between steps, never in the middle of saving one, so the
+// saved state always matches the log.
+function stopNow() {
+  console.log("\n\nStopped. Nothing more will be sent or paid.");
+  if (mode !== "practice") console.log(`To carry on: node agent/agent.mjs ${mode === "fake" ? "--fake " : ""}--resume ${runFolder}`);
+  process.exit(130);
+}
+process.on("SIGINT", stopNow);
+
 function record(step) {
   steps.push(step);
   fs.writeFileSync(new URL("steps.json", runDir), JSON.stringify({ ...head, steps }, null, 2));
@@ -256,7 +286,14 @@ else fs.writeFileSync(logFile, logHeader(head));
 
 // The whole state of the mission, saved after every step, so a stopped run can be resumed.
 // It holds the full conversation, so it is git-ignored.
-const save = (snapshot) => fs.writeFileSync(new URL("state.json", runDir), JSON.stringify(snapshot));
+// It is written to a second file and then moved into place, so a stop in the middle of
+// writing cannot leave half a file behind.
+const save = (snapshot) => {
+  const file = new URL("state.json", runDir);
+  const next = new URL("state.json.next", runDir);
+  fs.writeFileSync(next, JSON.stringify({ ...snapshot, list }));
+  fs.renameSync(next, file);
+};
 
 console.log(`Mission: ${objective}`);
 console.log(`${recipients.length} people on the list. Cap $${cap.toFixed(2)}. ${{ real: "REAL RUN: this emails the people on the list and spends credit.", practice: "PRACTICE RUN: an AI stand-in plays Flashpoint and invents the answers. Nothing is sent or paid.", fake: "PRACTICE RUN: canned fake Flashpoint. Nothing is sent or paid." }[mode]}`);
@@ -285,7 +322,7 @@ if (mode === "fake") {
   }
 }
 
-const { answer, spent } = await runAgent({ objective, recipients, cap, orders, llm, flashpoint, commander, wait, record, save, resume: resumed?.state ?? null });
+const { answer, spent } = await runAgent({ objective, recipients, cap, orders, llm, flashpoint, commander, wait, record, save, resume: resumed ? { ...resumed.state, steps: resumed.head.steps.length } : null });
 
 let wallet = null;
 if (balanceOf) {
