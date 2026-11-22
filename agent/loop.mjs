@@ -287,7 +287,7 @@ Before each tool call, say in a sentence or two what you are deciding and why. T
 // list, since a run log is public: the full name in any letter case, and each
 // part of it (a first name, a surname) as it was written. A part that is also
 // an everyday word is left alone, or "One of 3 answered" would lose its "One".
-const EVERYDAY = new Set(["an", "do", "so", "my", "be", "he", "me", "we", "no", "to", "in", "on", "at", "by", "of", "or", "if", "is", "it", "as", "us", "up", "go", "am", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "test", "tester", "user", "member", "person", "people", "the", "and", "club", "team"]);
+const EVERYDAY = new Set(["an", "do", "so", "my", "be", "he", "me", "we", "no", "to", "in", "on", "at", "by", "of", "or", "if", "is", "it", "as", "us", "up", "go", "am", "de", "la", "le", "al", "el", "du", "di", "da", "st", "jr", "sr", "dr", "mr", "ms", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "test", "tester", "user", "member", "person", "people", "the", "and", "club", "team"]);
 const wholeWord = (word, flags) => new RegExp(`(?<![\\p{L}\\p{N}])${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}])`, flags);
 export function makeRedactor(recipients) {
   return (text) => {
@@ -297,7 +297,7 @@ export function makeRedactor(recipients) {
       if (r.name && r.name.length >= 3) out = out.replace(wholeWord(r.name, "giu"), `[person ${i + 1}]`);
     });
     recipients.forEach((r, i) => {
-      for (const part of String(r.name ?? "").split(/\s+/)) {
+      for (const part of String(r.name ?? "").split(/\s+/).map((word) => word.replace(/^[^\p{L}]+|[^\p{L}]+$/gu, ""))) {
         if (part.length >= 2 && !EVERYDAY.has(part.toLowerCase())) out = out.replace(wholeWord(part, "gu"), `[person ${i + 1}]`);
       }
     });
@@ -323,7 +323,12 @@ export function unbackedNumbers(text, sources) {
 
 const saysYes = (text) => /^\W*(y|yes|yep|yeah|ok|okay|approve|approved|go|go ahead|send|send it|do it)\b/i.test(String(text ?? ""));
 // Approving a send takes a plain yes and nothing else. "ok but change Q2 first" is not one.
-export const approves = (text) => /^\W*(y|yes|yep|yeah|ok|okay|approve|approved|go|go ahead|send|send it|do it|yes,? (please|send|send it|go ahead|approved?|do it))\W*$/i.test(String(text ?? ""));
+const YES = new Set(["y", "yes", "yep", "yeah", "ok", "okay", "sure", "approve", "approved", "go", "send"]);
+const YES_WORDS = new Set([...YES, "please", "it", "ahead", "do", "looks", "good", "fine", "that", "is", "thats"]);
+export const approves = (text) => {
+  const words = String(text ?? "").toLowerCase().replace(/'/g, "").match(/[a-z]+/g) ?? [];
+  return words.length > 0 && words.length <= 6 && YES.has(words[0]) && words.every((word) => YES_WORDS.has(word));
+};
 // Whether a reply shows a survey's questions. Two question marks are enough.
 // A short follow-up may have only one, or word a question as "Rank these", so
 // a reply laid out as a table or a numbered list of questions counts as well.
@@ -333,7 +338,7 @@ export const listsQuestions = (text) => {
   if (marks >= 2) return true;
   const rows = text.split("\n").filter((line) => /^\s*\|.*\|\s*$/.test(line) && !/^\s*\|[\s:|-]+\|\s*$/.test(line)).length;
   // "1. Reworded question 2" reports a change. It is not a question.
-  const numbered = text.split("\n").filter((line) => /^\s*(Q\d+|\d+)[.):]\s+\S/.test(line) && !/^\s*(Q\d+|\d+)[.):]\s+\**(reworded|removed|added|changed|updated|replaced|fixed|shortened|renamed|dropped|moved|merged|split|deleted|edited)\b/i.test(line)).length;
+  const numbered = text.split("\n").filter((line) => /^\s*(Q\d+|\d+)[.):]\s+\S/.test(line) && !/^\s*(Q\d+|\d+)[.):]\s+\**(reworded|removed|added|changed|updated|replaced|fixed|shortened|renamed|dropped|deleted|edited)\b[^?]*$/i.test(line)).length;
   return rows >= 3 || numbered >= 2 || (marks === 1 && (rows >= 2 || numbered >= 1));
 };
 // A short go-ahead: "confirm", "Yes, confirm.", "Confirmed, go ahead".
@@ -344,17 +349,24 @@ const SEND_WORDS = /\b(send|sent|sending|e-?mail|mail|invit|distribut|deliver|no
 const offersOnlyPublishing = (reply) => /\b(publish|push|live)/i.test(reply) && !SEND_WORDS.test(reply);
 // True when a message tells Flashpoint to email people now. "Names and emails" and
 // "do not send yet" do not count.
+// The other emailing verbs count only as an order: at the start of the message or of a
+// sentence, or after "and", "then" or "please". "Ask what would remind them to come" is a
+// question for the survey, and a message that edits the survey is not a send.
+const ORDER_START = "(?:^|[.;:!]\\s+|\\band\\s+|\\bthen\\s+|\\bplease\\s+|\\bnow\\s+)";
+const ORDERS_A_REMINDER = new RegExp(`${ORDER_START}(remind|nudge|notify|follow up with|mail)\\s+(it to\\s+)?(the\\s+|all\\s+)?(them|everyone|everybody|panel|list|people|recipients|those|members|non-?respon\\w+)\\b`, "i");
+const ORDERS_A_LAUNCH = new RegExp(`${ORDER_START}(launch|share)\\s+(it\\s+|this\\s+|the survey\\s+)?(to|with)\\s+(them|everyone|everybody|the panel|the list|people|recipients)\\b`, "i");
 export function asksToSend(message) {
   const text = String(message)
-    .replace(/\b(do not|don't|not|never|without|before|until)\s+(yet\s+)?(publish(ing)?\s+(or|and)\s+)?(send|e-?mail|distribut|invit)\w*/gi, "")
+    .replace(/\b(do not|don't|not|never|without|before|until)\s+(yet\s+)?(publish(ing)?\s+(or|and)\s+)?(send|e-?mail|distribut|invit|remind|nudg|notif|shar|launch|mail|follow)\w*/gi, "")
     .replace(/\bsend(ing)?\s+(me|us|back|over)\b/gi, "")
     .replace(/\bsend(ing)?\s+(me\s+)?(the\s+|a\s+|an\s+)?(results?|summary|export|report|counts?|numbers|data|link|status)\b/gi, "");
   return /\b(send|sending|distribute|distributing|invite)\b/i.test(text) || /\be-?mail\s+(it|this|them|everyone|the survey|the panel|to|out)\b/i.test(text)
-    || /\b(remind|nudge|notify|follow up with|mail)\s+(it to\s+)?(the\s+|all\s+)?(them|everyone|everybody|panel|list|people|recipients|those|members|non-?respon\w+)\b/i.test(text)
-    || /\b(launch|share)\s+(it\s+|this\s+|the survey\s+)?(to|with)\s+(them|everyone|everybody|the panel|the list|people|recipients)\b/i.test(text);
+    || (!EDITS.test(text) && (ORDERS_A_REMINDER.test(text) || ORDERS_A_LAUNCH.test(text)));
 }
 
-const EDITS = /\b(change|edit|fix|reword|rewrite|rephrase|remove|delete|add|replace|drop|swap|shorten|rename|insert|update)\b/i;
+// An edit to the survey: an editing word with a part of the survey as its object.
+// "Add these people to a panel" is not one.
+const EDITS = /\b(change|edit|fix|reword|rewrite|rephrase|remove|delete|add|replace|drop|swap|shorten|rename|insert|update)\b[^.\n]{0,60}\b(questions?|q\d+|options?|choices?|wording|answers?|intro|title|typo|text|items?|scale)\b/i;
 
 // What the code looks for before it lets a send go out with nobody watching.
 export const SEND_CHECKS = [
@@ -397,7 +409,9 @@ export function readSendReply(text) {
   const reply = String(text ?? "");
   const went = SAYS_SENT.test(reply) && !NOT_SENT.test(reply);
   // "Sent. Reply confirm if you want a reminder too" says both. A person reads that one.
-  if (/\bconfirm\b/i.test(reply.slice(-300))) return went ? "unclear" : "asks-confirm";
+  // "Invitations are sent as soon as you confirm" has not sent anything yet.
+  const already = /\b(were|was|have been|has been|have|has|'ve)\s+(already\s+)?(sent|e-?mailed|invited|delivered|dispatched)\b|\b(sent|e-?mailed)\s+(it|the survey|invitations?|them)?\s*to\b/i.test(reply);
+  if (/\bconfirm\b/i.test(reply.slice(-300))) return went && already ? "unclear" : "asks-confirm";
   if (went) return "sent";
   if (SAYS_LIVE.test(reply)) return "published";
   return "unclear";
@@ -555,6 +569,12 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
         else if (draft === "") draft = text;
         else if (edits && !isConfirm(input.message)) changes.push(text);
       }
+      // A message taken for a send can still have changed the survey. Then the survey on
+      // record is the new one, and nothing approved before covers it.
+      if (sending && readSendReply(text) !== "sent") {
+        if (listsQuestions(text) && !reportsAnswers && text !== draft) { draft = text; changes = []; approved = false; }
+        else if (edits) { changes.push(text); approved = false; }
+      }
       if (sent && (!sending || input.action === "results")) readAfterSend = true;
       // Flashpoint often answers a request to send with "reply confirm". Then nothing has
       // gone out yet, and the commander's approval stands for the confirm that follows.
@@ -570,7 +590,9 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
           const answer = commander ? await hear({ kind: "ask", message: question, order: null }) : null;
           if (answer !== null) { given.push(answer); note({ kind: "commander", order: null, message: question, reply: answer }); }
           // With nobody to ask, a message that was plainly a send is counted as one.
-          emailed = answer !== null ? saysYes(answer) : input.action === "send" || asksToSend(input.message) || !handsOff;
+          // A reply that only shows the survey again has emailed nobody.
+          const showsSurvey = listsQuestions(text) && !reportsAnswers;
+          emailed = answer !== null ? saysYes(answer) : !showsSurvey && (input.action === "send" || asksToSend(input.message) || !handsOff);
           asked = emailed ? "\n\nThis reply did not say plainly what happened. It has been counted as the survey going out." : "\n\nThis reply did not say plainly what happened. It has been counted as NOT sent: if you meant to send, ask again and it will be checked again.";
         }
       }

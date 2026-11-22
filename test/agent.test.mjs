@@ -808,3 +808,45 @@ test("after a rehearsal the agent is told how to make it count", async () => {
   assert.match(seen[3], /ask Flashpoint for the persona results/);
   assert.doesNotMatch(kinds(out, "rehearsal")[0].reply, /make the rehearsal count/, "the hint is the code's, so it is kept out of Flashpoint's logged reply");
 });
+
+// ---- Found by a second read, of the fixes above ----
+
+test("words for the survey are not taken for an order to email people", () => {
+  for (const text of ["Add a note that we may follow up with members", "Ask what would remind them to come", "Publish the survey. Do not notify the panel yet", "Publish it, but do not share it with the panel yet", "Show the results. Do not nudge the non-respondents.", "Reword Q3 to ask what would remind them to come, and add a question asking for your full name", "Update question 3", "Show the results and notify me of anything odd"]) assert.ok(!asksToSend(text), text);
+  for (const text of ["Publish it, then remind everyone", "Please nudge the non-responders"]) assert.ok(asksToSend(text), text);
+});
+
+test("a reply that only promises to send after a confirm is a question, not a send", () => {
+  assert.equal(readSendReply("Invitations are sent as soon as you confirm. Reply confirm to proceed."), "asks-confirm");
+  assert.equal(readSendReply("3 invitations queued. Reply confirm"), "asks-confirm");
+  assert.equal(readSendReply("This cannot be undone once sent. Reply confirm to go ahead."), "asks-confirm");
+  assert.equal(readSendReply("I have sent it to 8 people. Reply confirm if you want a reminder too."), "unclear");
+});
+
+test("a plain yes may come with a polite word or two", async () => {
+  const { approves } = await import("../agent/loop.mjs");
+  for (const text of ["yes, looks good", "ok send it", "yes please send it", "sure", "Yes - go ahead", "ok, that's fine"]) assert.ok(approves(text), text);
+  for (const text of ["yes but shorten it", "ok change Q2", "go back", "looks good", "please do not send it", "send it tomorrow"]) assert.ok(!approves(text), text);
+});
+
+test("an initial or a particle in a name is not taken out of every reply", () => {
+  const redact = makeRedactor([{ name: "Mary A. Smith", email: "m@example.com" }, { name: "Luc De La Cruz", email: "l@example.com" }]);
+  assert.equal(redact("Option A. is the picnic. De facto, la la."), "Option A. is the picnic. De facto, la la.");
+  assert.equal(redact("Smith and Cruz answered."), "[person 1] and [person 2] answered.");
+});
+
+test("making a panel is not an edit to the survey", async () => {
+  const { commander, asked } = desk();
+  const flashpoint = says(SURVEY_TEXT, "Panel created with 2 members.", "Invitations were sent to 2 people.");
+  await run([ask("Write a survey", "design"), ask("Add these people to a panel: {{recipients}}"), seal(), ask("Send it to the panel now", "send"), finish], { flashpoint, commander });
+  assert.deepEqual(asked.find((a) => a.kind === "approve_send").changes, []);
+});
+
+test("handed over, a survey swapped in by a send-like message is checked before it goes", async () => {
+  const bad = `${SURVEY_TEXT}\n3. What is your full name?`;
+  const flashpoint = says(SURVEY_TEXT, bad, "never reached");
+  const out = await run([ask("Write a survey", "design"), seal(), ask("Send it, in this new version", "send"), ask("confirm", "send"), finish], { flashpoint, handsOff: true });
+  assert.equal(kinds(out, "send-held").length, 1, "the second ask is checked against the survey that came back");
+  assert.match(kinds(out, "send-held")[0].problems.join(" "), /a name/);
+  assert.equal(kinds(out, "flashpoint").some((s) => s.emailed), false);
+});
