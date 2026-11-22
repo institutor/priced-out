@@ -9,3 +9,4 @@ agent/runs/practice-*/
 agent/runs/*/raw/
 agent/runs/*/state.json
 agent/runs/*/state.json.next
+agent/runs/*/steps.json.next

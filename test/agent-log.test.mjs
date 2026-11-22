@@ -68,3 +68,10 @@ test("the header says when a run is practice", () => {
   assert.match(logHeader({ ...head, mode: "practice" }), /invented every answer/);
   assert.doesNotMatch(logHeader({ ...head, mode: "real", practiceCommander: false }), /practice|canned/);
 });
+
+test("a step cut off by a stop shows on the bill", async () => {
+  const { tally } = await import("../agent/log.mjs");
+  const rows = tally([{ kind: "flashpoint", price: 0.5 }, { kind: "resumed", cutOff: ["ask_flashpoint"], counted: 0.5 }, { kind: "resumed", cutOff: [], counted: 0 }]);
+  assert.deepEqual(rows.map((row) => [row.count, row.cost]), [[1, 0.5], [1, 0.5]]);
+  assert.match(rows[1].label, /cut off by a stop/);
+});

@@ -98,8 +98,9 @@ export function tally(steps) {
     ["Messages to Flashpoint's survey agent", steps.filter((s) => s.kind === "flashpoint" || (s.kind === "flashpoint-failed" && s.charged))],
     ["Persona rehearsals", steps.filter((s) => s.kind === "rehearsal" || (s.kind === "rehearsal-failed" && s.charged))],
     ["Slide decks", steps.filter((s) => s.kind === "deck" || (s.kind === "deck-failed" && s.charged))],
+    ["Steps cut off by a stop, counted as paid to be safe", steps.filter((s) => s.kind === "resumed" && s.counted > 0)],
   ];
-  return lines.filter(([, list]) => list.length > 0).map(([label, list]) => ({ label, count: list.length, cost: list.reduce((sum, s) => sum + (s.price ?? PRICE_OF[s.kind] ?? 0), 0) }));
+  return lines.filter(([, list]) => list.length > 0).map(([label, list]) => ({ label, count: list.length, cost: list.reduce((sum, s) => sum + (s.counted ?? s.price ?? PRICE_OF[s.kind] ?? 0), 0) }));
 }
 
 export function logFooter({ steps, cap, spent, wallet }) {

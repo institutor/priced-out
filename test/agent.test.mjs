@@ -392,8 +392,12 @@ test("a mission stopped in the middle of a send is told the outcome is not known
 
   const state = saved[saved.length - 1];
   const second = scripted([ask("What is the status of the survey?", "other"), ask("Show the results", "results"), open(), debrief(), finish]);
-  const out = await runAgent({ objective: "o", recipients, cap: 8, llm: second.llm, flashpoint: fake, commander: desk().commander, wait: async () => {}, resume: state });
+  // Only the commander can say that the cut-off send went out.
+  const after = desk({ reply: "yes, it arrived" });
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm: second.llm, flashpoint: fake, commander: after.commander, wait: async () => {}, resume: state });
 
+  assert.match(after.asked[0].message, /Did the survey go out\?/);
+  assert.match(second.seen[1], /commander confirms that the survey went out/);
   assert.match(second.seen[0], /Whether the step happened is not known/);
   assert.match(second.seen[0], /ask Flashpoint for the survey's status before you repeat it/);
   assert.deepEqual(out.steps[0].cutOff, ["ask_flashpoint"]);
@@ -437,4 +441,71 @@ test("the stand-in Flashpoint can be put back where a stopped run left it", asyn
   second.restore(copy(first.state()));
   const reply = await second.survey({ message: "confirm", newSurvey: false });
   assert.match(reply.text, /Survey 1 was emailed/);
+});
+
+// A Flashpoint whose next "confirm" after arm() drops the connection once.
+function flaky() {
+  const fake = fakeFlashpoint();
+  let armed = false;
+  const calls = [];
+  return {
+    calls,
+    arm: () => { armed = true; },
+    survey: async (args) => {
+      if (armed && /^confirm$/i.test(args.message)) { armed = false; throw new Error("network dropped"); }
+      calls.push(args.message);
+      return fake.survey(args);
+    },
+  };
+}
+const arm = { name: "wait_for_replies", input: { minutes: 1, why: "arm the failure" } };
+const approvals = (asked) => asked.filter((a) => a.kind === "approve_send").length;
+
+test("a send that failed cannot simply be tried again", async () => {
+  const flashpoint = flaky();
+  const { commander, asked } = desk({ reply: "no, nothing arrived" });
+  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), arm, ask("confirm", "send"), ask("confirm", "send"), ask("Where does the survey stand?", "other"), ask("confirm", "send"), finish]);
+  await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint, commander, wait: async () => { flashpoint.arm(); } });
+  assert.match(seen[6], /an earlier send was tried and nobody knows whether it went out/);
+  assert.equal(flashpoint.calls.filter((m) => m === "confirm").length, 2, "one publish and one send reached Flashpoint, not a blind retry");
+  assert.match(asked.find((a) => a.kind === "ask").message, /Did the survey go out\?/);
+  assert.match(seen[7], /counts as not sent/);
+  assert.equal(approvals(asked), 2, "the send after the status check is approved afresh");
+});
+
+test("when the commander says an unsure send went out, it is not sent again and the round goes on", async () => {
+  const flashpoint = flaky();
+  const { commander, asked } = desk({ reply: "yes" });
+  const out = await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), arm, ask("confirm", "send"), ask("Where does the survey stand?", "other"), ask("Show the results", "results"), open(), debrief(), finish], { flashpoint, commander, wait: async () => { flashpoint.arm(); } });
+  assert.equal(approvals(asked), 1);
+  assert.equal(kinds(out, "opened").length, 1);
+});
+
+test("if nobody confirms an unsure send, the envelope stays shut", async () => {
+  const flashpoint = flaky();
+  const { commander } = desk({ reply: "no" });
+  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), arm, ask("confirm", "send"), ask("Where does the survey stand?", "other"), ask("Show the results", "results"), open(), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint, commander, wait: async () => { flashpoint.arm(); } });
+  assert.equal(kinds(out, "opened").length, 0);
+  assert.doesNotMatch(seen[8], /about half/, "the commander's guess is not revealed");
+});
+
+test("one approval covers one send: a reminder is asked for again", async () => {
+  const { commander, asked } = desk();
+  await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Send a reminder email to everyone who has not answered", "send"), finish], { commander });
+  assert.equal(approvals(asked), 2);
+});
+
+test("asking to send and then confirming it is one send, approved once", async () => {
+  const { commander, asked } = desk();
+  const out = await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("Send the survey to the panel", "send"), ask("confirm", "send"), ask("Show the results", "results"), open(), debrief(), finish], { commander });
+  assert.equal(approvals(asked), 1);
+  assert.deepEqual(kinds(out, "flashpoint").map((s) => s.emailed), [false, false, false, true, false]);
+});
+
+test("a first name, a surname and another letter case are all removed, and everyday words are left", () => {
+  const redact = makeRedactor([{ name: "Jane Okafor", email: "jane@example.com" }, { name: "Tester One", email: "t1@example.com" }]);
+  assert.equal(redact("Jane and JANE OKAFOR answered. Okafor wrote more."), "[person 1] and [person 1] answered. [person 1] wrote more.");
+  assert.equal(redact("One of 3 testers answered. Tester One did."), "One of 3 testers answered. [person 2] did.");
+  assert.equal(redact("Janet answered"), "Janet answered", "only whole words");
 });

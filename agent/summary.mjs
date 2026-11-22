@@ -40,7 +40,8 @@ export function rounds(steps) {
       designs: sent.filter((s) => s.action === "design").length,
       rehearsed: mine.some((s) => s.kind === "rehearsal"),
       sealed: sealed ? sealed.envelope.predictions.map((p) => p.question) : [],
-      emailed: sent.some((s) => s.action === "send"),
+      // Newer runs record the step on which the email went out. Older ones only have the label.
+      emailed: sent.some((s) => (s.emailed === undefined ? s.action === "send" : s.emailed)) || mine.some((s) => s.kind === "commander" && /Did the survey go out/.test(s.message ?? "") && /^\W*y/i.test(s.reply ?? "")),
       refused: mine.filter((s) => s.kind === "send-refused").length,
       opened: mine.some((s) => s.kind === "opened"),
       challenged: mine.some((s) => s.kind === "challenge"),
@@ -68,7 +69,7 @@ export function summarize(run) {
     if (r.rehearsed) lines.push("- It rehearsed the survey on AI personas first. Their answers are synthetic.");
     if (r.sealed.length > 0) lines.push(`- Before sending, it sealed guesses on: ${r.sealed.map((q) => `"${cell(q)}"`).join("; ")}.`);
     if (r.refused > 0) lines.push(`- The commander refused the send ${times(r.refused)}.`);
-    lines.push(r.emailed ? "- The commander approved, and the survey was emailed." : "- The survey was not emailed.");
+    lines.push(r.emailed ? "- The commander approved, and the survey was emailed." : "- The survey was not emailed, as far as the run can tell.");
     if (r.debrief) {
       lines.push(`- Who was wrong: ${cell(r.debrief.whoWasWrong)}`);
       lines.push(`- Biggest surprise: ${cell(r.debrief.surprise)}`);

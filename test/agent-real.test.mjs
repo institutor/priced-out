@@ -61,7 +61,9 @@ test("replies that are not a survey step are failures, and say whether they were
     [{ error: "survey not found", result: null }, /survey not found/, true],
     ["Rate limited, try again", /had no text: Rate limited/, true],
     [text("   "), /had no text/, true],
-    [Object.assign(new Error("fetch failed"), { unpaid: true }), /fetch failed/, false],
+    // No reply at all: nobody knows whether it was paid, so it is counted as paid.
+    [Object.assign(new Error("fetch failed"), { unpaid: true }), /fetch failed/, true],
+    [Object.assign(new Error("payment failed: insufficient funds"), { unpaid: true }), /payment failed/, false],
     [new Error("socket hang up after payment"), /socket hang up/, true],
   ];
   for (const [reply, message, charged] of cases) {

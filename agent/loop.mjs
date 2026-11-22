@@ -241,15 +241,22 @@ Before each tool call, say in a sentence or two what you are deciding and why. T
 }
 
 // Emails never go to the model or into the log. Neither do the names on the
-// list, as they were written there, since a run log is public.
+// list, since a run log is public: the full name in any letter case, and each
+// part of it (a first name, a surname) as it was written. A part that is also
+// an everyday word is left alone, or "One of 3 answered" would lose its "One".
+const EVERYDAY = new Set(["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "test", "tester", "user", "member", "person", "people", "the", "and", "club", "team"]);
+const wholeWord = (word, flags) => new RegExp(`(?<![\\p{L}\\p{N}])${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}])`, flags);
 export function makeRedactor(recipients) {
   return (text) => {
     let out = String(text ?? "");
     recipients.forEach((r, i) => { if (r.email) out = out.split(r.email).join(`[recipient ${i + 1}]`); });
     recipients.forEach((r, i) => {
-      if (!r.name || r.name.length < 3) return;
-      const whole = new RegExp(`(?<![\\p{L}\\p{N}])${r.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}])`, "gu");
-      out = out.replace(whole, `[person ${i + 1}]`);
+      if (r.name && r.name.length >= 3) out = out.replace(wholeWord(r.name, "giu"), `[person ${i + 1}]`);
+    });
+    recipients.forEach((r, i) => {
+      for (const part of String(r.name ?? "").split(/\s+/)) {
+        if (part.length >= 3 && !EVERYDAY.has(part.toLowerCase())) out = out.replace(wholeWord(part, "gu"), `[person ${i + 1}]`);
+      }
     });
     return out.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[email]");
   };
@@ -383,6 +390,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     // A bare "confirm" does whatever Flashpoint last offered. Unless that was plainly
     // publishing and nothing else, treat it as a send, whatever the model called it.
     const sending = input.action === "send" || asksToSend(input.message) || (isConfirm(input.message) && !offersOnlyPublishing(lastReply));
+    if (sending && sendUnsure) return { text: `Not sent: an earlier send was tried and nobody knows whether it went out. First ask Flashpoint where the survey stands, in a message that does not ask it to send anything. Nothing was charged.\n\n${left()}`, failed: true };
     if (sending) {
       const refusal = await sendGate(input);
       if (refusal) return { text: `${refusal}\n\n${left()}`, failed: true };
@@ -397,23 +405,41 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       lastReply = text;
       if (!sending && input.action !== "results") {
         if (draft === "" || listsQuestions(text)) { draft = text; changes = []; }
-        else if (input.action === "design" && !/\breply\b.*\bconfirm\b/i.test(text.slice(-200)) ) changes.push(text);
+        else if (input.action === "design" && !isConfirm(input.message)) changes.push(text);
       }
       if (sent && (!sending || input.action === "results")) readAfterSend = true;
-      if (sending) { sent = true; sendUnsure = false; }
-      // After a send whose outcome was not known, the agent asks Flashpoint where the survey
-      // stands. Once it has, the round can go on to its results without emailing people twice.
-      else if (sendUnsure && ["results", "other"].includes(input.action ?? "other")) { sent = true; sendUnsure = false; }
+      // Flashpoint often answers a request to send with "reply confirm". Then nothing has
+      // gone out yet, and the commander's approval stands for the confirm that follows.
+      const emailed = sending && !/\bconfirm\b/i.test(text.slice(-300));
+      // One approval covers one send. A reminder, or a second try, is asked for again.
+      if (emailed) { sent = true; approved = false; }
       // A changed survey is a different survey: the commander approves it again.
       else if (input.action === "design" && !sent) approved = false;
-      note({ kind: "flashpoint", round, action: input.action ?? "other", why: input.why, couldChange: input.could_change ?? "", message: redact(message), reply: text, receipts: reply.receipts ?? [], price: PRICES.survey, spent });
-      return { text: `${text}\n\n${left()}` };
+      note({ kind: "flashpoint", round, action: input.action ?? "other", why: input.why, couldChange: input.could_change ?? "", message: redact(message), reply: text, receipts: reply.receipts ?? [], price: PRICES.survey, spent, emailed });
+      // After a send whose outcome was not known, the agent asks Flashpoint where the survey
+      // stands. Only the commander can then say that it went out: the code does not guess.
+      let settled = "";
+      if (sendUnsure && !sending) {
+        sendUnsure = false;
+        approved = false;
+        const question = `A send was tried earlier and nobody knows whether it went out. Flashpoint now says:\n\n${text}\n\nDid the survey go out? Answer yes or no.`;
+        const answer = commander ? await hear({ kind: "ask", message: question, order: null }) : null;
+        if (answer !== null) given.push(answer);
+        note({ kind: "commander", order: null, message: question, reply: answer });
+        if (answer !== null && saysYes(answer)) {
+          sent = true;
+          settled = "\n\nThe commander confirms that the survey went out. Do not send it again. Wait, then read the results.";
+        } else {
+          settled = "\n\nThe commander has not confirmed that the survey went out, so it counts as not sent. If you send it, they will be asked to approve again.";
+        }
+      }
+      return { text: `${text}${settled}\n\n${left()}` };
     } catch (err) {
       const charged = err?.charged === true;
       if (charged) spent += PRICES.survey;
       const text = redact(err?.message ?? err);
       note({ kind: "flashpoint-failed", round, why: input.why, message: redact(message), error: text, charged, spent });
-      if (sending) sendUnsure = true;
+      if (sending) { sendUnsure = true; approved = false; }
       const unsure = sending ? " This step would have emailed people and its outcome is not known: ask Flashpoint for the survey's status before you try again, so that nobody is emailed twice." : "";
       return { text: `Flashpoint did not complete this step${charged ? ", but it was charged" : ", and it was not charged"}: ${text}${unsure}\n\n${left()}`, failed: true };
     }
@@ -564,9 +590,11 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     const priceOf = { ask_flashpoint: PRICES.survey, rehearse_on_personas: PRICES.rehearsal, make_deck: PRICES.deck };
     for (const call of cutOff) {
       spent += priceOf[call.name] ?? 0;
-      if (call.name === "ask_flashpoint" && envelope && !sent) sendUnsure = true;
+      const said = String(call.input?.message ?? "");
+      if (call.name === "ask_flashpoint" && (call.input?.action === "send" || asksToSend(said) || isConfirm(said))) { sendUnsure = true; approved = false; }
     }
-    note({ kind: "resumed", away, cutOff: cutOff.map((call) => call.name), spent });
+    const counted = cutOff.reduce((sum, call) => sum + (priceOf[call.name] ?? 0), 0);
+    note({ kind: "resumed", away, cutOff: cutOff.map((call) => call.name), counted, spent });
     if (calls.length > 0) {
       const results = calls.map((call) => done.find((result) => result.tool_use_id === call.id) ?? {
         type: "tool_result", tool_use_id: call.id,

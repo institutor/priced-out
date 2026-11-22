@@ -17,6 +17,7 @@ import fs from "node:fs";
 import path from "node:path";
 import readline from "node:readline";
 import { createHash } from "node:crypto";
+import { fileURLToPath } from "node:url";
 import Anthropic from "@anthropic-ai/sdk";
 import { runAgent, makeRedactor, DEFAULT_ORDERS } from "./loop.mjs";
 import { fakeFlashpoint } from "./fake-flashpoint.mjs";
@@ -118,7 +119,7 @@ const recipients = readRecipients(recipientsFile);
 // The saved conversation calls people "[recipient 1]", "[recipient 2]" and so on. If the list
 // changed while the run was stopped, those would now point at different people.
 const list = {
-  file: typeof recipientsFile === "string" ? path.resolve(recipientsFile) : recipientsFile.pathname,
+  file: typeof recipientsFile === "string" ? path.resolve(recipientsFile) : fileURLToPath(recipientsFile),
   mark: createHash("sha256").update(recipients.map((person) => `${person.name}\n${person.email}`).join("\n")).digest("hex"),
 };
 if (resumed && resumed.state.list && resumed.state.list.mark !== list.mark) {
@@ -275,7 +276,9 @@ process.on("SIGINT", stopNow);
 
 function record(step) {
   steps.push(step);
-  fs.writeFileSync(new URL("steps.json", runDir), JSON.stringify({ ...head, steps }, null, 2));
+  // Written to one side and moved into place, so a stop cannot leave half a file.
+  fs.writeFileSync(new URL("steps.json.next", runDir), JSON.stringify({ ...head, steps }, null, 2));
+  fs.renameSync(new URL("steps.json.next", runDir), new URL("steps.json", runDir));
   if (step.kind === "sealed") fs.writeFileSync(new URL(`envelope-round-${step.round}.json`, runDir), JSON.stringify(step.envelope));
   fs.appendFileSync(logFile, `${logEntry(step)}\n`);
   printStep(shortLine(step));
@@ -328,7 +331,7 @@ let wallet = null;
 if (balanceOf) {
   try {
     const after = await balanceOf();
-    wallet = `Wallet: ${before} USDC before, ${after} USDC after, so this run cost ${(before - after).toFixed(2)} USDC.`;
+    wallet = `Wallet: ${before} USDC before, ${after} USDC after, so ${resumed ? "this run, since it was carried on, cost" : "this run cost"} ${(before - after).toFixed(2)} USDC.`;
   } catch {
     wallet = `Wallet: ${before} USDC before. The balance could not be read afterwards.`;
   }

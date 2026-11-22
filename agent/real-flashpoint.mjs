@@ -51,7 +51,10 @@ export function realFlashpoint({ connect, callTool, keepRaw = () => {}, saveFile
       keepRaw(tool, { sent: args, result, receipts });
       return { result, receipts };
     } catch (err) {
-      err.charged = receipts.length > 0;
+      // A receipt means it was paid. With no reply at all (a dropped connection, a timeout)
+      // nobody knows, so it is counted as paid: the budget must never be understated.
+      const noReply = /fetch failed|network|socket|timed? ?out|ECONN|EPIPE|terminated|aborted/i.test(String(err?.message ?? err) + String(err?.cause?.message ?? ""));
+      err.charged = receipts.length > 0 || noReply;
       throw err;
     } finally {
       console.error = printError;

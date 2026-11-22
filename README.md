@@ -82,7 +82,7 @@ guessed wrong is what the next round asks about.
 | Whether to rehearse on AI personas first | A budget cap. A paid step that would pass it is refused |
 | What it expects people to answer | The commander's guess stays hidden from the agent until the envelope is opened |
 | Who was wrong, and what that means | A guess cannot be sealed or changed after the survey is sent |
-| Whether to run another round, and on what | Names and addresses never reach the model or the logs |
+| Whether to run another round, and on what | Addresses never reach the model or the logs, and the names on the list are taken out |
 | When to stop, and the final recommendation | Every paid step is logged with its price and the decision it could change |
 
 ### How to run it
