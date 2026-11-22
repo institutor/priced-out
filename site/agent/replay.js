@@ -49,9 +49,13 @@ const said = (text, who = "") => el("div", { class: `said ${who}`.trim(), text }
 const pairs = (rows) => el("dl", { class: "pairs" }, rows.flatMap(([term, value]) => [el("dt", { text: term }), value instanceof Node ? el("dd", {}, value) : el("dd", { text: value })]));
 
 function table(head, rows) {
-  return el("div", { class: "table-wrap" }, el("table", {}, [
+  return el("div", { class: "table-wrap" }, el("table", { class: "stack" }, [
     el("thead", {}, el("tr", {}, head.map((text) => el("th", { scope: "col", text })))),
-    el("tbody", {}, rows.map((cells) => el("tr", {}, cells.map((cell) => (cell instanceof Node ? cell : el("td", { text: cell ?? "" })))))),
+    el("tbody", {}, rows.map((cells) => el("tr", {}, cells.map((cell, i) => {
+      const td = cell instanceof Node ? cell : el("td", { text: cell ?? "" });
+      td.setAttribute("data-label", head[i]);
+      return td;
+    })))),
   ]));
 }
 
