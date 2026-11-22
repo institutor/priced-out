@@ -14,7 +14,7 @@ const calls = [
   { name: "wait_for_replies", input: { minutes: 2, why: "they answer fast" } },
   { name: "ask_flashpoint", input: { message: "Show the results", action: "results", why: "read", could_change: "the answer" } },
   { name: "open_envelope", input: { results: [{ question: "Which | price?", people_said: "2 of 3 picked the lower option" }] } },
-  { name: "debrief", input: { who_was_wrong: "I was", biggest_surprise: "dinner", still_unknown: "why", next_move: "finish", reason: "budget" } },
+  { name: "debrief", input: { who_was_wrong: "I was", biggest_surprise: "dinner", still_unknown: "nothing", next_move: "finish", reason: "budget" } },
   { name: "ask_commander", input: { message: "I was wrong.", order: "Tell me what you learned before you start a second round.", why: "the order" } },
   { name: "make_deck", input: { title: "Findings", findings: "2 of 3", why: "to keep", could_change: "nothing" } },
   { name: "finish", input: { recommendation: "Charge less.", evidence: "2 of 3 picked the lower option; 40% said so", scoreboard: [{ round: 1, question: "Which price?", people_said: "2 of 3 lower", agent: "wrong", personas: "partly", commander: "right" }], learned_between_rounds: "no second round", limits: "3 people" } },

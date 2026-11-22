@@ -65,6 +65,8 @@ export function logEntry(step) {
     }
     case "debrief":
       return `${n} what the round ${step.round} envelope taught the agent\n\n| Debrief | |\n|---|---|\n| Who was wrong | ${cell(step.whoWasWrong)} |\n| Biggest surprise | ${cell(step.surprise)} |\n| Still unknown | ${cell(step.stillUnknown)} |\n| Next move | ${step.nextMove === "another_round" ? "another round" : "finish"} |\n| Why | ${cell(step.reason)} |\n`;
+    case "challenge":
+      return `${n} the agent was asked to think again before stopping\n\nIt chose to finish after one round with budget left and this still unknown: ${step.stillUnknown}\n\nIts reason: ${step.reason}\n\nThe loop asks this once per mission. The decision stays the agent's.\n`;
     case "send-approved":
       return `${n} the commander approved the round ${step.round} send\n\n*Commander:* ${step.reply}\n`;
     case "send-refused":
@@ -134,6 +136,7 @@ export function shortLine(step) {
     case "sealed": return `${tag} Envelope sealed for round ${step.round}: ${step.hash.slice(0, 16)}…`;
     case "opened": return `${tag} Envelope opened for round ${step.round}\n${step.rows.map((row) => `       ${row.question}\n         people:    ${row.people_said}\n         agent:     ${row.agent}\n         personas:  ${row.personas ?? "no guess"}\n         commander: ${row.commander ?? "no guess"}`).join("\n")}`;
     case "debrief": return `${tag} Debrief: ${step.nextMove === "another_round" ? "another round" : "finish"}, because ${step.reason}\n       wrong:     ${step.whoWasWrong}\n       surprise:  ${step.surprise}\n       unknown:   ${step.stillUnknown}`;
+    case "challenge": return `${tag} Asked to think again before stopping after one round`;
     case "send-approved": return `${tag} Send approved by the commander`;
     case "send-refused": return `${tag} Send refused: ${step.reason}`;
     case "commander": return `${tag} Commander replied: ${step.reply ?? "(nobody at the desk)"}`;

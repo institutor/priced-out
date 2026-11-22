@@ -37,7 +37,23 @@ function desk({ approve = ["yes"], guess = "about half", reply = "carry on" } = 
 const ask = (message, action = "other", extra = {}) => ({ name: "ask_flashpoint", input: { message, action, why: "because", could_change: "what I ask next", ...extra } });
 const seal = (question = "What will most people pick?") => ({ name: "seal_predictions", input: { predictions: [{ question, agent_guess: "the lower option" }], why: "it decides the answer" } });
 const open = (people_said = "2 of 3 picked the lower option") => ({ name: "open_envelope", input: { results: [{ question: "What will most people pick?", people_said }] } });
-const debrief = (next_move = "finish") => ({ name: "debrief", input: { who_was_wrong: "me", biggest_surprise: "none", still_unknown: "why", next_move, reason: "r" } });
+const debrief = (next_move = "finish") => ({ name: "debrief", input: { who_was_wrong: "me", biggest_surprise: "none", still_unknown: "nothing", next_move, reason: "r" } });
+
+test("stopping after one round with an open question and budget left is challenged once", async () => {
+  const stop = { name: "debrief", input: { who_was_wrong: "me", biggest_surprise: "price did not matter", still_unknown: "what does decide it", next_move: "finish", reason: "only 3 people" } };
+  const round = [ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), open()];
+  const { llm, seen } = scripted([...round, stop, finish, stop, finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), commander: desk().commander, wait: async () => {} });
+  assert.match(seen[7], /Before you stop: you say this is still unknown: \\"what does decide it\\"/);
+  assert.match(seen[8], /have not debriefed/, "finish waits for the final decision");
+  assert.equal(kinds(out, "challenge").length, 1);
+  assert.equal(kinds(out, "debrief").length, 1, "the second debrief stands");
+  assert.ok(out.answer);
+
+  const tight = await run([...round, stop, finish], { cap: 3, commander: desk().commander });
+  assert.equal(kinds(tight, "challenge").length, 0, "no challenge when a second round cannot be afforded");
+  assert.ok(tight.answer);
+});
 const pause = { name: "wait_for_replies", input: { minutes: 5, why: "let them answer" } };
 const finish = { name: "finish", input: { recommendation: "r", evidence: "e", scoreboard: [], learned_between_rounds: "l", limits: "x" } };
 const kinds = (out, kind) => out.steps.filter((s) => s.kind === kind);

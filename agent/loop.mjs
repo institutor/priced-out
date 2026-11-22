@@ -232,7 +232,7 @@ Budget and receipts
 You have $${cap.toFixed(2)}. Every tool result tells you what is left. Each paid step needs a receipt: the decision of yours that it could change. If you cannot name one, the step is not worth its price, so skip it. Keep enough budget to read the results of anything you send. The budget is there to be used on steps that could change the answer: finishing with an open question you could have afforded to ask is a worse result than spending the money. Stop when no step you can afford could change your answer, and say that is why you stopped; what is left then goes back to the commander.
 
 How to do good research here
-First work out what you would need to know to answer the mission, and what the commander may already know (it is free to ask them once, early, if local knowledge would change the survey). Keep each survey short, since the same few people answer every round. Avoid screening and skip rules: they are what breaks a survey. You can email these people only a few times, so a question that turns out confusing wastes a round; a rehearsal on personas is the cheap way to find that out first. One round rarely settles a mission: expect to run a second. It should be shorter than the first and ask only about what the first envelope got wrong or left open; never repeat a first-round question. A few people can still tell you why, even when they are too few to count. If nobody has answered yet, wait and check again rather than guessing.
+First work out what you would need to know to answer the mission, and what the commander may already know (it is free to ask them once, early, if local knowledge would change the survey). Keep each survey short, since the same few people answer every round. Avoid screening and skip rules: they are what breaks a survey. You can email these people only a few times, so a question that turns out confusing wastes a round; a rehearsal on personas is the cheap way to find that out first. One round rarely settles a mission: expect to run a second. It should be shorter than the first and ask only about what the first envelope got wrong or left open; never repeat a first-round question. The same people answering a different question is not a repeat. A few people can still tell you why, even when they are too few to count. If nobody has answered yet, wait and check again rather than guessing.
 
 Honesty
 Report only what Flashpoint returned. Never fill in a number you did not get. Persona answers are synthetic: use them to fix the survey and to place a guess, and never count them as evidence. With this few people the answer is a direction, not a measurement, and your limits must say so.
@@ -322,6 +322,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   let envelope = null; // { hash, content }
   let opened = false;
   let debriefed = false;
+  let challenged = false;
   const owesDebrief = () => opened && !debriefed;
   const DEBRIEF_FIRST = "Not yet: you opened an envelope and have not debriefed it. Call debrief first.";
 
@@ -480,8 +481,17 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     if (name === "open_envelope") return openEnvelope(input);
     if (name === "debrief") {
       if (!opened) return { text: "There is no opened envelope to debrief.", failed: true };
-      debriefed = true;
       const move = input.next_move === "another_round" ? "another_round" : "finish";
+      // One challenge per mission: stopping after a single round, with something still
+      // unknown and the money to ask about it, has to be argued for.
+      const stillUnknown = redact(input.still_unknown);
+      const openQuestion = !/^\W*(none|nothing|n\/a)\b/i.test(stillUnknown);
+      if (move === "finish" && round === 1 && !challenged && openQuestion && cap - spent >= 4 * PRICES.survey - 1e-9) {
+        challenged = true;
+        note({ kind: "challenge", round, stillUnknown, reason: redact(input.reason) });
+        return { text: `Before you stop: you say this is still unknown: "${stillUnknown}". ${left()} That is enough for a short second round. Asking the same people a different question is not a repeat, and a few people can tell you why even when they are too few to count. If the thing the mission asked about turned out not to decide the matter, the mission is not answered until you ask what does. Call debrief again with your final decision: another_round, or finish with the reason no question you could ask would change what the commander does.`, failed: true };
+      }
+      debriefed = true;
       note({ kind: "debrief", round, whoWasWrong: redact(input.who_was_wrong), surprise: redact(input.biggest_surprise), stillUnknown: redact(input.still_unknown), nextMove: move, reason: redact(input.reason) });
       return { text: `Debrief recorded. ${move === "another_round" ? "Start the next round with new_survey: true when you are ready." : "Call finish when you are ready."} Mind the standing orders. ${left()}` };
     }
