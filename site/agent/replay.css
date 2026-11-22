@@ -830,3 +830,24 @@ html.present .m-beat .sub {
 .m-runs .m-foot {
   display: block;
 }
+
+/* The agent, drawn small beside a part of the run. */
+.m-vignette {
+  width: min(100%, 17rem);
+  height: auto;
+}
+
+.drawing .m-vignette tspan {
+  animation: ink-in 0.18s ease-out both;
+  animation-delay: var(--wait, 0ms);
+}
+
+@media (max-width: 52rem) {
+  .m-beat-side {
+    order: -1;
+  }
+
+  .m-vignette {
+    width: min(100%, 14rem);
+  }
+}

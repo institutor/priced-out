@@ -54,7 +54,7 @@ const TALL = {
 };
 
 // An aerial on the agent's head, so it is plainly not one of the members.
-function aerial(pen, head, height, seed) {
+export function aerial(pen, head, height, seed) {
   const top = [head.x + height * 0.02, head.y - head.r - height * 0.1];
   pen.stroke(sketch.line(head.x, head.y - head.r * 0.96, top[0], top[1], { seed, rough: height * 0.006, passes: 1 }), "figure-line", 110);
   pen.stroke(sketch.ellipse(top[0], top[1] - height * 0.022, height * 0.022, height * 0.022, { seed: seed + 1, rough: height * 0.003, steps: 8, overlap: 0.1 }), "figure-line", 110);

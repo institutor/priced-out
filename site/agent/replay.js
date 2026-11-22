@@ -14,6 +14,7 @@ import * as scene from "./scene.js";
 import { aboutRun, autonomy, lastOf, money, partsOf, roundsIn, runFor } from "./story.js";
 import { card, envelope, meter, numbered, slip, stamp, verdict } from "./draw.js";
 import * as present from "./present.js";
+import { vignette } from "./vignette.js";
 
 const plural = (count, one, many = `${one}s`) => `${count} ${count === 1 ? one : many}`;
 const words = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
@@ -165,6 +166,7 @@ const TELL = {
           ["How it would use the budget", plan.budget],
         ]),
       ],
+      side: vignette("plan", ["First: what do I", "need to find out?"], 21),
     };
   },
 
@@ -181,7 +183,7 @@ const TELL = {
         draft?.why ? el("p", { class: "m-why", text: `Its reason: ${draft.why}.`.replace(/\.\.$/, ".") }) : null,
         draft ? fold("Read the survey Flashpoint drafted", draft.reply) : null,
       ],
-      side: paidSlip(part, run, `write ${part.round}`),
+      side: [vignette("write", first ? ["I'll ask them this."] : ["A short follow-up,", "on what surprised us."], 30 + part.round), paidSlip(part, run, `write ${part.round}`)],
     };
   },
 
@@ -218,7 +220,7 @@ const TELL = {
       body.push(el("p", { text: `Flashpoint emailed the survey to all ${run.people} people on the list.${run.emailLimit ? ` That was email ${before + 1} of the ${run.emailLimit} each of them may get.` : ""}` }));
     }
     if (wait) body.push(el("p", { text: `Then the agent chose to wait up to ${wait.minutes} minutes for answers.${run.mode === "real" ? "" : " A practice run does not really wait: the invented answers come straight back."}` }));
-    return { doodle: "plane", title: "The survey goes out", body, side: paidSlip(part, run, `send ${part.round}`) };
+    return { doodle: "plane", title: "The survey goes out", body, side: [emailed ? vignette("send", run.emailLimit ? [`Email ${before + 1} of ${run.emailLimit}.`, "Off it goes."] : ["Off it goes."], 40 + part.round) : null, paidSlip(part, run, `send ${part.round}`)] };
   },
 
   open(part, run) {
@@ -260,7 +262,7 @@ const TELL = {
       body.push(el("p", { class: "m-foot", text: step.order ? `A standing order applied here: “${step.order}” So the agent told the commander what it had learned.` : "The agent went to the commander with a question." }));
       if (step.reply) body.push(quote(step.reply, "commander"));
     }
-    return { doodle: "glass", title: again ? "It learns, and chooses another round" : "It learns, and chooses to stop", body };
+    return { doodle: "glass", title: again ? "It learns, and chooses another round" : "It learns, and chooses to stop", body, side: debrief ? vignette("decide", again ? ["One more round,", "on what we got wrong."] : ["That is enough", "to answer."], 50 + part.round) : null };
   },
 
   answer(part, run) {
@@ -274,6 +276,7 @@ const TELL = {
         el("p", { text: `The agent stopped and wrote its recommendation, the evidence for it, and its limits. It spent ${money(spent)} of its ${money(run.cap)} budget and handed back ${money(Math.max(0, run.cap - spent))}.` }),
         el("p", {}, el("a", { href: "#answer", class: "m-jump", text: "Read the answer" })),
       ],
+      side: vignette("answer", ["Here is what", "I would do."], 61),
     };
   },
 };
