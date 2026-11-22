@@ -112,8 +112,8 @@ agent's that the step could change. If it cannot name one, it is told to skip th
   the log when it is sealed and checked when it is opened.
 - **A hard budget cap.** The code refuses any paid step that would pass the cap. A call
   that fails is not counted.
-- **The model never sees an email address.** It writes `{{RECIPIENTS}}` and the code puts
-  the list in. Addresses are also removed from Flashpoint's replies and from anything you
+- **The model never sees a name or an email address.** It writes `{{RECIPIENTS}}` and the
+  code puts the list in. Names and addresses are also removed from Flashpoint's replies and from anything you
   type before the model or the log sees them. Only Flashpoint receives them.
 - **Invented numbers are flagged.** A number in the final answer that appears in nothing
   Flashpoint or the commander said is listed in the log under "Check these numbers".

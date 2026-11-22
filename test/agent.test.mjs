@@ -96,6 +96,7 @@ test("Flashpoint gets the real addresses; the model and the log never do", async
   const everything = seen.join("") + JSON.stringify(out.steps);
   assert.doesNotMatch(everything, /@example\.com|@else\.org/);
   assert.match(kinds(out, "flashpoint")[0].reply, /\[recipient 1\] and \[email\]/);
+  assert.doesNotMatch(everything, /\bAna\b|\bBen\b/, "names on the list stay out too");
   assert.equal(kinds(out, "commander")[0].reply, "ask [recipient 2]");
 });
 
@@ -225,6 +226,8 @@ test("numbers in the answer that came from nowhere are flagged", async () => {
 test("the redactor removes listed and unlisted addresses", () => {
   const redact = makeRedactor(recipients);
   assert.equal(redact("to ben@example.com and x.y@z.co"), "to [recipient 2] and [email]");
+  assert.equal(redact("Ana <ana+1@example.com> answered"), "[person 1] <[recipient 1]> answered");
+  assert.equal(redact("Analysis for Ben. Benefits: none"), "Analysis for [person 2]. Benefits: none");
 });
 
 test("the practice writer plays Flashpoint without ever seeing an address", async () => {

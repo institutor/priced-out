@@ -226,7 +226,7 @@ The sealed envelope
 Before each survey is sent, call seal_predictions with what you expect people to answer on its main questions. If you rehearsed on personas, put their answers in as the personas' guess. The commander seals a guess too, and you cannot see it. After the real results are in, call open_envelope, then debrief: who was wrong (yourself first), what surprised everyone, what is still unknown, and your next move. A wrong guess or a surprise is the most useful thing a round can give you. It marks what nobody understood yet, and that is what the next round should ask about. Often the surprise is that the thing you asked about is not what decides the matter; then the next round asks about the thing that does.
 
 The people
-There are ${people} people on the list. They have agreed to be surveyed. You never see their addresses: write {{RECIPIENTS}} in a message to Flashpoint and the list is put in for you. Survey only these people. Emailing them cannot be undone, so have Flashpoint draft first (tell it "do not publish or send yet"), and read the survey it wrote before you ask to send it. The commander approves from the last full list of questions Flashpoint showed, so if you change the survey, ask Flashpoint to show the full survey again.
+There are ${people} people on the list. They have agreed to be surveyed. You never see their names or addresses: write {{RECIPIENTS}} in a message to Flashpoint and the list is put in for you. Survey only these people. Emailing them cannot be undone, so have Flashpoint draft first (tell it "do not publish or send yet"), and read the survey it wrote before you ask to send it. The commander approves from the last full list of questions Flashpoint showed, so if you change the survey, ask Flashpoint to show the full survey again.
 
 Budget and receipts
 You have $${cap.toFixed(2)}. Every tool result tells you what is left. Each paid step needs a receipt: the decision of yours that it could change. If you cannot name one, the step is not worth its price, so skip it. Keep enough budget to read the results of anything you send. The budget is there to be used on steps that could change the answer: finishing with an open question you could have afforded to ask is a worse result than spending the money. Stop when no step you can afford could change your answer, and say that is why you stopped; what is left then goes back to the commander.
@@ -240,12 +240,17 @@ Report only what Flashpoint returned. Never fill in a number you did not get. Pe
 Before each tool call, say in a sentence or two what you are deciding and why. Those notes are kept as the mission log.`;
 }
 
-// Emails never go to the model or into the log.
+// Emails never go to the model or into the log. Neither do the names on the
+// list, as they were written there, since a run log is public.
 export function makeRedactor(recipients) {
-  const known = recipients.map((r) => r.email).filter(Boolean);
   return (text) => {
     let out = String(text ?? "");
-    known.forEach((email, i) => { out = out.split(email).join(`[recipient ${i + 1}]`); });
+    recipients.forEach((r, i) => { if (r.email) out = out.split(r.email).join(`[recipient ${i + 1}]`); });
+    recipients.forEach((r, i) => {
+      if (!r.name || r.name.length < 3) return;
+      const whole = new RegExp(`(?<![\\p{L}\\p{N}])${r.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}])`, "gu");
+      out = out.replace(whole, `[person ${i + 1}]`);
+    });
     return out.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[email]");
   };
 }
