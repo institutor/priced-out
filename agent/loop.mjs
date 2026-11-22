@@ -43,7 +43,7 @@ export const TOOLS = [
   {
     name: "rehearse_on_personas",
     description:
-      "Run the survey you have drafted on a small panel of AI personas before any real person sees it. Costs $0.60. Use it to catch broken or confusing questions and to get the personas' own answers. The answers are synthetic: they are a rehearsal and a guess, never a finding. After it finishes, ask Flashpoint for the rehearsal results with ask_flashpoint. If it fails, carry on without it.",
+      "Run the survey on a small panel of AI personas before any real person sees it. Costs $0.60. The personas take the PUBLISHED version of the survey, so publish it first (publishing emails nobody); if you change the survey afterwards, publish the change before you send. Use it to catch broken or confusing questions and to get the personas' own answers. The answers are synthetic: they are a rehearsal and a guess, never a finding. After it finishes, ask Flashpoint for the rehearsal results with ask_flashpoint. If it fails, carry on without it.",
     input_schema: {
       type: "object",
       properties: {
@@ -205,7 +205,7 @@ export const TOOLS = [
 export function systemPrompt({ people, cap, orders = DEFAULT_ORDERS, canRehearse = true, canDeck = true }) {
   const tools = [
     `- ask_flashpoint ($${PRICES.survey.toFixed(2)} a message): Flashpoint's survey agent. In plain words it can make a first-party panel from a list of names and emails, write a survey from a brief, change it, publish it, email it to the panel, report how many have answered, and give results. Publishing and sending each need a second message that says only "confirm"; you send it yourself when the reply asks for it and matches what you intended.`,
-    canRehearse ? `- rehearse_on_personas ($${PRICES.rehearsal.toFixed(2)}): runs your draft on AI personas first. It can catch a question that confuses or cuts people off, and it gives the personas a guess of their own for the envelope. It is slow (a few minutes) and can fail; the mission does not depend on it.` : null,
+    canRehearse ? `- rehearse_on_personas ($${PRICES.rehearsal.toFixed(2)}): runs your published, not yet sent, survey on AI personas first. It can catch a question that confuses or cuts people off, and it gives the personas a guess of their own for the envelope. It is slow (a few minutes) and can fail; the mission does not depend on it.` : null,
     "- seal_predictions, open_envelope and debrief (free): the sealed envelope, explained below.",
     "- ask_commander (free): the commander is at the desk.",
     "- wait_for_replies (free).",

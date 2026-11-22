@@ -7,9 +7,9 @@ import { logEntry, logHeader, logFooter, shortLine, tally } from "../agent/log.m
 const recipients = [{ name: "Ana", email: "ana@example.com" }];
 const calls = [
   { name: "ask_flashpoint", input: { message: "Write a survey for {{RECIPIENTS}}", action: "design", why: "start", could_change: "the questions" } },
+  { name: "ask_flashpoint", input: { message: "confirm", action: "publish", why: "publish", could_change: "nothing yet" } },
   { name: "rehearse_on_personas", input: { audience: "members", how_many: 6, why: "check it", could_change: "the wording" } },
   { name: "seal_predictions", input: { predictions: [{ question: "Which | price?", agent_guess: "$20", personas_guess: "$25" }], why: "it is the mission" } },
-  { name: "ask_flashpoint", input: { message: "confirm", action: "publish", why: "publish", could_change: "nothing yet" } },
   { name: "ask_flashpoint", input: { message: "confirm", action: "send", why: "send", could_change: "everything" } },
   { name: "wait_for_replies", input: { minutes: 2, why: "they answer fast" } },
   { name: "ask_flashpoint", input: { message: "Show the results", action: "results", why: "read", could_change: "the answer" } },

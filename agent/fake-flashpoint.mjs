@@ -86,6 +86,8 @@ export function fakeFlashpoint({ rehearsalFails = false, writer = cannedWriter, 
 
   async function rehearse({ howMany, audience }) {
     if (survey === 0) throw new Error("There is no survey to rehearse.");
+    // The real personas take the published version of a survey, never the draft.
+    if (!published) throw new Error(`Survey ${survey} is not published, and personas take the published version of a survey. Publish it first (publishing emails nobody), then rehearse.`);
     if (rehearsalFails) throw new Error("The persona run was interrupted before any persona finished.");
     rehearsed = howMany;
     await writer.rehearse({ survey, howMany, audience });

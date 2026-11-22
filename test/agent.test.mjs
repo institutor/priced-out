@@ -64,10 +64,10 @@ test("a full two-round mission: rehearse, seal, approve, send, open, learn, repe
   const waits = [];
   const out = await run([
     ask("Make a panel from {{RECIPIENTS}} and write a survey", "design"),
+    ask("confirm", "publish"),
     { name: "rehearse_on_personas", input: { audience: "club members", how_many: 8, why: "catch broken questions", could_change: "the wording" } },
     ask("Show the persona rehearsal results", "results"),
     seal(),
-    ask("confirm", "publish"),
     ask("confirm", "send"),
     pause,
     ask("Show the results", "results"),
@@ -96,7 +96,7 @@ test("a full two-round mission: rehearse, seal, approve, send, open, learn, repe
   assert.deepEqual(kinds(out, "debrief").map((s) => s.nextMove), ["another_round", "finish"]);
   assert.match(kinds(out, "rehearsal")[0].reply, /SYNTHETIC/);
   const replies = kinds(out, "flashpoint").map((s) => s.reply);
-  assert.match(replies[1], /SYNTHETIC rehearsal of survey 1/);
+  assert.match(replies[2], /SYNTHETIC rehearsal of survey 1/);
   assert.match(replies[4], /Survey 1: 3 of 3 answered/);
   assert.match(replies[8], /Survey 2: 3 of 3 answered/);
   assert.equal(kinds(out, "finish")[0].handedBack, 8 - out.spent);
@@ -212,8 +212,12 @@ test("a rehearsal that fails is not charged and does not stop the mission", asyn
   const early = await run([rehearse, finish]);
   assert.equal(early.spent, 0, "nothing to rehearse before a draft");
 
-  const out = await run([ask("Write a survey", "design"), rehearse, finish], { flashpoint: fakeFlashpoint({ rehearsalFails: true }) });
-  assert.equal(out.spent, PRICES.survey);
+  const unpublished = await run([ask("Write a survey", "design"), rehearse, finish]);
+  assert.match(kinds(unpublished, "rehearsal-failed")[0].error, /personas take the published version/);
+
+  const out = await run([ask("Write a survey", "design"), ask("confirm", "publish"), rehearse, finish], { flashpoint: fakeFlashpoint({ rehearsalFails: true }) });
+  assert.match(kinds(out, "rehearsal-failed")[0].error, /interrupted/);
+  assert.equal(out.spent, 2 * PRICES.survey);
   assert.equal(kinds(out, "rehearsal-failed")[0].charged, false);
   assert.ok(out.answer);
 
@@ -254,9 +258,10 @@ test("the practice writer plays Flashpoint without ever seeing an address", asyn
   const { commander } = desk();
   const out = await run([
     ask("Make a panel from {{RECIPIENTS}} and ask about price", "design"),
+    ask("confirm", "publish"),
     { name: "rehearse_on_personas", input: { audience: "members", how_many: 5, why: "w", could_change: "c" } },
     ask("Show the persona rehearsal results", "results"),
-    seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), open(), debrief(), finish,
+    seal(), ask("confirm", "send"), ask("Show the results", "results"), open(), debrief(), finish,
   ], { flashpoint, commander });
   assert.doesNotMatch(prompts.join("\n"), /@example\.com/);
   assert.match(prompts[0], /Invent exactly 2 members/);
