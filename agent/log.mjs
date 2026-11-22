@@ -46,7 +46,7 @@ export function logEntry(step) {
     case "flashpoint":
       return `${n} Flashpoint, ${ACTIONS[step.action] ?? "a message"} (round ${step.round})\n\n${receipt(step, "one message to Flashpoint's survey agent")}\n\n*Why:* ${step.why}\n\n*Sent:*\n\n${quote(step.message)}\n\n*Flashpoint replied:*\n\n${quote(step.reply)}\n${step.receipts.map((r) => `\n${r}`).join("")}\n`;
     case "flashpoint-failed":
-      return `${n} a Flashpoint call failed (not charged)\n\n*Why:* ${step.why}\n\n${step.error}\n`;
+      return `${n} a Flashpoint call failed (${step.charged ? "charged" : "not charged"})\n\n*Why:* ${step.why}\n\n${step.error}\n`;
     case "rehearsal":
       return `${n} dress rehearsal on AI personas (round ${step.round})\n\n${receipt(step, "a synthetic persona run")}\n\n*Why:* ${step.why}\n\n*Flashpoint replied (synthetic, not people):*\n\n${quote(step.reply)}\n${step.receipts.map((r) => `\n${r}`).join("")}\n`;
     case "rehearsal-failed":
@@ -85,14 +85,16 @@ export function logEntry(step) {
   }
 }
 
+const PRICE_OF = { "flashpoint-failed": 0.5, "rehearsal-failed": 0.6, "deck-failed": 0.25 };
+
 // What the run paid for, by kind.
 export function tally(steps) {
   const lines = [
-    ["Messages to Flashpoint's survey agent", steps.filter((s) => s.kind === "flashpoint")],
+    ["Messages to Flashpoint's survey agent", steps.filter((s) => s.kind === "flashpoint" || (s.kind === "flashpoint-failed" && s.charged))],
     ["Persona rehearsals", steps.filter((s) => s.kind === "rehearsal" || (s.kind === "rehearsal-failed" && s.charged))],
     ["Slide decks", steps.filter((s) => s.kind === "deck" || (s.kind === "deck-failed" && s.charged))],
   ];
-  return lines.filter(([, list]) => list.length > 0).map(([label, list]) => ({ label, count: list.length, cost: list.reduce((sum, s) => sum + (s.price ?? 0), 0) }));
+  return lines.filter(([, list]) => list.length > 0).map(([label, list]) => ({ label, count: list.length, cost: list.reduce((sum, s) => sum + (s.price ?? PRICE_OF[s.kind] ?? 0), 0) }));
 }
 
 export function logFooter({ steps, cap, spent, wallet }) {
@@ -123,7 +125,7 @@ export function shortLine(step) {
   switch (step.kind) {
     case "thinking": return `${tag} Agent: ${step.text}`;
     case "flashpoint": return `${tag} Flashpoint: ${ACTIONS[step.action] ?? "a message"} (${paid(step)})\n       could change: ${step.couldChange || "(none given)"}`;
-    case "flashpoint-failed": return `${tag} Flashpoint failed, not charged: ${step.error}`;
+    case "flashpoint-failed": return `${tag} Flashpoint failed, ${step.charged ? "charged" : "not charged"}: ${step.error}`;
     case "rehearsal": return `${tag} Dress rehearsal on AI personas (${paid(step)})\n       could change: ${step.couldChange || "(none given)"}`;
     case "rehearsal-failed": return `${tag} Dress rehearsal failed, carrying on: ${step.error}`;
     case "deck": return `${tag} Slide deck made (${paid(step)})`;

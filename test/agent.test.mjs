@@ -274,3 +274,53 @@ test("the commander approves from the latest full survey, plus any changes since
   assert.deepEqual(approval.changes, ["Reworded Q2 as asked."]);
   assert.deepEqual(asked.filter((a) => a.kind === "guess").map((a) => [a.number, a.of]), [[1, 1]]);
 });
+
+test("go-aheads are judged by what Flashpoint last offered", async () => {
+  const offers = async (offer, goAhead) => {
+    let n = 0;
+    const flashpoint = async () => { n += 1; return { text: n === 1 ? offer : "done" }; };
+    const { commander, asked } = desk();
+    const out = await run([ask("Write a survey", "design"), seal(), ask(goAhead, "publish"), finish], { flashpoint, commander });
+    return { gated: asked.some((a) => a.kind === "approve_send"), spent: out.spent };
+  };
+  assert.equal((await offers("Publishing will make the survey immediately live. Reply confirm.", "confirm")).gated, false);
+  assert.equal((await offers("Pushing v2 will replace the live survey immediately. Please reply confirm once more.", "Confirm.")).gated, false);
+  assert.equal((await offers("I will publish and notify the panel. Reply confirm.", "confirm")).gated, true);
+  assert.equal((await offers("I will publish it and share the link with members. Reply confirm.", "Yes, confirm")).gated, true);
+  assert.equal((await offers("Ready when you are.", "Confirmed, go ahead")).gated, true, "an unknown offer is treated as a send");
+});
+
+test("asking for results never counts as sending, and the envelope can then be opened", async () => {
+  assert.ok(!asksToSend("Please send me the results with exact counts"));
+  assert.ok(!asksToSend("Send back a summary"));
+  const out = await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Please send me the results", "results"), open(), debrief(), finish], { commander: desk().commander });
+  assert.equal(kinds(out, "opened").length, 1);
+});
+
+test("a changed survey needs the commander's approval again", async () => {
+  let fail = true;
+  const fake = fakeFlashpoint();
+  const flashpoint = { survey: async (args) => { if (/^confirm$/i.test(args.message) && fail === "next") { fail = false; throw new Error("network dropped"); } return fake.survey(args); } };
+  const { commander, asked } = desk();
+  fail = false;
+  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), { name: "wait_for_replies", input: { minutes: 1, why: "arm the failure" } }, ask("confirm", "send"), ask("Add a question about dinner", "design"), ask("confirm", "send"), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint, commander, wait: async () => { fail = "next"; } });
+  assert.equal(asked.filter((a) => a.kind === "approve_send").length, 2, "approved once before the failed send, and again after the change");
+  assert.match(seen[5], /outcome is not known: ask Flashpoint for the survey's status/);
+  assert.equal(kinds(out, "flashpoint-failed")[0].charged, false);
+});
+
+test("a failure that was charged is counted against the budget", async () => {
+  let n = 0;
+  const flashpoint = async () => { n += 1; if (n === 1) throw Object.assign(new Error("reply had no text"), { charged: true }); return { text: "ok" }; };
+  const out = await run([ask("one"), ask("two"), ask("three"), finish], { cap: 1, flashpoint });
+  assert.equal(out.spent, 1);
+  assert.equal(n, 2);
+  assert.equal(kinds(out, "flashpoint-failed")[0].charged, true);
+});
+
+test("a round cannot be abandoned with its results read and its envelope sealed", async () => {
+  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), ask("Round two", "design", { new_survey: true }), finish]);
+  await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), commander: desk().commander, wait: async () => {} });
+  assert.match(seen[6], /envelope is still sealed/);
+});

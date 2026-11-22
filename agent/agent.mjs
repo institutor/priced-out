@@ -174,12 +174,15 @@ async function realFlashpoint() {
   async function survey({ message, newSurvey }) {
     if (newSurvey) ids = {};
     const { result, receipts } = await paid("tool_survey", { brief: message, ...ids });
-    if (result?.error) throw new Error(errorText(result.error));
+    const charged = receipts.length > 0;
+    if (result?.error) throw failure(errorText(result.error), charged);
     const inner = result?.result ?? {};
-    const conversation_id = inner.conversation_id ?? result?.conversation_id;
-    ids = { ...(conversation_id ? { conversation_id } : {}), ...(inner.survey_id ?? ids.survey_id ? { survey_id: inner.survey_id ?? ids.survey_id } : {}) };
-    const text = inner.final_text ?? (typeof result === "string" ? result : JSON.stringify(result));
-    return { text, receipts };
+    // A reply with no text is not a survey step that worked, whatever else it holds.
+    if (typeof inner.final_text !== "string" || inner.final_text.trim() === "") throw failure(`Flashpoint's reply had no text: ${(typeof result === "string" ? result : JSON.stringify(result)).slice(0, 400)}`, charged);
+    const conversation_id = inner.conversation_id ?? result.conversation_id ?? ids.conversation_id;
+    const survey_id = inner.survey_id ?? ids.survey_id;
+    ids = { ...(conversation_id ? { conversation_id } : {}), ...(survey_id ? { survey_id } : {}) };
+    return { text: inner.final_text, receipts };
   }
 
   // Makes a small panel of AI personas and runs them through the current survey.
@@ -201,20 +204,28 @@ async function realFlashpoint() {
     // a plain fetch stands in for the paying one, so it could not pay if asked.
     for (let tries = 0; !summary && tries < 16; tries++) {
       await sleep(30000);
-      const handle = await connect();
-      const status = await callTool({ ...handle, paidFetch: fetch }, "panel", { action: "status", job_id });
+      let status;
+      try {
+        const handle = await connect();
+        status = await callTool({ ...handle, paidFetch: fetch }, "panel", { action: "status", job_id });
+      } catch (err) {
+        // The run was paid for when it started, whatever happens while asking about it.
+        throw failure(`Could not check on the persona run: ${err?.message ?? err}`, true);
+      }
       const state = findKey(status, "status");
       summary = findWith(status, "status_breakdown");
       if (!summary && ["failed", "interrupted"].includes(state)) throw failure(`The persona run ${state}.`, true);
     }
     if (!summary) throw failure("The persona run did not finish in 8 minutes.", true);
     const ended = summary.status_breakdown ?? {};
+    const scope = summary.analytics_scope ?? {};
     const cutOff = ended.TERMINATED ?? 0;
     const lines = [
       `SYNTHETIC rehearsal: ${summary.responses_submitted} of ${summary.total_personas} AI personas responded. These are AI personas, not people.`,
       `How their responses ended: ${JSON.stringify(ended)}.`,
       cutOff > 0 ? `${cutOff} were cut off before the end, which usually means a screening or skip rule in the survey stops people early.` : "None was cut off.",
       summary.analytics_note ?? "",
+      scope.panel_id ? `To read these answers, ask the survey agent for the results of this survey scoped to panel_id=${scope.panel_id}${scope.run_id ? ` and run_id=${scope.run_id}` : ""}, and say they are a synthetic rehearsal.` : "",
     ];
     return { text: lines.filter(Boolean).join("\n"), receipts };
   }
@@ -237,12 +248,28 @@ async function realFlashpoint() {
 
 // ---- The commander's desk: everything typed at the keyboard goes through here. ----
 
+// One typed line. Anything typed before the prompt appeared is thrown away, so a
+// key pressed during a long step cannot answer a question nobody had read yet.
 function typed(prompt, { timeoutMs = 0 } = {}) {
   return new Promise((resolve) => {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    const done = (text) => { clearTimeout(timer); rl.close(); resolve(text); };
+    const shown = Date.now();
+    let finished = false;
+    const done = (text) => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      rl.close();
+      resolve(text);
+    };
     const timer = timeoutMs > 0 ? setTimeout(() => { console.log(""); done(""); }, timeoutMs) : null;
-    rl.question(prompt, (text) => done(text.trim()));
+    rl.on("line", (text) => {
+      if (Date.now() - shown < 400) { rl.prompt(); return; }
+      done(text.trim());
+    });
+    rl.on("close", () => done("")); // Ctrl+D counts as an empty reply
+    rl.setPrompt(prompt);
+    rl.prompt();
   });
 }
 
@@ -346,8 +373,12 @@ const { answer, spent } = await runAgent({ objective, recipients, cap, orders, l
 
 let wallet = null;
 if (balanceOf) {
-  const after = await balanceOf();
-  wallet = `Wallet: ${before} USDC before, ${after} USDC after, so this run cost ${(before - after).toFixed(2)} USDC.`;
+  try {
+    const after = await balanceOf();
+    wallet = `Wallet: ${before} USDC before, ${after} USDC after, so this run cost ${(before - after).toFixed(2)} USDC.`;
+  } catch {
+    wallet = `Wallet: ${before} USDC before. The balance could not be read afterwards.`;
+  }
   console.log(`\n${wallet}`);
 }
 fs.appendFileSync(logFile, logFooter({ steps, cap, spent, wallet }));

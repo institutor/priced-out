@@ -273,11 +273,19 @@ export function unbackedNumbers(text, sources) {
 
 const saysYes = (text) => /^\W*(y|yes|yep|yeah|ok|okay|approve|approved|go|go ahead|send|send it|do it)\b/i.test(String(text ?? ""));
 const listsQuestions = (text) => text.length > 200 && (text.match(/\?/g) ?? []).length >= 2;
-const isConfirm = (text) => /^\W*confirm\W*$/i.test(text);
+// A short go-ahead: "confirm", "Yes, confirm.", "Confirmed, go ahead".
+const isConfirm = (text) => String(text).length < 80 && /^\W*(confirm(ed)?|yes|yep|ok(ay)?|proceed|go ahead|do it|approved?)\b/i.test(text);
+const SEND_WORDS = /\b(send|sent|sending|e-?mail|mail|invit|distribut|deliver|notif|share|sharing)/i;
+// What a go-ahead would do, judged from what Flashpoint last offered. Only an offer
+// that is plainly about putting the survey live, and nothing else, is not a send.
+const offersOnlyPublishing = (reply) => /\b(publish|push|live)/i.test(reply) && !SEND_WORDS.test(reply);
 // True when a message tells Flashpoint to email people now. "Names and emails" and
 // "do not send yet" do not count.
 export function asksToSend(message) {
-  const text = String(message).replace(/\b(do not|don't|not|never|without|before|until)\s+(yet\s+)?(publish(ing)?\s+(or|and)\s+)?(send|e-?mail|distribut|invit)\w*/gi, "");
+  const text = String(message)
+    .replace(/\b(do not|don't|not|never|without|before|until)\s+(yet\s+)?(publish(ing)?\s+(or|and)\s+)?(send|e-?mail|distribut|invit)\w*/gi, "")
+    .replace(/\bsend(ing)?\s+(me|us|back|over)\b/gi, "")
+    .replace(/\bsend(ing)?\s+(me\s+)?(the\s+|a\s+|an\s+)?(results?|summary|export|report|counts?|numbers|data|link|status)\b/gi, "");
   return /\b(send|sending|distribute|distributing|invite)\b/i.test(text) || /\be-?mail\s+(it|this|them|everyone|the survey|the panel|to|out)\b/i.test(text);
 }
 
@@ -353,14 +361,14 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     }
     const newSurvey = input.new_survey === true;
     if (newSurvey && owesDebrief()) return { text: DEBRIEF_FIRST, failed: true };
+    if (newSurvey && envelope && readAfterSend && !opened) return { text: "Not yet: this round's results are in and its envelope is still sealed. Open it and debrief before you start another round.", failed: true };
     if (newSurvey && started) {
       round += 1;
       started = false; draft = ""; changes = []; lastReply = ""; approved = false; sent = false; readAfterSend = false; envelope = null; opened = false; debriefed = false;
     }
     // A bare "confirm" does whatever Flashpoint last offered. Unless that was plainly
     // publishing and nothing else, treat it as a send, whatever the model called it.
-    const onlyPublishes = /publish/i.test(lastReply) && !/\b(send|sent|sending|e-?mail|invit|distribut)/i.test(lastReply);
-    const sending = input.action === "send" || asksToSend(input.message) || (isConfirm(input.message) && !onlyPublishes);
+    const sending = input.action === "send" || asksToSend(input.message) || (isConfirm(input.message) && !offersOnlyPublishing(lastReply));
     if (sending) {
       const refusal = await sendGate(input);
       if (refusal) return { text: `${refusal}\n\n${left()}`, failed: true };
@@ -377,14 +385,19 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
         if (draft === "" || listsQuestions(text)) { draft = text; changes = []; }
         else if (input.action === "design" && !/\breply\b.*\bconfirm\b/i.test(text.slice(-200)) ) changes.push(text);
       }
+      if (sent && (!sending || input.action === "results")) readAfterSend = true;
       if (sending) sent = true;
-      else if (sent) readAfterSend = true;
+      // A changed survey is a different survey: the commander approves it again.
+      else if (input.action === "design" && !sent) approved = false;
       note({ kind: "flashpoint", round, action: input.action ?? "other", why: input.why, couldChange: input.could_change ?? "", message: redact(message), reply: text, receipts: reply.receipts ?? [], price: PRICES.survey, spent });
       return { text: `${text}\n\n${left()}` };
     } catch (err) {
+      const charged = err?.charged === true;
+      if (charged) spent += PRICES.survey;
       const text = redact(err?.message ?? err);
-      note({ kind: "flashpoint-failed", round, why: input.why, message: redact(message), error: text });
-      return { text: `Flashpoint did not complete this step, and it was not charged: ${text}\n\n${left()}`, failed: true };
+      note({ kind: "flashpoint-failed", round, why: input.why, message: redact(message), error: text, charged, spent });
+      const unsure = sending ? " This step would have emailed people and its outcome is not known: ask Flashpoint for the survey's status before you try again, so that nobody is emailed twice." : "";
+      return { text: `Flashpoint did not complete this step${charged ? ", but it was charged" : ", and it was not charged"}: ${text}${unsure}\n\n${left()}`, failed: true };
     }
   }
 
