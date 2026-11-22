@@ -8,21 +8,23 @@
 import { el, svg } from "./dom.js";
 import { drawnIn, inkButton } from "./ink.js";
 import * as sketch from "../lib/sketch.js";
-import * as scene from "./scene.js";
+import * as pricedOut from "./scene.js";
 
 // When each part of the drawing starts, in milliseconds. The strip of
 // figures goes first, and everything else follows from when it ends.
 const SCENE = 250;
-const AFTER = SCENE + scene.LASTS;
-const AT = {
-  scene: SCENE,
-  ask: AFTER + 200,
-  title: AFTER + 750,
-  out: AFTER + 1500,
-  rule: AFTER + 2100,
-  note: AFTER + 1500,
-  go: AFTER + 1800,
-  settled: AFTER + 3200,
+const timesFor = (lasts) => {
+  const after = SCENE + lasts;
+  return {
+    scene: SCENE,
+    ask: after + 200,
+    title: after + 750,
+    out: after + 1500,
+    rule: after + 2100,
+    note: after + 1500,
+    go: after + 1800,
+    settled: after + 3200,
+  };
 };
 
 // The lettering needs its two typefaces before it can be measured. If they
@@ -55,7 +57,7 @@ function writeOut(node, starts) {
 // Each letter is its own piece of text, so each can be drawn in turn. The
 // first word is pencilled and then inked solid. The second is left as the
 // pencil drawing: it is the one that is out.
-function drawTitle(title) {
+function drawTitle(title, AT, solidWords) {
   const text = title.textContent.trim();
   const stage = svg("svg", { class: "art title-art", "aria-hidden": "true", focusable: "false" });
   const inkProbe = svg("text", { class: "t-solid", x: 0, y: 0, text });
@@ -63,7 +65,12 @@ function drawTitle(title) {
   stage.append(inkProbe, pencilProbe);
   title.replaceChildren(el("span", { class: "visually-hidden", text }), stage);
 
-  const firstWordEnds = text.indexOf(" ") === -1 ? text.length : text.indexOf(" ");
+  // Where the inked words end: after the first word, unless told otherwise.
+  let firstWordEnds = -1;
+  for (let word = 0; word < solidWords; word++) {
+    const next = text.indexOf(" ", firstWordEnds + 1);
+    firstWordEnds = next === -1 ? text.length : next;
+  }
   const pencilled = [];
   const inked = [];
   let drawn = 0;
@@ -90,7 +97,10 @@ function drawTitle(title) {
   return stage;
 }
 
-export async function mount(root) {
+// `scene` is the strip of figures to draw (its draw, LASTS and NARROW), and
+// `solidWords` how many words of the title are inked; the rest stay pencil.
+export async function mount(root, { scene = pricedOut, solidWords = 1 } = {}) {
+  const AT = timesFor(scene.LASTS);
   const strip = root.querySelector(".scene");
   const ask = root.querySelector(".cover-ask");
   const title = root.querySelector(".title");
@@ -104,7 +114,7 @@ export async function mount(root) {
   const drawStrip = () => scene.draw(strip, { start: AT.scene, narrow: Boolean(narrow?.matches) });
   let lines = strip ? drawStrip() : null;
   if (ask) writeOut(ask, AT.ask);
-  const stage = drawTitle(title);
+  const stage = drawTitle(title, AT, solidWords);
   if (note) wait(note, AT.note);
   if (go) {
     wait(go, AT.go);

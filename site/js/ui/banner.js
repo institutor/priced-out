@@ -10,7 +10,7 @@ import * as sketch from "../lib/sketch.js";
 // same thing in fewer words. A second pen goes over that line as the page is
 // read, as far along it as the reader is down the page. `change` adds a link
 // to the part of the page where other answers can be loaded.
-function strip(className, lead, text, short, { change = false } = {}) {
+export function strip(className, lead, text, short, { change = false } = {}) {
   const link = change ? [" ", el("a", { href: "#yours", text: "Change" })] : [];
   const node = el("div", { class: className, role: "status" },
     el("p", {}, el("strong", { text: lead }), el("span", { class: "long", text }), el("span", { class: "short", text: short }), link),

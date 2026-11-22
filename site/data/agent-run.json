@@ -1,76 +1,62 @@
 {
- "objective": "We want more members at our weekly meetings. What is the one change that would bring the most people back?",
+ "objective": "Figure out the best event to put on for our club next spring.",
  "mode": "practice",
  "model": "claude-sonnet-5-5",
- "cap": 8,
+ "cap": 9,
  "emailLimit": 2,
  "orders": [
   "Check with me before any email goes out.",
   "Come to me if the answers split evenly and you cannot call it.",
   "Tell me what you learned before you start a second round."
  ],
- "people": 3,
- "stamp": "2026-11-22T06-34-33",
+ "people": 8,
+ "stamp": "2026-11-22T09-03-06",
  "practiceCommander": true,
+ "standInCommander": true,
+ "handsOff": false,
+ "memory": [],
  "steps": [
   {
    "n": 1,
-   "at": "2026-11-22T06:34:36.907Z",
-   "kind": "thinking",
-   "text": "I'm deciding what the candidate changes are. The commander knows the club, so I'll ask them before I write the survey."
+   "at": "2026-11-22T09:03:14.032Z",
+   "kind": "plan",
+   "first": true,
+   "needToKnow": [
+    "Which event type members prefer for spring",
+    "What would make them attend (timing, cost, format)",
+    "Any local constraints the commander knows"
+   ],
+   "hunches": [
+    "A social outdoor event (picnic/field day) beats formal options, since it is low-effort"
+   ],
+   "wouldChange": "Strong preference for a different format, or ranking showing indoor/skill events on top",
+   "surveyIdea": "One survey to all 8, ~5 questions: rank 4-5 event options, preferred weekday/time, max cost, open-ended why/ideas. Opening line mentions one short follow-up may come.",
+   "budget": "~$2.50 per round; round 1 survey, optional short follow-up as second email; keep money to read results."
   },
   {
    "n": 2,
-   "at": "2026-11-22T06:34:36.909Z",
-   "kind": "commander",
-   "order": null,
-   "why": "Their reply sets the answer options so the survey tests real, feasible changes.",
-   "message": "Before I draft the survey: which 3-5 changes are you actually considering for the weekly meetings (e.g. different day/time, new venue, shorter meetings, food, more activities)? Also, is there a reason you suspect people stopped coming?",
-   "reply": "Nobody is at the keyboard for this practice run. Use your own judgement and carry on."
-  },
-  {
-   "n": 3,
-   "at": "2026-11-22T06:34:47.283Z",
+   "at": "2026-11-22T09:03:27.655Z",
    "kind": "flashpoint",
    "round": 1,
    "action": "design",
-   "why": "Get a draft to review before anything is sent.",
-   "couldChange": "The wording and options of the survey I send.",
-   "message": "Make a panel from [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>. Draft (do not publish or send yet) a short survey. Opening line: we want more people at our weekly meetings; this is a short survey and one short follow-up may come later. Questions: 1) Which ONE change would most make you come to more weekly meetings? (single choice: different day; different start time; better/closer venue; shorter meetings; more social time/food; more interesting content/activities; other - please say) 2) In a sentence, why? (free text) 3) How many of the last 4 meetings did you attend? (0,1,2,3,4). No skip logic. Show me the full survey.",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 1.\n\nPanel: 3 members.\n\n| Label | Type | Text | Answer options |\n|---|---|---|---|\n| Intro | Display (no answer) | We want more people at our weekly meetings. This is a short survey, and one short follow-up may come later. | None |\n| Q1 | Single choice | Which ONE change would most make you come to more weekly meetings? | Different day / Different start time / Better or closer venue / Shorter meetings / More social time or food / More interesting content or activities / Other (please say) |\n| Q2 | Free text | In a sentence, why? | Open text |\n| Q3 | Single choice | How many of the last 4 meetings did you attend? | 0 / 1 / 2 / 3 / 4 |\n\nValidation: 0 blockers. Survey 1 is saved as a draft and has not been published or sent.\nIt is not published. Reply confirm to publish it.",
+   "why": "Draft survey for review",
+   "couldChange": "Determines the event recommendation",
+   "message": "Make a panel from [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>\n[person 4] <[recipient 4]>\n[person 5] <[recipient 5]>\n[person 6] <[recipient 6]>\n[person 7] <[recipient 7]>\n[person 8] <[recipient 8]>: 8 members of our club who agreed to be surveyed. Draft a short survey (do not publish or send yet). Opening line: we're choosing the club's spring event; one short follow-up may come. Questions: 1) Rank these events from most to least preferred: outdoor picnic/field day; workshop or skill session; social evening (dinner/games); day trip/outing; volunteer/community project. 2) Best time: weekday evening, Saturday daytime, Sunday daytime, no preference. 3) Most you'd pay: free, up to $10, up to $25, more than $25. 4) Open: what would make you definitely come to a spring event, or any other idea? Show full wording of every question and every option.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 1.\n\nThe panel has 8 members.\n\n| Label | Type | Question text | Answer options |\n|---|---|---|---|\n| Intro | Statement | We're choosing the club's spring event; one short follow-up may come. | None |\n| Q1 | Ranking | Rank these events from most to least preferred. | Outdoor picnic/field day; Workshop or skill session; Social evening (dinner/games); Day trip/outing; Volunteer/community project |\n| Q2 | Single choice | What is the best time for you? | Weekday evening; Saturday daytime; Sunday daytime; No preference |\n| Q3 | Single choice | The most you'd pay: | Free; Up to $10; Up to $25; More than $25 |\n| Q4 | Open text | What would make you definitely come to a spring event, or any other idea? | Free-text response |\n\nValidation: 0 blockers.\nIt is not published. Reply confirm to publish it.",
    "receipts": [],
    "price": 0.5,
    "spent": 0.5,
    "emailed": false
   },
   {
-   "n": 4,
-   "at": "2026-11-22T06:34:49.550Z",
-   "kind": "sealed",
-   "round": 1,
-   "why": "Main question of the mission.",
-   "hash": "b0bf411f80d47e3a1278bc6568c0706b2c52aa1dbe2ec6c62fc8c6262c056797",
-   "questions": [
-    "Which ONE change would most make you come to more weekly meetings?"
-   ],
-   "commanderGuessed": 0
-  },
-  {
-   "n": 5,
-   "at": "2026-11-22T06:34:50.802Z",
-   "kind": "send-approved",
-   "round": 1,
-   "reply": "yes"
-  },
-  {
-   "n": 6,
-   "at": "2026-11-22T06:34:50.802Z",
+   "n": 3,
+   "at": "2026-11-22T09:03:30.241Z",
    "kind": "flashpoint",
    "round": 1,
    "action": "publish",
-   "why": "Publish survey.",
-   "couldChange": "Whether the survey can be sent.",
-   "message": "confirm publish (publish only; do not send)",
+   "why": "Publish",
+   "couldChange": "Enables send",
+   "message": "confirm publish. I approve publishing with no quotas and no fraud screening.",
    "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nPublishing survey 1 makes it live. Reply confirm to publish it.",
    "receipts": [],
    "price": 0.5,
@@ -78,13 +64,26 @@
    "emailed": false
   },
   {
-   "n": 7,
-   "at": "2026-11-22T06:34:52.116Z",
+   "n": 4,
+   "at": "2026-11-22T09:03:31.969Z",
+   "kind": "sealed",
+   "round": 1,
+   "why": "Main decision is event type and cost",
+   "hash": "6fce0a4ac9c1ec9867ddf9d56883f74b8be0fd61f961a936f9bfdc52138ddfcf",
+   "questions": [
+    "Which event is ranked most preferred?",
+    "Most you'd pay?"
+   ],
+   "commanderGuessed": 2
+  },
+  {
+   "n": 5,
+   "at": "2026-11-22T09:03:33.483Z",
    "kind": "flashpoint",
    "round": 1,
    "action": "publish",
-   "why": "Complete publish.",
-   "couldChange": "Whether the survey can be sent.",
+   "why": "Finish publish",
+   "couldChange": "Enables send",
    "message": "confirm",
    "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 1 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
    "receipts": [],
@@ -93,13 +92,20 @@
    "emailed": false
   },
   {
-   "n": 8,
-   "at": "2026-11-22T06:34:59.008Z",
+   "n": 6,
+   "at": "2026-11-22T09:03:35.239Z",
+   "kind": "send-approved",
+   "round": 1,
+   "reply": "yes"
+  },
+  {
+   "n": 7,
+   "at": "2026-11-22T09:03:45.971Z",
    "kind": "flashpoint",
    "round": 1,
    "action": "send",
-   "why": "Send survey 1 to the panel; the commander approval screen will appear.",
-   "couldChange": "Whether I get real answers.",
+   "why": "Send survey to panel (commander approval screen applies)",
+   "couldChange": "Gets real answers",
    "message": "confirm",
    "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 1 was emailed to every panel member who can receive it.",
    "receipts": [],
@@ -108,74 +114,89 @@
    "emailed": true
   },
   {
-   "n": 9,
-   "at": "2026-11-22T06:34:59.988Z",
+   "n": 8,
+   "at": "2026-11-22T09:03:47.492Z",
    "kind": "wait",
-   "why": "Give members time to answer.",
-   "minutes": 10
+   "why": "Allow responses",
+   "minutes": 30
   },
   {
-   "n": 10,
-   "at": "2026-11-22T06:35:04.255Z",
+   "n": 9,
+   "at": "2026-11-22T09:03:55.826Z",
    "kind": "flashpoint",
    "round": 1,
    "action": "results",
-   "why": "Read responses.",
-   "couldChange": "Whether I recommend a change or need a follow-up.",
-   "message": "Show results for survey 1: counts for each question and all free-text answers.",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 1 results** (3 responses; draft, not published or sent)\n\n**Intro:** Display only, no answer.\n\n**Q1: Which ONE change would most make you come to more weekly meetings?** (3 answered)\n\n| Answer option | Count |\n|---|---|\n| Different day | 0 |\n| Different start time | 0 |\n| Better or closer venue | 1 |\n| Shorter meetings | 1 |\n| More social time or food | 0 |\n| More interesting content or activities | 1 |\n| Other (please say) | 0 |\n\n**Q2: In a sentence, why?** (3 answered, open text, quoted in full)\n\n- **Respondent 1:** \"I like the people and the work we do, but the sessions can feel samey, and I'd come more if there was more variety.\"\n- **Respondent 2:** \"I work evenings and the bus fare adds up, so a closer place would make it much easier to come.\"\n- **Respondent 3:** \"A weekly commitment is hard to keep up with alongside everything else, so when I'm unsure I can make it, I tend to let it slide.\"\n\n**Q3: How many of the last 4 meetings did you attend?** (3 answered)\n\n| Answer option | Count |\n|---|---|\n| 0 | 1 |\n| 1 | 0 |\n| 2 | 1 |\n| 3 | 1 |\n| 4 | 0 |",
+   "why": "Read answers",
+   "couldChange": "Event recommendation",
+   "message": "Show results for survey 1: counts for each question, average rank per event, and the open answers word for word.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 1: Spring event (8 responses)**\n\n**Answered:** Q1: 8 · Q2: 8 · Q3: 8 · Q4: 8\n\n**Q1: Average rank per event** (1 = most preferred, 5 = least preferred; 8 rankings)\n\n| Event | Average rank | Sum of ranks |\n|---|---|---|\n| Outdoor picnic/field day | 2.00 | 16 |\n| Day trip/outing | 2.25 | 18 |\n| Workshop or skill session | 2.75 | 22 |\n| Volunteer/community project | 3.25 | 26 |\n| Social evening (dinner/games) | 4.75 | 38 |\n\n**Q2: Best time**\n\n| Option | Count |\n|---|---|\n| Weekday evening | 0 |\n| Saturday daytime | 8 |\n| Sunday daytime | 0 |\n| No preference | 0 |\n\n**Q3: Most you'd pay**\n\n| Option | Count |\n|---|---|\n| Free | 3 |\n| Up to $10 | 2 |\n| Up to $25 | 2 |\n| More than $25 | 1 |\n\n**Q4: Open answers (verbatim)**\n\n- **Respondent 1:** A small, relaxed outdoor get-together with a few people would suit me better than a big group night. I'm glad to help plan it if it stays low-key.\n- **Respondent 2:** A proper skill session with a good instructor would get me there, and I'd pay for it. Free events make it feel like nobody values the time, so I'd rather pay for something worth doing.\n- **Respondent 3:** Childcare is what keeps me away, so a free event with kids welcome, or some childcare offered, would bring me in. I can't really afford anything with a cost right now.\n- **Respondent 4:** I'd suggest we skip the big spring event this year and put that budget toward a member who's struggling financially. Let's talk about that before we book anything.\n- **Respondent 5:** A spring volunteer project day would get me out. Social evenings feel awkward as a newer member, but I'd like to hear what others want too.\n- **Respondent 6:** Anything outdoors I'd come to. Money is tight right now, so keeping it free or close to it would help, and something without a sit-down meal would make it easier for me to show up.\n- **Respondent 7:** Please avoid Sundays, since my church commitments make them impossible. Day trips are my favourite, so a spring outing on a Saturday would be lovely.\n- **Respondent 8:** I'd come to a spring trip if the club shows clearly where any money goes. I'd also like to propose a paid annual trip, if others are open to that idea.",
    "receipts": [],
    "price": 0.5,
    "spent": 2.5,
    "emailed": false
   },
   {
-   "n": 11,
-   "at": "2026-11-22T06:35:06.148Z",
+   "n": 10,
+   "at": "2026-11-22T09:03:58.552Z",
    "kind": "opened",
    "round": 1,
-   "hash": "b0bf411f80d47e3a1278bc6568c0706b2c52aa1dbe2ec6c62fc8c6262c056797",
+   "hash": "6fce0a4ac9c1ec9867ddf9d56883f74b8be0fd61f961a936f9bfdc52138ddfcf",
    "intact": true,
    "rows": [
     {
-     "question": "Which ONE change would most make you come to more weekly meetings?",
-     "people_said": "3 responses, split 1-1-1: better/closer venue 1, shorter meetings 1, more interesting content/activities 1; others 0.",
-     "agent": "Different start time or day (scheduling is the commonest barrier); no strong consensus with 3 people.",
+     "question": "Which event is ranked most preferred?",
+     "people_said": "Outdoor picnic/field day avg rank 2.00, day trip 2.25, workshop 2.75, volunteer 3.25, social evening last at 4.75 (8 responses)",
+     "agent": "Social evening or picnic leads; low effort and social",
      "personas": null,
-     "commander": null
+     "commander": "Our members have been asking for more hands-on stuff, so I'd guess a skills workshop or a hackathon-style event will top the list. My reason is that it's what came up most in casual conversation and at our last general meeting."
+    },
+    {
+     "question": "Most you'd pay?",
+     "people_said": "Free 3, up to $10 2, up to $25 2, more than $25 1",
+     "agent": "Up to $10 most common",
+     "personas": null,
+     "commander": "I'd guess most members would pay around $5 to $10, since we're a student club and most people are watching their budget, and anything above that tends to get fewer sign-ups."
     }
    ]
   },
   {
+   "n": 11,
+   "at": "2026-11-22T09:04:01.780Z",
+   "kind": "challenge",
+   "round": 1,
+   "stillUnknown": "Whether a free outdoor picnic or a day trip is preferred once cost and transport are considered; whether to skip the event.",
+   "reason": "Direction is clear enough: free Saturday outdoor event. A follow-up could split picnic vs trip but picnic is already ahead and free fits budget constraints; I'll leave that to the commander."
+  },
+  {
    "n": 12,
-   "at": "2026-11-22T06:35:09.452Z",
-   "kind": "commander",
-   "order": "Come to me if the answers split evenly and you cannot call it. / Tell me what you learned before you start a second round.",
-   "why": "Standing orders require reporting a split and my learnings before round 2.",
-   "message": "Round 1 (3 of 3 answered) split three ways: closer venue 1, shorter meetings 1, more varied content 1. Nobody picked day or time, which I had guessed. Free text: one finds sessions samey, one has bus-fare cost, one finds a weekly commitment hard and lets it slide. Common thread: the weekly commitment and effort of attending. I can't call a single winner. Plan: one short follow-up (3 questions max) asking which of those three they'd pick if only one could happen, and whether a lighter option (e.g. drop-in/flexible attendance) would help. Or I can stop here and report the split. Any objection?",
-   "reply": "Nobody is at the keyboard for this practice run. Use your own judgement and carry on."
+   "at": "2026-11-22T09:04:06.591Z",
+   "kind": "debrief",
+   "round": 1,
+   "whoWasWrong": "I was wrong: social evening ranked last, and price was split not clustered at $10. Commander was wrong too: workshop came third, not first.",
+   "surprise": "All 8 chose Saturday daytime; money hardship came up repeatedly, and one member proposed skipping the event.",
+   "stillUnknown": "Picnic vs day trip when cost and transport matter; support for skipping the event and redirecting funds.",
+   "nextMove": "another_round",
+   "reason": "Short follow-up of 3 questions: ask about a free Saturday picnic vs a subsidised day trip vs skipping the event, and what would block attendance."
   },
   {
    "n": 13,
-   "at": "2026-11-22T06:35:11.911Z",
-   "kind": "debrief",
-   "round": 1,
-   "whoWasWrong": "I was wrong: I guessed day/time; nobody chose either. Commander and personas gave no guess.",
-   "surprise": "A three-way tie, and the free text points to attendance friction (cost, commitment, variety) rather than scheduling.",
-   "stillUnknown": "Which of venue, length or variety matters most when forced to rank, and whether flexible attendance would help.",
-   "nextMove": "another_round",
-   "reason": "One short follow-up forcing a ranking among the three named changes, plus the flexible-attendance idea, could break the tie."
+   "at": "2026-11-22T09:04:08.914Z",
+   "kind": "commander",
+   "order": "Tell me what you learned before you start a second round.",
+   "why": "Required update before round 2; commander may add local knowledge.",
+   "message": "Round 1 (8 of 8 answered): outdoor picnic/field day ranked first (avg 2.0), day trip second (2.25), workshop third (2.75), volunteer 4th, social evening last (4.75). All 8 want Saturday daytime. Cost split: free 3, ≤$10 2, ≤$25 2, >$25 1. Several say money is tight, one has childcare needs, and one suggests skipping the event to help a struggling member. Your workshop guess came third. I plan a 3-question follow-up: free picnic vs subsidised day trip vs skip/redirect funds, plus what would block attendance.",
+   "reply": "That lines up with what I'd expect. A free picnic is the easiest sell since money is tight for a lot of us, and the childcare point is real: we've lost people before because a Saturday event had no kid-friendly option. The idea of skipping the event to help a struggling member is worth taking seriously, but we don't have much slack in the budget, so I'd be careful about treating it as either/or."
   },
   {
    "n": 14,
-   "at": "2026-11-22T06:35:18.762Z",
+   "at": "2026-11-22T09:04:16.164Z",
    "kind": "flashpoint",
    "round": 2,
    "action": "design",
-   "why": "Draft follow-up to break the tie.",
-   "couldChange": "Which single change I recommend.",
-   "message": "Using [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>, draft (do not publish or send yet) a new short follow-up survey. Opening line: This is the short follow-up to our earlier survey; it's worth a minute because answers were split three ways and yours will break the tie. Questions: 1) If only ONE of these could happen, which would you most want? (single choice: a closer/easier-to-reach venue; shorter meetings; more variety in what we do; a flexible drop-in option with no weekly commitment). 2) Which of those would you least care about? (same four options, single choice). 3) Anything else that would make it easy to come? (free text, optional). No skip logic. Show the full survey.",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 2.\n\nPanel: 3 members.\n\n| Label | Type | Question text | Answer options |\n|---|---|---|---|\n| Intro | Statement | This is the short follow-up to our earlier survey; it's worth a minute because answers were split three ways and yours will break the tie. | None |\n| Q1 | Single choice | If only ONE of these could happen, which would you most want? | A closer/easier-to-reach venue; Shorter meetings; More variety in what we do; A flexible drop-in option with no weekly commitment |\n| Q2 | Single choice | Which of those would you least care about? | A closer/easier-to-reach venue; Shorter meetings; More variety in what we do; A flexible drop-in option with no weekly commitment |\n| Q3 | Free text (optional) | Anything else that would make it easy to come? | Open text entry; not required |\n\nValidation: 0 blockers.\nIt is not published. Reply confirm to publish it.",
+   "why": "Draft follow-up",
+   "couldChange": "Final choice of event format",
+   "message": "New survey for the same panel [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>\n[person 4] <[recipient 4]>\n[person 5] <[recipient 5]>\n[person 6] <[recipient 6]>\n[person 7] <[recipient 7]>\n[person 8] <[recipient 8]> (8 club members). Draft only, do not publish or send. Opening line: this is the short follow-up to the spring event survey; one minute, it helps us decide. Questions: 1) Which would you most prefer? Free Saturday picnic with kids welcome; Saturday day trip with a modest cost partly covered by the club; Smaller low-cost event plus club funds set aside to help members in financial need; No big spring event, put the budget toward helping members in need. 2) Which of these would most likely stop you coming to a Saturday event? Cost; Childcare; Transport; Weather; Nothing would stop me. 3) Open: anything the club should do so more members can take part? Show full wording of every question and option.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 2.\n\nThe panel has 8 members.\n\n| Label | Type | Question text | Answer options |\n|---|---|---|---|\n| Intro | Display text | This is the short follow-up to the spring event survey; one minute, it helps us decide. | None |\n| Q1 | Single choice | Which would you most prefer? | Free Saturday picnic with kids welcome; Saturday day trip with a modest cost partly covered by the club; Smaller low-cost event plus club funds set aside to help members in financial need; No big spring event, put the budget toward helping members in need |\n| Q2 | Single choice | Which of these would most likely stop you coming to a Saturday event? | Cost; Childcare; Transport; Weather; Nothing would stop me |\n| Q3 | Open text | Is there anything the club should do so more members can take part? | Free text |\n\nValidation: 0 blockers.\nIt is not published. Reply confirm to publish it.",
    "receipts": [],
    "price": 0.5,
    "spent": 3,
@@ -183,132 +204,185 @@
   },
   {
    "n": 15,
-   "at": "2026-11-22T06:35:21.321Z",
-   "kind": "sealed",
-   "round": 2,
-   "why": "Main round 2 question.",
-   "hash": "3a56555fca2a65078b5ac9c1ae1eaea02ff5581bd89854638fc784e32a1d8433",
-   "questions": [
-    "If only ONE of these could happen, which would you most want?"
-   ],
-   "commanderGuessed": 0
-  },
-  {
-   "n": 16,
-   "at": "2026-11-22T06:35:21.322Z",
+   "at": "2026-11-22T09:04:19.089Z",
    "kind": "flashpoint",
    "round": 2,
    "action": "publish",
-   "why": "Publish survey 2.",
-   "couldChange": "Whether it can be sent.",
-   "message": "confirm",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
+   "why": "Publish",
+   "couldChange": "Enables send",
+   "message": "confirm publish. I approve publishing with no quotas and no fraud screening.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nPublishing survey 2 makes it live. Reply confirm to publish it.",
    "receipts": [],
    "price": 0.5,
    "spent": 3.5,
    "emailed": false
   },
   {
+   "n": 16,
+   "at": "2026-11-22T09:04:20.810Z",
+   "kind": "sealed",
+   "round": 2,
+   "why": "Decides format and barriers",
+   "hash": "7fb470b358b069f228a943e59bcfadf61e895e515c8b07d818518610acc41acd",
+   "questions": [
+    "Which would you most prefer: free picnic, subsidised day trip, small event plus aid fund, or no event with budget to aid?",
+    "What would most likely stop you coming?"
+   ],
+   "commanderGuessed": 2
+  },
+  {
    "n": 17,
-   "at": "2026-11-22T06:35:22.734Z",
+   "at": "2026-11-22T09:04:22.448Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "publish",
+   "why": "Finish publish",
+   "couldChange": "Enables send",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 4,
+   "emailed": false
+  },
+  {
+   "n": 18,
+   "at": "2026-11-22T09:04:24.105Z",
    "kind": "send-approved",
    "round": 2,
    "reply": "yes"
   },
   {
-   "n": 18,
-   "at": "2026-11-22T06:35:28.453Z",
+   "n": 19,
+   "at": "2026-11-22T09:04:33.805Z",
    "kind": "flashpoint",
    "round": 2,
    "action": "send",
-   "why": "Send follow-up (2nd and last email).",
-   "couldChange": "Whether I get tie-breaking answers.",
+   "why": "Send follow-up",
+   "couldChange": "Gets real answers",
    "message": "confirm",
    "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 was emailed to every panel member who can receive it.",
    "receipts": [],
    "price": 0.5,
-   "spent": 4,
+   "spent": 4.5,
    "emailed": true
   },
   {
-   "n": 19,
-   "at": "2026-11-22T06:35:29.400Z",
-   "kind": "wait",
-   "why": "Allow time to answer.",
-   "minutes": 10
-  },
-  {
    "n": 20,
-   "at": "2026-11-22T06:35:33.247Z",
-   "kind": "flashpoint",
-   "round": 2,
-   "action": "results",
-   "why": "Read follow-up.",
-   "couldChange": "The recommendation.",
-   "message": "Show results for survey 2: counts per question and all free-text answers.",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 2 results (3 respondents, 3 answered)**\n\n**Q1: If only ONE of these could happen, which would you most want?**\n\n| Answer option | Count |\n|---|---|\n| A closer/easier-to-reach venue | 1 |\n| Shorter meetings | 0 |\n| More variety in what we do | 1 |\n| A flexible drop-in option with no weekly commitment | 1 |\n| **Total answered** | **3** |\n\n**Q2: Which of those would you least care about?**\n\n| Answer option | Count |\n|---|---|\n| A closer/easier-to-reach venue | 1 |\n| Shorter meetings | 1 |\n| More variety in what we do | 1 |\n| A flexible drop-in option with no weekly commitment | 0 |\n| **Total answered** | **3** |\n\n**Q3: Anything else that would make it easy to come? (optional)**\n\n3 answered.\n\n- Respondent 1: \"A regular schedule and an agenda sent ahead would help me plan around work and set-up duties.\"\n- Respondent 2: \"A venue on a bus route I already use, or something free, and times that don't clash with my evening shifts.\"\n- Respondent 3: \"Nothing specific that I can think of. I'm fine with how things are.\"",
-   "receipts": [],
-   "price": 0.5,
-   "spent": 4.5,
-   "emailed": false
+   "at": "2026-11-22T09:04:35.042Z",
+   "kind": "wait",
+   "why": "Allow responses",
+   "minutes": 30
   },
   {
    "n": 21,
-   "at": "2026-11-22T06:35:34.499Z",
+   "at": "2026-11-22T09:04:41.658Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "results",
+   "why": "Read answers",
+   "couldChange": "Final recommendation",
+   "message": "Show results for survey 2: counts per question and open answers word for word.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 2: Results**\n\n**Answered:** 8 of 8 panel members responded to Q1, Q2, and Q3.\n\n**Q1: Which would you most prefer?**\n\n| Answer option | Count |\n|---|---|\n| Free Saturday picnic with kids welcome | 2 |\n| Saturday day trip with a modest cost partly covered by the club | 3 |\n| Smaller low-cost event plus club funds set aside to help members in financial need | 2 |\n| No big spring event, put the budget toward helping members in need | 1 |\n| **Total** | **8** |\n\n**Q2: Which of these would most likely stop you coming to a Saturday event?**\n\n| Answer option | Count |\n|---|---|\n| Cost | 4 |\n| Childcare | 1 |\n| Transport | 0 |\n| Weather | 0 |\n| Nothing would stop me | 3 |\n| **Total** | **8** |\n\n**Q3: Is there anything the club should do so more members can take part?** (open text, 8 responses, verbatim)\n\n- **Respondent 1:** \"Maybe rotate who gets invited to the smaller get-togethers so it doesn't always feel like the same group.\"\n- **Respondent 2:** \"Offer a paid skill session with real instructors. People will pay for things they value, and it would be nice to see the club do that.\"\n- **Respondent 3:** \"A kids' corner or some childcare at events would let parents actually join. I'd be glad to help set that up if the club wants.\"\n- **Respondent 4:** \"We should ask whether this year's spring event is the best use of the budget, and whether that money would do more for a member who is struggling.\"\n- **Respondent 5:** \"Make more room for volunteer days and service projects. They're easier to join as a newer member than social evenings.\"\n- **Respondent 6:** \"Keep some outdoor events free, with no pressure to contribute, so nobody has to explain why they can't chip in.\"\n- **Respondent 7:** \"Please keep the main events on Saturdays and avoid Sundays. I've said \"no preference\" for years, but church makes Sundays impossible for me.\"\n- **Respondent 8:** \"Consider a paid annual trip with a clear breakdown of where the money goes. I think more people would pay more if they could see what it covers, though I'm not sure everyone would agree.\"",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 5,
+   "emailed": false
+  },
+  {
+   "n": 22,
+   "at": "2026-11-22T09:04:47.632Z",
+   "kind": "commander",
+   "order": "Come to me if the answers split evenly and you cannot call it.",
+   "why": "Split is close; commander knows the budget.",
+   "message": "Round 2 split: day trip with club-subsidised cost 3, free picnic 2, small event plus aid fund 2, skip event 1. Cost is the top barrier (4), childcare 1, nothing 3. Round 1 had picnic first, day trip second, all Saturday. My call: a Saturday outdoor event, free or nearly free, kids welcome, with the club covering any trip costs. I'd pick a local outdoor day outing, or a picnic if the budget is tight, and set aside a small aid amount. Does that fit your budget, or do you want to decide between picnic and trip yourself?",
+   "reply": "Cost is our real limit, so the picnic is the safer choice, but I'd want the aid fund kept small and the club only covering trip costs if the treasurer confirms we have the money. I'll leave the final pick between picnic and day trip to the committee, so send me a rough cost for each and I'll bring it to the next meeting."
+  },
+  {
+   "n": 23,
+   "at": "2026-11-22T09:04:49.656Z",
    "kind": "opened",
    "round": 2,
-   "hash": "3a56555fca2a65078b5ac9c1ae1eaea02ff5581bd89854638fc784e32a1d8433",
+   "hash": "7fb470b358b069f228a943e59bcfadf61e895e515c8b07d818518610acc41acd",
    "intact": true,
    "rows": [
     {
-     "question": "If only ONE of these could happen, which would you most want?",
-     "people_said": "3 responses, split 1-1-1: closer venue 1, more variety 1, flexible drop-in 1, shorter meetings 0.",
-     "agent": "Another split, likely with flexible drop-in or venue edging ahead; 3 people can't give a clear winner.",
+     "question": "Which would you most prefer: free picnic, subsidised day trip, small event plus aid fund, or no event with budget to aid?",
+     "people_said": "Subsidised day trip 3, free picnic 2, small event plus aid fund 2, no event 1 (8 responses)",
+     "agent": "Free picnic most common (~3-4 of 8), aid-fund option second; money is tight",
      "personas": null,
-     "commander": null
+     "commander": "Most members will probably pick the free picnic, since it's simple, low-commitment, and everyone gets something right away without having to think about trade-offs. The aid fund option may draw some support from members who care about the cause, but it's less likely to win a plurality."
+    },
+    {
+     "question": "What would most likely stop you coming?",
+     "people_said": "Cost 4, nothing 3, childcare 1, transport 0, weather 0",
+     "agent": "Cost most common, then childcare",
+     "personas": null,
+     "commander": "Most members would probably say the timing or a clash with exams or part-time work, since our meetings have tended to land on busy weeknights. A close second would be not knowing anyone there, because a lot of people are new and quiet at the first event."
     }
    ]
   },
   {
-   "n": 22,
-   "at": "2026-11-22T06:35:37.127Z",
+   "n": 24,
+   "at": "2026-11-22T09:04:59.553Z",
    "kind": "debrief",
    "round": 2,
-   "whoWasWrong": "I was partly right (another split) but wrong in round 1 on day/time. Commander and personas gave no guesses.",
-   "surprise": "Shorter meetings dropped to 0 as first choice, and respondents shifted their choice between rounds; no single change wins.",
-   "stillUnknown": "Whether the pattern holds in the wider membership; this panel is only 3 people, and no further emails are allowed.",
+   "whoWasWrong": "Me: picnic got 2, not 3-4; day trip led. Commander was wrong on picnic as leader and on timing as barrier (cost led; timing was not an option offered). I was right on cost as top barrier.",
+   "surprise": "Day trip edged ahead of the picnic once cost-sharing was offered; opinion is genuinely split.",
+   "stillUnknown": "Actual costs of picnic and trip, and treasurer's budget.",
    "nextMove": "finish",
-   "reason": "Everyone has had their 2 emails, so no further survey is possible. The split can't be broken with this panel."
+   "reason": "Both emails are used up for everyone; the remaining decision depends on costs and budget the commander holds."
   },
   {
-   "n": 23,
-   "at": "2026-11-22T06:35:43.248Z",
+   "n": 25,
+   "at": "2026-11-22T09:04:59.555Z",
    "kind": "finish",
-   "recommendation": "The survey did not find one winning change. With 3 people, answers split evenly in both rounds. If you must pick one, make attending easier: a closer or easier-to-reach venue, or a flexible drop-in option. These match what people wrote about bus fares, evening shifts and finding a weekly commitment hard. Shorter meetings looks like the weakest idea, and nobody asked for a different day or time.",
-   "evidence": "Round 1 (3 of 3 answered): closer venue 1, shorter meetings 1, more interesting content 1, day/time 0. Attendance in the last 4 meetings: 0 for one person, 2 for one, 3 for one. Round 2 (3 of 3 answered): most wanted was closer venue 1, more variety 1, flexible drop-in 1, shorter meetings 0. Least cared about: venue 1, shorter meetings 1, variety 1, drop-in 0. Free text: bus fares and shifts; an agenda sent ahead and a regular schedule; one person was happy as things are.",
+   "recommendation": "Hold a Saturday daytime outdoor event with kids welcome, and keep it free or very cheap. A free picnic or field day is the safe choice, because cost is the main barrier. A club-subsidised day trip is a close alternative that members like, if the treasurer confirms the money. Keep any aid fund small. The committee should choose between picnic and trip once rough costs are known.",
+   "evidence": "Round 1 (8 of 8 answered): average rank was picnic 2.00, day trip 2.25, workshop 2.75, volunteer project 3.25, social evening 4.75. All 8 chose Saturday daytime. Maximum price: free 3, up to $10 2, up to $25 2, over $25 1. Round 2 (8 of 8): subsidised day trip 3, free picnic 2, small event plus aid fund 2, skip the event 1. Biggest barrier: cost 4, nothing 3, childcare 1. Open answers asked for no Sundays, childcare or a kids' corner, free outdoor options, and volunteer days. Every number is from the Flashpoint tool, which labelled itself a practice stand-in with invented answers.",
    "scoreboard": [
     {
      "round": 1,
-     "question": "Which ONE change would most make you come to more weekly meetings?",
-     "people_said": "Split 1-1-1: venue, shorter meetings, content. Day and time got 0.",
-     "agent": "wrong",
+     "question": "Which event ranks most preferred?",
+     "people_said": "Picnic 2.0 avg rank, day trip 2.25, workshop 2.75, social evening last",
+     "agent": "partly",
      "personas": "no guess",
-     "commander": "no guess"
+     "commander": "wrong"
+    },
+    {
+     "round": 1,
+     "question": "Most you'd pay?",
+     "people_said": "Free 3, ≤$10 2, ≤$25 2, >$25 1",
+     "agent": "partly",
+     "personas": "no guess",
+     "commander": "partly"
     },
     {
      "round": 2,
-     "question": "If only ONE of these could happen, which would you most want?",
-     "people_said": "Split 1-1-1: venue, variety, drop-in. Shorter meetings got 0.",
+     "question": "Preferred format: picnic, subsidised trip, small event plus aid, no event",
+     "people_said": "Trip 3, picnic 2, small plus aid 2, no event 1",
      "agent": "partly",
      "personas": "no guess",
-     "commander": "no guess"
+     "commander": "wrong"
+    },
+    {
+     "round": 2,
+     "question": "What would most stop you coming?",
+     "people_said": "Cost 4, nothing 3, childcare 1",
+     "agent": "right",
+     "personas": "no guess",
+     "commander": "wrong"
     }
    ],
-   "learned_between_rounds": "Round 1 split three ways and the free text pointed to attendance friction, not scheduling. So round 2 forced a single choice among venue, length, variety and a new flexible drop-in option. It split again, and shorter meetings dropped out. The commander was not at the keyboard to reply, so I went ahead on my own judgement.",
-   "limits": "There were only 3 respondents, so this is a direction and not a measurement. Individual answers shifted between rounds. No persona rehearsal was run. The commander gave no guesses. Both emails are now used for everyone, so no further survey is possible. The tool replies were labelled as practice, with answers invented by an AI stand-in.",
+   "learned_between_rounds": "Round 1 showed money and childcare worries and one suggestion to skip the event. Round 2 asked about picnic vs subsidised trip vs aid-fund options and the main barriers. It found the choice is split and cost is the top barrier.",
+   "limits": "Only 8 people, so this is a direction, not a measurement. Round 2 was split 3/2/2/1. I have no cost figures for the options. Nobody could be emailed again. The tool's replies were labelled as practice and AI-generated.",
+   "lessons": [
+    "Rank questions gave a clearer signal than single choice, which split on 8 people.",
+    "Offering cost-sharing in the options changed the preference order, so test price framing explicitly.",
+    "My guesses and the commander's both missed; ask about barriers openly instead of assuming them."
+   ],
    "unbacked": [],
-   "spent": 4.5,
-   "handedBack": 3.5
+   "spent": 5,
+   "handedBack": 4
   }
  ]
 }

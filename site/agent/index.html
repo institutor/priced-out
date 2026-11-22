@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Sealed Envelope</title>
-  <meta name="description" content="An AI agent runs survey research through Flashpoint. Before each survey goes out, the agent, AI personas and the commander each seal a guess. Watch one mission, step by step.">
+  <meta name="description" content="Give an AI agent one objective. It decides what survey to make, sends it to your email list through the Flashpoint MCP, and comes back with an answer. Watch one run, step by step.">
   <meta property="og:title" content="The Sealed Envelope">
-  <meta property="og:description" content="An AI agent runs the survey. Before each one goes out, it bets on the answers, and so do you. Watch one mission, step by step.">
+  <meta property="og:description" content="One objective in, a researched answer out. An AI agent runs the survey through the Flashpoint MCP. What it guessed wrong is what it asks about next.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://institutor.github.io/priced-out/agent/">
   <meta property="og:image" content="https://institutor.github.io/priced-out/og.jpg">
@@ -14,107 +14,171 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M10,1.9Q15.9,3 21.9,1.8Q30,1.7 29.9,9.8Q30.7,16.2 29.8,22.5Q29.8,30.7 21.6,30.6Q15.8,29.7 10,30.5Q1.9,30.4 1.9,22.3Q2.6,16.2 1.9,10.1Q1.8,2 10,1.9Z%22 fill=%22%23ffe873%22/%3E%3Cg fill=%22none%22 stroke=%22%231b1f6b%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5.2,12.2L6.7,11L10.1,11L5,16.4L5,19.5L14.1,11L14.5,13.9L8,20.8L11.3,21L14.5,17.2%22 stroke-width=%222.3%22/%3E%3Cpath d=%22M6.9,10.1Q9.8,9.6 12.7,10.1Q14.7,10.1 14.8,12.1Q14.8,15.7 15,19.3Q15.1,21.4 13.1,21.3Q9.8,21.8 6.6,21.1Q4.6,21 4.6,19Q3.9,15.5 4.8,12.1Q4.9,10 6.9,10.1Z%22 stroke-width=%221.3%22/%3E%3Cpath d=%22M19.2,11.2Q22.2,10.5 25.2,11.2Q27.2,11.2 27.3,13.2Q27.3,16.4 27.7,19.6Q27.9,21.6 25.9,21.7Q22.6,21.4 19.3,21.9Q17.3,21.9 17.3,19.9Q17.4,16.6 17.3,13.2Q17.2,11.2 19.2,11.2Z%22 stroke-width=%221.4%22 stroke-dasharray=%222.4 2.2%22/%3E%3C/g%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Londrina+Solid:wght@400;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Londrina+Sketch&family=Londrina+Solid:wght@400;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="replay.css">
+  <!-- The wobble's filters live in this page, so the rule that names them
+       does too: a stylesheet elsewhere would look for them beside itself. -->
+  <style>
+    .boil {
+      animation: boil 0.48s steps(1) infinite;
+    }
+
+    @keyframes boil {
+      0% {
+        filter: url(#boil-1);
+      }
+      33% {
+        filter: url(#boil-2);
+      }
+      66% {
+        filter: url(#boil-3);
+      }
+    }
+
+    .shiver {
+      animation: shiver 0.66s steps(1) infinite;
+    }
+
+    @keyframes shiver {
+      0% {
+        filter: url(#shiver-1);
+      }
+      33% {
+        filter: url(#shiver-2);
+      }
+      66% {
+        filter: url(#shiver-3);
+      }
+    }
+  </style>
+  <link rel="modulepreload" href="../js/lib/reading.js">
+  <link rel="modulepreload" href="../js/lib/sketch.js">
+  <link rel="modulepreload" href="../js/lib/figure.js">
+  <link rel="modulepreload" href="../js/ui/banner.js">
+  <link rel="modulepreload" href="../js/ui/contents.js">
+  <link rel="modulepreload" href="../js/ui/cover.js">
+  <link rel="modulepreload" href="../js/ui/dom.js">
+  <link rel="modulepreload" href="../js/ui/doodles.js">
+  <link rel="modulepreload" href="../js/ui/ink.js">
+  <link rel="modulepreload" href="../js/ui/scene.js">
+  <link rel="modulepreload" href="scene.js">
+  <link rel="modulepreload" href="story.js">
+  <link rel="modulepreload" href="draw.js">
+  <link rel="modulepreload" href="present.js">
+  <script>document.documentElement.classList.add("js");</script>
 </head>
 <body>
-  <header class="top">
-    <a href="../">Back to Priced Out</a>
-    <a href="https://github.com/institutor/priced-out/tree/main/agent">The code</a>
+  <!-- Three versions of one wobble. Switching between them a few times a
+       second makes a drawing shiver like frames of a hand-drawn film. -->
+  <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <filter id="boil-1" x="-4%" y="-8%" width="108%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="4" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="boil-2" x="-4%" y="-8%" width="108%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="17" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="boil-3" x="-4%" y="-8%" width="108%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="31" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <!-- The same again, finer and fainter, for the small drawings. -->
+    <filter id="shiver-1" x="-12%" y="-12%" width="124%" height="124%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="1" seed="2" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="shiver-2" x="-12%" y="-12%" width="124%" height="124%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="1" seed="13" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="shiver-3" x="-12%" y="-12%" width="124%" height="124%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="1" seed="29" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
+
+  <div id="banner"></div>
+  <nav id="contents" class="contents" aria-label="Contents"></nav>
+
+  <nav class="m-pages" aria-label="The two parts of this project">
+    <a href="../">Priced Out <span>the calculator</span></a>
+    <a href="./" aria-current="page">The Sealed Envelope <span>the agent</span></a>
+  </nav>
+
+  <header class="cover m-cover" id="top" data-slide="The idea">
+    <div class="scene">
+      <p class="visually-hidden">A drawing. A club officer asks: “What event should our club put on?” An agent, a figure with an aerial on its head, holds a sealed envelope and says: “I'll ask them. First, my guess goes in here.” Three members answer: “Trivia night!” and “Only if it's free.” A note beside them, in another pen, reads: nobody guessed that.</p>
+    </div>
+    <p class="cover-ask">What it guessed wrong is what it asks about next.</p>
+    <div class="cover-foot">
+      <h1 class="title">The Sealed Envelope</h1>
+      <div class="cover-pitch">
+        <p class="cover-note">One objective in, an answer out. An AI agent decides what survey to make, sends it to your email list through the Flashpoint MCP, and comes back with a recommendation.</p>
+        <p class="cover-go"><a class="button" href="#watch"><span>Watch a run</span></a></p>
+        <p class="cover-more">Or read <a href="#how">how it works</a> and <a href="#rules">who decides what</a>, or <a href="#run">run it yourself</a>. Presenting? <button type="button" class="m-link" id="present-open">Open present mode</button>.</p>
+      </div>
+    </div>
   </header>
 
-  <main>
-    <section class="opening">
-      <h1>The Sealed Envelope</h1>
-      <p class="lede">You give an AI agent a question about real people. It runs the survey research through Flashpoint by itself. Before each survey goes out, the agent bets on what people will say, and so do you. The bets go in an envelope.</p>
-      <p>When the answers come back, the envelope is opened. Whatever was guessed wrong is the thing nobody understood yet, so that is what the agent asks about next.</p>
-      <svg class="envelope hero-envelope" viewBox="0 0 240 150" role="img" aria-label="A sealed envelope with three guesses inside: the agent's, the AI personas' and the commander's.">
-        <rect class="env-body" x="6" y="30" width="228" height="114" rx="6"/>
-        <path class="env-line" d="M6 36 L120 104 L234 36"/>
-        <circle class="env-seal" cx="120" cy="100" r="13"/>
-        <text class="env-note" x="120" y="24" text-anchor="middle">3 guesses inside</text>
-      </svg>
-    </section>
-
-    <section>
-      <h2>How a mission goes</h2>
-      <ol class="how">
-        <li><b>You give the mission</b> and a few standing orders, such as “check with me before any email goes out”.</li>
-        <li><b>The agent decides what to ask</b> and has Flashpoint build the survey. It can rehearse it on AI personas first.</li>
-        <li><b>Everyone seals a guess.</b> The agent's, the personas' and yours. The agent cannot see yours.</li>
-        <li><b>You approve the send.</b> No email goes out without your yes. The code enforces that, not the agent.</li>
-        <li><b>The envelope is opened</b> against the real answers, and the agent says who was wrong, itself first.</li>
-        <li><b>The agent decides the next move:</b> a second round on what surprised everyone, or the answer.</li>
-      </ol>
-      <p>Every paid step prints a receipt first: what it costs, and the decision it could change.</p>
-    </section>
-
-    <section>
-      <h2>Who decides what</h2>
-      <div class="two-lists">
-        <div>
-          <h3>The agent decides</h3>
-          <ul>
-            <li>What to ask, and how to word it</li>
-            <li>Whether to rehearse on AI personas first</li>
-            <li>What it expects people to answer</li>
-            <li>Who was wrong, and what that means</li>
-            <li>Whether to run another round, and on what</li>
-            <li>When to stop, and the final recommendation</li>
-          </ul>
-        </div>
-        <div>
-          <h3>The code holds, whatever the agent says</h3>
-          <ul>
-            <li>No email goes out until the commander has seen the survey and typed yes</li>
-            <li>A budget cap. A paid step that would pass it is refused</li>
-            <li>Nobody gets more than two emails in a mission, reminders included. A third is refused</li>
-            <li>The commander's guess stays hidden from the agent until the envelope is opened</li>
-            <li>A guess cannot be sealed or changed after the survey is sent</li>
-            <li>Addresses never reach the model or the logs, and the names on the list are taken out</li>
-            <li>Every paid step is logged with its price and the decision it could change</li>
-          </ul>
-        </div>
+  <main id="app">
+    <section id="objective" aria-labelledby="objective-title" data-slide="The objective">
+      <h2 id="objective-title" data-doodle="flag">The objective</h2>
+      <div class="section-body">
+        <p id="status" class="empty">Loading the run…</p>
       </div>
     </section>
 
-    <section id="mission">
-      <h2>Watch a mission</h2>
-      <p id="status" class="status">Loading the mission…</p>
-      <div id="practice" class="practice" hidden></div>
-      <div id="brief" class="brief" hidden></div>
+    <section id="watch" aria-labelledby="watch-title">
+      <h2 id="watch-title" data-doodle="envelope">Watch the run</h2>
+      <div class="section-body"></div>
+    </section>
 
-      <div id="controls" class="controls" hidden>
-        <div class="buttons">
-          <button type="button" id="replay">Replay step by step</button>
-          <button type="button" id="next" hidden>Next step</button>
-          <button type="button" id="play" hidden>Play</button>
-          <button type="button" id="all" hidden>Show everything</button>
-        </div>
-        <div class="meter" aria-live="polite">
-          <span id="where"></span>
-          <span class="bar"><span id="fill"></span></span>
-          <span id="spent"></span>
-        </div>
+    <section id="answer" aria-labelledby="answer-title" data-slide="The answer">
+      <h2 id="answer-title" data-doodle="star">The answer it came back with</h2>
+      <div class="section-body"></div>
+    </section>
+
+    <section id="how" aria-labelledby="how-title" data-slide="How it works">
+      <h2 id="how-title" data-doodle="plan">How one round goes</h2>
+      <div class="section-body"></div>
+    </section>
+
+    <section id="rules" aria-labelledby="rules-title" data-slide="Who decides what">
+      <h2 id="rules-title" data-doodle="lock">Who decides what</h2>
+      <div class="section-body"></div>
+    </section>
+
+    <section id="run" aria-labelledby="run-title" data-slide="Run it yourself">
+      <h2 id="run-title" data-doodle="prompt">Run it yourself</h2>
+      <div class="section-body">
+        <p>A practice run is free. An AI stand-in plays Flashpoint and invents the answers, so no email is sent and no credit is spent.</p>
+        <pre class="m-command">node agent/agent.mjs "Figure out the best event to put on for our club next spring." --practice</pre>
+        <p>A real run emails the people on your list through the Flashpoint MCP and pays for each step from a budget you set. Add <code>--hands-off</code> and nobody has to stay at the keyboard: the code checks each survey before it is sent.</p>
+        <pre class="m-command">node agent/agent.mjs "Figure out the best event to put on for our club next spring." --cap 9</pre>
+        <p>How to set it up is in <a href="https://github.com/institutor/priced-out/blob/main/agent/README.md" target="_blank" rel="noopener">the agent's README</a>. The whole run on this page is written out in <a href="https://github.com/institutor/priced-out/blob/main/agent/examples/practice-run/log.md" target="_blank" rel="noopener">its log</a>.</p>
       </div>
-
-      <ol id="log" class="log"></ol>
-    </section>
-
-    <section id="answer" hidden>
-      <h2>The answer</h2>
-      <div id="answer-body"></div>
-    </section>
-
-    <section>
-      <h2>Run it yourself</h2>
-      <p>A practice run is free. An AI stand-in plays Flashpoint and invents the answers, so no email is sent and no credit is spent.</p>
-      <pre class="command">node agent/agent.mjs "Should our club move its weekly meeting to Sunday?" --practice</pre>
-      <p>A real run emails the people on your list and pays Flashpoint for each step. How to set it up is in <a href="https://github.com/institutor/priced-out/blob/main/agent/README.md">the agent's README</a>.</p>
     </section>
   </main>
 
-  <noscript><p class="noscript">This page needs JavaScript to draw the mission. The same mission is written out in full in <a href="https://github.com/institutor/priced-out/blob/main/agent/examples/practice-run/log.md">the log</a>.</p></noscript>
+  <footer class="colophon">
+    <div class="colophon-rule">
+      <p class="colophon-mark" aria-hidden="true"></p>
+      <p>Built for the MCP Challenge of the Flashpoint AI and Columbia AI Club hackathon, November 2026. The agent does its research through the Flashpoint MCP. The code was written with Claude Code.</p>
+      <ul class="colophon-links">
+        <li><a href="https://github.com/institutor/priced-out/tree/main/agent" target="_blank" rel="noopener">The agent's code</a></li>
+        <li><a href="https://github.com/institutor/priced-out/blob/main/agent/README.md" target="_blank" rel="noopener">How to run it</a></li>
+        <li><a href="https://github.com/institutor/priced-out/blob/main/agent/examples/practice-run/log.md" target="_blank" rel="noopener">The log of this run</a></li>
+        <li><a href="../">Priced Out, the calculator</a></li>
+        <li><a href="#top">Back to the top</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <div id="present-bar" class="m-bar" hidden></div>
+
+  <noscript><p class="noscript">This page needs JavaScript to draw the run. The same run is written out in full in <a href="https://github.com/institutor/priced-out/blob/main/agent/examples/practice-run/log.md">the log</a>.</p></noscript>
   <script type="module" src="replay.js"></script>
 </body>
 </html>

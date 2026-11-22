@@ -1,277 +1,842 @@
-/* The Sealed Envelope: a mission, replayed.
-   Same notebook as the rest of Priced Out: indigo ink, a canary highlighter,
-   a pink slip for anything paid. */
+/* The Sealed Envelope
+   The agent's page, in the same notebook as Priced Out: its tokens, lettering
+   and drawing rules come from ../css/style.css. Only what this page adds is
+   here, and every class of its own starts with "m-". */
 
-:root {
-  color-scheme: light dark;
-  --paper: #fcfcfe;
-  --ink: #1b1f6b;
-  --ink-soft: #4c5196;
-  --rule: #d5d8f0;
-  --canary: #ffe873;
-  --pink: #ffc9d4;
-  --serial: #c81e3c;
-  --sheet-ink: #1b1f6b;
-  --font-display: "Londrina Solid", "Arial Narrow", "Helvetica Neue Condensed", sans-serif;
-  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  --font-receipt: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --measure: 62ch;
+/* The two parts of the project, at the very top ----------------------------- */
+
+.m-pages {
+  max-width: 70rem;
+  margin-inline: auto;
+  padding: 0.9rem var(--gutter) 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.6rem;
+  font: 400 1.25rem/1.2 var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+.m-pages a {
+  text-decoration: none;
+  color: var(--ink-soft);
+  padding: 0.2rem 0;
+}
+
+.m-pages a span {
+  font: 400 0.9rem var(--font-body);
+  letter-spacing: 0;
+}
+
+.m-pages a:hover {
+  color: var(--ink);
+}
+
+.m-pages a[aria-current] {
+  color: var(--ink);
+  box-shadow: inset 0 -0.5em 0 var(--hilite);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #12143a;
-    --ink: #ecedff;
-    --ink-soft: #b4b8ea;
-    --rule: #30357a;
-    --serial: #ff7a90;
+  .m-pages a[aria-current] {
+    box-shadow: inset 0 -2px 0 var(--series);
   }
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+/* The title page -------------------------------------------------------------- */
 
-body {
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font: 400 1.0625rem/1.55 var(--font-body);
+.m-cover .title {
+  width: min(100%, 44rem, 92svh);
 }
 
-a { color: inherit; text-underline-offset: 0.2em; }
-:focus-visible { outline: 3px solid var(--serial); outline-offset: 3px; }
-[hidden] { display: none !important; }
-
-.top {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem clamp(1rem, 4vw, 3rem);
-  font-size: 0.95rem;
+.scene-art .seal-fill {
+  fill: var(--serial);
+  stroke: none;
 }
 
-main {
-  max-width: 48rem;
-  margin: 0 auto;
-  padding: 0 clamp(1rem, 4vw, 3rem) 5rem;
+.cover.play .scene-art .seal-fill {
+  animation: ink-in 0.25s ease-out both;
+  animation-delay: var(--wait, 0ms);
 }
 
-section { margin-top: 3.5rem; }
-p { margin: 0 0 1em; max-width: var(--measure); }
-
-h1 {
-  font: 900 clamp(2.8rem, 9vw, 5rem)/0.95 var(--font-display);
-  letter-spacing: 0.01em;
-  margin: 1.5rem 0 1.25rem;
+.m-link {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
 }
 
-h2 {
-  font: 400 clamp(1.7rem, 4.5vw, 2.3rem)/1.1 var(--font-display);
+/* Shared small things ----------------------------------------------------------- */
+
+.section-body > p,
+.m-beat-main > p {
+  max-width: var(--measure);
+}
+
+.m-foot {
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+}
+
+.m-why {
+  color: var(--ink-soft);
+}
+
+.m-points {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1em;
+  max-width: var(--measure);
+}
+
+.m-points li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.m-points .bullet {
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+}
+
+.m-pairs {
+  display: grid;
+  grid-template-columns: minmax(8rem, 13rem) minmax(0, 1fr);
+  gap: 0.7rem 1.5rem;
+  margin: 0 0 1.2em;
+  max-width: 54rem;
+}
+
+.m-pairs dt {
+  font: 900 1.15rem/1.25 var(--font-display);
   letter-spacing: 0.02em;
-  margin: 0 0 1rem;
+  padding-top: 0.12em;
 }
 
-.lede { font-size: 1.25rem; line-height: 1.45; }
+.m-pairs dd {
+  margin: 0;
+}
 
-/* The envelope --------------------------------------------------------- */
+.m-pairs .m-points {
+  margin-bottom: 0;
+}
 
-.envelope { display: block; width: 100%; max-width: 15rem; height: auto; }
-.hero-envelope { max-width: 19rem; margin-top: 2rem; }
-.env-body { fill: var(--canary); stroke: var(--sheet-ink); stroke-width: 3; }
-.env-line { fill: none; stroke: var(--sheet-ink); stroke-width: 3; stroke-linejoin: round; }
-.env-flap { fill: var(--canary); stroke: var(--sheet-ink); stroke-width: 3; stroke-linejoin: round; }
-.env-seal { fill: var(--serial); stroke: var(--sheet-ink); stroke-width: 3; }
-.env-slip { fill: #fff; stroke: var(--sheet-ink); stroke-width: 2.5; }
-.env-note { font: 700 13px var(--font-receipt); fill: var(--ink); }
+@media (max-width: 40rem) {
+  .m-pairs {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.15rem;
+  }
 
-/* How a mission goes ---------------------------------------------------- */
+  .m-pairs dd {
+    margin-bottom: 0.8rem;
+  }
+}
 
-.how { padding-left: 1.4rem; max-width: var(--measure); }
-.how li { margin-bottom: 0.6rem; padding-left: 0.3rem; }
-.how li::marker { font-family: var(--font-display); font-size: 1.3rem; }
+.m-said {
+  max-width: var(--measure);
+  margin: 0 0 1em;
+  padding: 0.1rem 0 0.1rem 1rem;
+  border-left: 3px solid var(--rule);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 
-/* The mission ----------------------------------------------------------- */
+.m-said.commander {
+  border-left-color: var(--mark-2);
+}
 
-.practice {
-  border: 3px solid var(--serial);
-  border-radius: 6px;
-  padding: 0.9rem 1.1rem;
+.m-fold summary,
+.m-steps summary {
+  cursor: pointer;
+  width: fit-content;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  padding: 0.3rem 0;
+}
+
+.m-pre {
+  margin: 0.4rem 0 1rem;
+  padding: 0.9rem 1rem;
+  border: 1.5px dashed var(--rule);
+  font: 400 0.86rem/1.5 var(--font-receipt);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 24rem;
+  overflow: auto;
+}
+
+.m-command {
+  margin: 0 0 1.2rem;
+  padding: 0.9rem 1rem;
+  border: 1.5px dashed var(--ink-soft);
+  font: 400 0.92rem/1.5 var(--font-receipt);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 54rem;
+}
+
+code {
+  font: 400 0.92em var(--font-receipt);
+}
+
+.m-warn {
+  max-width: var(--measure);
+}
+
+.m-warn .marked {
+  color: var(--sheet-ink);
+  padding: 0 0.15em;
+}
+
+.m-warn .hl-fill {
+  fill: var(--pink);
+}
+
+/* The objective ------------------------------------------------------------------ */
+
+.m-objective {
+  font: 900 clamp(1.9rem, 4.6vw, 3.2rem)/1.2 var(--font-display);
+  letter-spacing: 0.01em;
+  max-width: 24ch;
+  margin: 0 0 0.7em;
+  text-wrap: balance;
+}
+
+.m-objective .marked {
+  padding: 0 0.1em;
+}
+
+.m-tally {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem 2rem;
+  margin: 2rem 0 2.5rem;
+  max-width: 62rem;
+}
+
+.m-tally div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+}
+
+.m-tally dd {
+  margin: 0;
+  font: 900 clamp(3rem, 7vw, 4.6rem)/0.95 var(--font-display);
+  color: var(--series);
+}
+
+.m-tally dt {
+  font-size: 1rem;
+  line-height: 1.4;
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 52rem) {
+  .m-tally {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* The run ------------------------------------------------------------------------ */
+
+.m-controls {
+  position: sticky;
+  top: var(--banner, 0px);
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.5rem;
+  padding: 0.7rem 0 0.8rem;
   margin-bottom: 1.5rem;
+  background: var(--paper);
+  border-bottom: 1.5px dashed var(--rule);
+}
+
+.m-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.button.m-small {
+  font-size: 1.15rem;
+  padding: 0.55em 0.95em 0.5em;
+}
+
+.button.m-small:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.m-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 0 auto;
+  font: 400 0.92rem var(--font-receipt);
+  white-space: nowrap;
+}
+
+.m-meter {
+  display: inline-block;
+  width: clamp(5rem, 16vw, 11rem);
+  height: 1.15rem;
+}
+
+.m-meter-line {
+  stroke: var(--ink);
+  stroke-width: 1.6;
+}
+
+.m-meter-fill {
+  stroke: var(--mark-2);
+  stroke-width: 2;
+}
+
+.m-beats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.m-beat {
+  padding: 1.6rem 0 1.9rem;
+  border-bottom: 1.5px dashed var(--rule);
+  scroll-margin-top: calc(var(--banner, 4.5rem) + 5.5rem);
+}
+
+.m-beat:last-child {
+  border-bottom: 0;
+}
+
+.m-beat-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.m-beat-head .doodle {
+  flex: none;
+  width: 3.2rem;
+  height: 3.2rem;
+  margin: 0;
+}
+
+.m-beat-head .sub {
+  margin: 0;
+  max-width: 34ch;
+}
+
+.m-when {
+  margin: 0 0 0.15rem;
+  font: 400 0.9rem var(--font-receipt);
+  color: var(--mark-2);
+}
+
+.m-beat-body.two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 17rem);
+  gap: 1.5rem 3rem;
+  align-items: start;
+}
+
+.m-beat.open .m-beat-body.two {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.m-beat.open .m-beat-side {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem 3rem;
+  order: -1;
+}
+
+.m-beat-side > * + * {
+  margin-top: 1.2rem;
+}
+
+.m-beat.open .m-beat-side > * + * {
+  margin-top: 0;
+}
+
+@media (max-width: 52rem) {
+  .m-beat-body.two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.m-move {
+  font: 900 1.5rem/1.3 var(--font-display);
+  letter-spacing: 0.01em;
+  margin: 1.4rem 0 1.2rem;
+}
+
+.m-move strong {
+  display: inline-block;
+  margin-left: 0.5em;
+  font-weight: 900;
+}
+
+.m-jump {
   font-weight: 700;
 }
 
-.brief {
-  background: var(--canary);
-  color: var(--sheet-ink);
-  border-radius: 4px;
-  padding: 1.2rem 1.4rem;
-  margin-bottom: 1.5rem;
+/* The envelope */
+.m-envelope {
+  width: min(100%, 15rem);
+  height: auto;
 }
-.brief .label { font: 700 0.85rem var(--font-receipt); display: block; margin-bottom: 0.3rem; }
-.brief .mission { font: 400 1.6rem/1.2 var(--font-display); margin: 0 0 0.9rem; max-width: none; }
-.brief ul { margin: 0.2rem 0 0.8rem; padding-left: 1.2rem; }
-.brief p { margin: 0; font-size: 0.95rem; }
 
-.controls {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background: var(--paper);
+.m-env-fill {
+  fill: var(--canary);
+  stroke: none;
+}
+
+.m-envelope .m-env-line {
+  stroke: var(--sheet-ink);
+  stroke-width: 2.2;
+}
+
+.m-envelope .m-env-line.thin {
+  stroke-width: 1.4;
+}
+
+.m-envelope .m-env-seal {
+  fill: var(--serial);
+  stroke: none;
+}
+
+.m-envelope .m-env-slip {
+  fill: #fcfcfe;
+  stroke: none;
+}
+
+.m-envelope .m-env-flap {
+  stroke: var(--ink);
+  stroke-width: 2.2;
+}
+
+.m-env-name {
+  font: 400 11.5px var(--font-display);
+  letter-spacing: 0.03em;
+  fill: var(--sheet-ink);
+}
+
+/* The pink slip */
+.m-paid {
+  width: 100%;
+  max-width: 17rem;
+  color: var(--sheet-ink);
+  font: 400 0.84rem/1.5 var(--font-receipt);
+  padding: 1.3rem 1.1rem 1.4rem;
+}
+
+.m-paid-head {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.m-paid ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.m-paid li,
+.m-paid-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.m-paid-total {
+  margin: 0.5rem 0 0;
+  padding-top: 0.45rem;
+  border-top: 1.5px dashed var(--sheet-ink);
+  font-weight: 700;
+}
+
+/* The stamp */
+.m-stamp {
+  display: inline-block;
+  padding: 0.3em 0.6em 0.22em;
+  margin-right: 0.35rem;
+  font: 900 1.15rem/1 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--serial);
+  transform: rotate(-4deg);
+}
+
+.m-stamp-line {
+  stroke: var(--serial);
+  stroke-width: 2;
+}
+
+@media (prefers-color-scheme: dark) {
+  .m-stamp {
+    color: #ff8fa3;
+  }
+
+  .m-stamp-line {
+    stroke: #ff8fa3;
+  }
+}
+
+/* Tables */
+.m-table-wrap {
+  overflow-x: auto;
+  margin: 0.4rem 0 1.2rem;
+}
+
+.m-table {
+  width: 100%;
+  max-width: 62rem;
+  font-size: 0.98rem;
+  font-variant-numeric: normal;
+}
+
+.m-table th,
+.m-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.55rem 1.2rem 0.55rem 0;
+  border-bottom: 1.5px dashed var(--rule);
+}
+
+.m-table th {
+  font: 900 1.05rem/1.2 var(--font-display);
+  letter-spacing: 0.02em;
   border-bottom: 2px solid var(--ink);
-  padding: 0.7rem 0;
+}
+
+.m-table .m-people {
+  font-weight: 700;
+}
+
+.m-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.m-verdict-art {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+}
+
+.m-verdict-art path {
+  stroke-width: 2.6;
+}
+
+.m-verdict.right path {
+  stroke: var(--series);
+}
+
+.m-verdict.wrong path {
+  stroke: var(--serial);
+}
+
+.m-verdict.partly path {
+  stroke: var(--mark-2);
+}
+
+.m-verdict.none {
+  color: var(--ink-soft);
+}
+
+.m-verdict.none path {
+  stroke: var(--ink-soft);
+}
+
+@media (prefers-color-scheme: dark) {
+  .m-verdict.wrong path {
+    stroke: #ff8fa3;
+  }
+}
+
+@media (max-width: 40rem) {
+  /* Each row becomes a short list: every cell under its column's name. */
+  .m-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .m-table tr {
+    display: block;
+    padding: 0.7rem 0;
+    border-bottom: 1.5px dashed var(--rule);
+  }
+
+  .m-table td {
+    display: block;
+    border: 0;
+    padding: 0.15rem 0;
+  }
+
+  .m-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font: 700 0.75rem var(--font-receipt);
+    color: var(--ink-soft);
+  }
+}
+
+/* Every raw step, folded under its part */
+.m-steps {
+  margin-top: 0.8rem;
+}
+
+.m-raw {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0 0 0 1rem;
+  border-left: 2px solid var(--rule);
+  max-width: 54rem;
+  font-size: 0.98rem;
+}
+
+.m-raw > li {
+  display: grid;
+  grid-template-columns: 2.2rem minmax(0, 1fr);
+  gap: 0 0.6rem;
+  padding: 0.6rem 0;
+}
+
+.m-n {
+  font: 700 0.85rem/1.9 var(--font-receipt);
+  color: var(--ink-soft);
+}
+
+.m-who {
+  margin: 0;
+  font: 400 0.82rem var(--font-receipt);
+  color: var(--mark-2);
+}
+
+.m-what {
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+}
+
+.m-raw p {
+  margin-bottom: 0.4rem;
+}
+
+.m-priced,
+.m-hash {
+  font: 400 0.82rem/1.5 var(--font-receipt);
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+/* While a replay is running, what comes after the run waits. */
+.replaying #answer,
+.replaying #how,
+.replaying #rules,
+.replaying #run {
+  display: none;
+}
+
+/* The answer --------------------------------------------------------------------- */
+
+.m-recommendation {
+  font: 400 clamp(1.45rem, 2.7vw, 2rem)/1.3 var(--font-display);
+  letter-spacing: 0.01em;
+  max-width: 34ch;
+  margin: 0 0 1.2em;
+  text-wrap: pretty;
+}
+
+.m-spend {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.7rem 1.5rem;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  max-width: none;
+  margin-top: 1.6rem;
 }
-.buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-button {
-  font: 700 0.95rem var(--font-body);
-  color: var(--ink);
-  background: transparent;
-  border: 2px solid var(--ink);
-  border-radius: 999px;
-  padding: 0.4rem 1rem;
-  cursor: pointer;
-}
-button:hover { background: var(--canary); color: var(--sheet-ink); }
-.meter { display: flex; align-items: center; gap: 0.6rem; font: 400 0.85rem var(--font-receipt); }
-.bar { width: 7rem; height: 0.7rem; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; display: inline-block; }
-#fill { display: block; height: 100%; width: 0; background: var(--serial); transition: width 0.3s ease-out; }
 
-.log { list-style: none; margin: 1.5rem 0 0; padding: 0; }
-.step {
+#answer .sub,
+#objective .sub {
+  margin-top: 2rem;
+}
+
+/* Who decides what --------------------------------------------------------------- */
+
+.m-two {
   display: grid;
-  grid-template-columns: 2.6rem 1fr;
-  gap: 0 0.8rem;
-  padding: 1.1rem 0;
-  border-bottom: 1px solid var(--rule);
-}
-.step.fresh { animation: arrive 0.35s ease-out; }
-@keyframes arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.num { font: 700 0.85rem var(--font-receipt); color: var(--ink-soft); padding-top: 0.2rem; }
-.who { font: 700 0.85rem var(--font-receipt); color: var(--ink-soft); margin: 0 0 0.2rem; }
-.what { font-weight: 700; margin: 0 0 0.4rem; }
-.step p { margin-bottom: 0.5em; }
-.soft { color: var(--ink-soft); }
-.thinking .what { font-weight: 400; font-style: italic; }
-
-.said {
-  border-left: 4px solid var(--ink);
-  padding: 0.1rem 0 0.1rem 0.9rem;
-  margin: 0.5rem 0;
-  white-space: pre-wrap;
-  max-width: var(--measure);
-}
-.said.commander { border-left-color: var(--canary); background: linear-gradient(to right, color-mix(in srgb, var(--canary) 28%, transparent), transparent 70%); }
-
-/* A receipt: the pink slip that comes before anything paid. */
-.receipt {
-  background: var(--pink);
-  color: var(--sheet-ink);
-  font: 400 0.85rem/1.5 var(--font-receipt);
-  padding: 0.6rem 0.9rem;
-  margin: 0.5rem 0 0.6rem;
-  max-width: 30rem;
-  border-radius: 2px;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.1rem 0.9rem;
-}
-.receipt dt { font-weight: 700; }
-.receipt dd { margin: 0; }
-
-details { margin: 0.4rem 0; }
-summary { cursor: pointer; font-size: 0.95rem; text-decoration: underline; text-underline-offset: 0.2em; }
-details pre {
-  font: 400 0.8rem/1.5 var(--font-receipt);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  border: 1px solid var(--rule);
-  border-radius: 4px;
-  padding: 0.8rem;
-  margin: 0.5rem 0 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem 2.5rem;
+  max-width: 62rem;
 }
 
-.sealed-row, .opened-row { display: grid; grid-template-columns: 9rem 1fr; gap: 1rem; align-items: start; }
-.sealed-row ul { margin: 0 0 0.6rem; padding-left: 1.1rem; }
-.step { scroll-margin-top: 5rem; }
-h3 { font: 400 1.4rem/1.2 var(--font-display); letter-spacing: 0.02em; margin: 1.8rem 0 0.4rem; }
-.hash { font: 400 0.78rem var(--font-receipt); color: var(--ink-soft); overflow-wrap: anywhere; }
-
-.table-wrap { overflow-x: auto; margin: 0.6rem 0; }
-table { border-collapse: collapse; font-size: 0.9rem; min-width: 30rem; }
-th, td { text-align: left; vertical-align: top; padding: 0.45rem 0.7rem 0.45rem 0; border-bottom: 1px solid var(--rule); }
-th { font: 700 0.8rem var(--font-receipt); }
-td.people { font-weight: 700; }
-.mark-right { font-weight: 700; }
-.mark-wrong { color: var(--serial); font-weight: 700; }
-
-.pairs { display: grid; grid-template-columns: 9rem 1fr; gap: 0.3rem 1rem; margin: 0.5rem 0; max-width: var(--measure); }
-.pairs dt { font: 700 0.85rem var(--font-receipt); padding-top: 0.15rem; }
-.pairs dd { margin: 0; }
-.decision { display: inline-block; background: var(--canary); color: var(--sheet-ink); font-weight: 700; padding: 0 0.4rem; border-radius: 2px; }
-
-.stamp {
-  display: inline-block;
-  border: 3px solid var(--serial);
-  color: var(--serial);
-  font: 900 1.1rem var(--font-display);
-  letter-spacing: 0.06em;
-  padding: 0.1rem 0.7rem;
-  border-radius: 4px;
-  transform: rotate(-3deg);
-  margin: 0.2rem 0 0.4rem;
+.m-card {
+  padding: 1.5rem 2rem 1.9rem 1.5rem;
 }
 
-.command {
-  font: 400 0.85rem/1.5 var(--font-receipt);
-  background: var(--ink);
-  color: var(--paper);
-  padding: 0.9rem 1.1rem;
-  border-radius: 4px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  max-width: var(--measure);
+.m-card .sub {
+  margin-top: 0;
 }
 
-#answer-body .recommendation { font: 400 1.5rem/1.3 var(--font-display); max-width: 34rem; margin-bottom: 1rem; }
-
-@media (max-width: 34rem) {
-  .step { grid-template-columns: 1.9rem 1fr; scroll-margin-top: 9rem; }
-  .sealed-row, .opened-row { grid-template-columns: 1fr; }
-  .sealed-row .envelope, .opened-row .envelope { max-width: 9rem; }
-  .pairs { grid-template-columns: 1fr; gap: 0 1rem; }
-  .pairs dd { margin-bottom: 0.5rem; }
-  .meter .bar { width: 4.5rem; }
+.m-card .m-points {
+  margin-bottom: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .step.fresh { animation: none; }
-  #fill { transition: none; }
+@media (max-width: 52rem) {
+  .m-two {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
-/* A grid column is as wide as its widest child unless told otherwise. Without
-   this a table pushes the whole page sideways on a phone. */
-.step > div { min-width: 0; }
+/* The foot ----------------------------------------------------------------------- */
 
-.noscript { max-width: 48rem; margin: 2rem auto; padding: 0 clamp(1rem, 4vw, 3rem); }
-
-@media (max-width: 34rem) {
-  /* Tables become stacked rows: each cell on its own line, under its column's name. */
-  table.stack { min-width: 0; width: 100%; }
-  table.stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-  table.stack tr { display: block; padding: 0.7rem 0; border-bottom: 1px solid var(--rule); }
-  table.stack td { display: block; border: 0; padding: 0.15rem 0; width: auto; }
-  table.stack td[data-label]::before { content: attr(data-label); display: block; font: 700 0.75rem var(--font-receipt); color: var(--ink-soft); }
-  .top { font-size: 0.9rem; }
+.colophon-mark .doodle {
+  width: 2.4rem;
+  height: 2.4rem;
+  margin: 0;
 }
 
-.two-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2.5rem; }
-.two-lists h3 { margin-top: 0.4rem; }
-.two-lists ul { margin: 0; padding-left: 1.1rem; }
-.two-lists li { margin-bottom: 0.5rem; }
-@media (max-width: 34rem) {
-  .two-lists { grid-template-columns: 1fr; }
-  .two-lists div + div { margin-top: 1.5rem; }
+/* Present mode --------------------------------------------------------------------
+   One part of the page at a time, with a strip of controls along the bottom. */
+
+.m-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 7;
+  background: var(--paper);
+  border-top: 2px solid var(--ink);
+}
+
+.m-bar-in {
+  max-width: 70rem;
+  margin-inline: auto;
+  padding: 0.5rem var(--gutter) max(0.5rem, env(safe-area-inset-bottom));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 1.4rem;
+  font: 400 0.9rem var(--font-receipt);
+}
+
+.m-bar-in p {
+  margin: 0;
+  max-width: none;
+}
+
+.m-bar-where {
+  font-weight: 700;
+  margin-right: 0.8rem;
+}
+
+.m-bar-note {
+  color: var(--mark-2);
+  font-weight: 700;
+}
+
+.m-bar-keys {
+  color: var(--ink-soft);
+}
+
+.m-bar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+.m-bar .button.m-small {
+  font-size: 1rem;
+}
+
+@media (max-width: 52rem) {
+  .m-bar-keys {
+    display: none;
+  }
+}
+
+html.present {
+  scroll-behavior: auto;
+}
+
+@media (min-width: 64rem) {
+  html.present {
+    font-size: 112%;
+  }
+}
+
+@media (min-width: 90rem) {
+  html.present {
+    font-size: 125%;
+  }
+}
+
+html.present .m-pages,
+html.present .contents,
+html.present .colophon,
+html.present .tear,
+html.present #watch > h2,
+html.present .m-watch-intro,
+html.present .m-controls,
+html.present .again,
+html.present [data-slide] {
+  display: none;
+}
+
+html.present [data-slide].on {
+  display: block;
+  padding-top: clamp(1.25rem, 4svh, 3rem);
+  padding-bottom: 6.5rem;
+  border-bottom: 0;
+}
+
+html.present header[data-slide].on {
+  padding-top: 0;
+}
+
+html.present #watch {
+  padding-bottom: 0;
+}
+
+html.present .m-beat-head .doodle {
+  width: 4rem;
+  height: 4rem;
+}
+
+html.present .m-beat .sub {
+  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+}
+
+@media print {
+  .m-pages,
+  .m-controls,
+  .m-bar {
+    display: none;
+  }
+}
+
+/* The small drawing beside a heading hangs in the margin, so a screen in
+   present mode keeps a margin wide enough for it. */
+@media (min-width: 64rem) {
+  html.present .cover,
+  html.present main {
+    padding-inline: max(var(--gutter), 5.5rem);
+  }
 }
