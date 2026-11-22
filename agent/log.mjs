@@ -17,7 +17,7 @@ const PRACTICE_NOTE = {
   practice: " (practice run: an AI stand-in played Flashpoint and invented every answer. No real survey, no real people.)",
 };
 
-export function logHeader({ objective, people, cap, emailLimit, model, orders, mode = "real", practiceCommander, stamp }) {
+export function logHeader({ objective, people, cap, emailLimit, model, orders, mode = "real", practiceCommander, standInCommander, handsOff, memory = [], stamp }) {
   const lines = [
     `# Mission log ${stamp}${PRACTICE_NOTE[mode] ?? ""}`,
     "",
@@ -29,7 +29,10 @@ export function logHeader({ objective, people, cap, emailLimit, model, orders, m
     "",
     ...orders.map((order) => `- ${order}`),
     "",
-    practiceCommander ? "Nobody was at the keyboard, so the commander's replies below are canned practice replies. The canned commander approves sends and makes no guesses.\n" : "",
+    handsOff ? "The commander handed this mission over and was away. No person approved a send: the code checked each survey before it went out, and the checks are listed where they were made.\n" : "",
+    standInCommander ? "Nobody was at the keyboard, so an AI stand-in played the commander as well. Its replies and its sealed guesses below are invented, like everything else in a practice run. It approves every send.\n"
+      : practiceCommander ? "Nobody was at the keyboard, so the commander's replies below are canned practice replies. The canned commander approves sends and makes no guesses.\n" : "",
+    memory.length > 0 ? `**What the agent remembered from earlier missions:**\n\n${memory.map((lesson) => `- ${lesson}`).join("\n")}\n` : "",
     "The agent chose every step below. The commander speaks only where the log says so. The loop itself steps in at two points, both marked: no email goes out without the commander's yes, and if the agent stops after one round with a question still open, it is asked once to think again.",
     "",
     "---",
@@ -43,6 +46,12 @@ export function logEntry(step) {
   switch (step.kind) {
     case "thinking":
       return `**Agent:** ${step.text}\n`;
+    case "plan":
+      return `${n} the agent's plan${step.first ? "" : ", updated"}\n\n*What it needs to find out:*\n\n${step.needToKnow.map((line) => `- ${line}`).join("\n")}\n\n*What it already suspects (a guess, not a finding):*\n\n${step.hunches.map((line) => `- ${line}`).join("\n")}\n\n*What would change its answer:* ${step.wouldChange}\n\n*The survey it has in mind:* ${step.surveyIdea}\n\n*Budget and emails:* ${step.budget}\n`;
+    case "send-preapproved":
+      return `${n} the code checked the round ${step.round} survey and let it go\n\nThe commander was away. This is email ${step.email} of the ${step.emailLimit} each person may get. The checks it passed:\n\n${step.checks.map((check) => `- ${check}`).join("\n")}\n`;
+    case "send-held":
+      return `${n} the code held back the round ${step.round} send\n\nThe commander was away, and the survey did not pass the send checks. Nothing was sent or charged.\n\n${step.problems.map((problem) => `- ${problem}`).join("\n")}\n`;
     case "flashpoint":
       return `${n} Flashpoint, ${ACTIONS[step.action] ?? "a message"} (round ${step.round})\n\n${receipt(step, "one message to Flashpoint's survey agent")}\n\n*Why:* ${step.why}\n\n*Sent:*\n\n${quote(step.message)}\n\n*Flashpoint replied:*\n\n${quote(step.reply)}\n${step.receipts.map((r) => `\n${r}`).join("")}\n`;
     case "flashpoint-failed":
@@ -109,6 +118,7 @@ export function logFooter({ steps, cap, spent, wallet }) {
   const rows = tally(steps).map((row) => `| ${row.label} | ${row.count} | ${money(row.cost)} |`);
   const asked = steps.filter((s) => s.kind === "commander").length;
   const approvals = steps.filter((s) => s.kind === "send-approved" || s.kind === "send-refused").length;
+  const checked = steps.filter((s) => s.kind === "send-preapproved" || s.kind === "send-held").length;
   const challenges = steps.filter((s) => s.kind === "challenge").length;
   return [
     "---",
@@ -121,7 +131,7 @@ export function logFooter({ steps, cap, spent, wallet }) {
     `| **Spent** | | **${money(spent)}** |`,
     `| Handed back, of the ${money(cap)} cap | | ${money(Math.max(0, cap - spent))} |`,
     "",
-    `The agent went to the commander ${asked} time${asked === 1 ? "" : "s"} and asked for ${approvals} send approval${approvals === 1 ? "" : "s"}. ${challenges > 0 ? "The loop asked it once to think again before stopping. " : ""}Every other step was the agent's own choice.`,
+    `The agent went to the commander ${asked} time${asked === 1 ? "" : "s"} and asked for ${approvals} send approval${approvals === 1 ? "" : "s"}. ${checked > 0 ? `The code checked ${checked} send${checked === 1 ? "" : "s"} in the commander's place. ` : ""}${challenges > 0 ? "The loop asked it once to think again before stopping. " : ""}Every other step was the agent's own choice.`,
     wallet ? `\n${wallet}` : "",
     "",
   ].join("\n");
@@ -133,6 +143,9 @@ export function shortLine(step) {
   const paid = (step) => `${money(step.price)}, ${money(step.spent)} spent`;
   switch (step.kind) {
     case "thinking": return `${tag} Agent: ${step.text}`;
+    case "plan": return `${tag} Plan${step.first ? "" : " updated"}\n${step.needToKnow.map((line) => `       needs: ${line}`).join("\n")}\n       would change its answer: ${step.wouldChange}`;
+    case "send-preapproved": return `${tag} Send checked by the code and let go (email ${step.email} of ${step.emailLimit})`;
+    case "send-held": return `${tag} Send held back by the code: ${step.problems.join(" ")}`;
     case "flashpoint": return `${tag} Flashpoint: ${ACTIONS[step.action] ?? "a message"} (${paid(step)})\n       could change: ${step.couldChange || "(none given)"}`;
     case "flashpoint-failed": return `${tag} Flashpoint failed, ${step.charged ? "charged" : "not charged"}: ${step.error}`;
     case "rehearsal": return `${tag} Dress rehearsal on AI personas (${paid(step)})\n       could change: ${step.couldChange || "(none given)"}`;

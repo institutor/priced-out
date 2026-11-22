@@ -21,7 +21,7 @@ export function forSite(run) {
   });
   const out = {
     objective: run.objective, mode: run.mode, model: run.model, cap: run.cap, emailLimit: run.emailLimit ?? null, orders: run.orders,
-    people: run.people, stamp: run.stamp, practiceCommander: run.practiceCommander === true, steps,
+    people: run.people, stamp: run.stamp, practiceCommander: run.practiceCommander === true, standInCommander: run.standInCommander === true, handsOff: run.handsOff === true, memory: run.memory ?? [], steps,
   };
   const found = JSON.stringify(out).match(ADDRESS);
   if (found) throw new Error("This run still holds an email address, so it was not published.");

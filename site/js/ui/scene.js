@@ -72,7 +72,7 @@ const TALL = {
 
 // A pen that keeps the time. Each stroke it puts down starts as the one
 // before it is finishing.
-function makePen(stage) {
+export function makePen(stage) {
   let clock = 0;
   return {
     get now() {
@@ -92,7 +92,7 @@ function makePen(stage) {
   };
 }
 
-function person(pen, spec, ground, seed, pace = 1) {
+export function person(pen, spec, ground, seed, pace = 1) {
   const drawn = figure({ ...spec, ground, seed });
   drawn.strokes.forEach((d, index) => pen.stroke(d, "figure-line", STROKE[index] * pace));
   return drawn;
@@ -100,7 +100,7 @@ function person(pen, spec, ground, seed, pace = 1) {
 
 // A line of lettering, a word at a time. A word that ends a phrase is
 // followed by a short breath.
-function letter(pen, line, attrs, pace = 85) {
+export function letter(pen, line, attrs, pace = 85) {
   const words = line.split(" ");
   const text = svg("text", attrs);
   words.forEach((word, index) => {
@@ -125,7 +125,7 @@ function widthOf(text, size) {
 }
 
 // What someone says: the box first, its tail down to them, then the words.
-function speech(words, pen, { lines, size, centre, top }, speaker, seed) {
+export function speech(words, pen, { lines, size, centre, top }, speaker, seed) {
   const lineHeight = size * 1.12;
   const padX = size * 0.62;
   const padY = size * 0.42;

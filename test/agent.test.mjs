@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { runAgent, makeRedactor, envelopeHash, unbackedNumbers, asksToSend, PRICES, TOOLS, systemPrompt } from "../agent/loop.mjs";
+import { runAgent, makeRedactor, envelopeHash, unbackedNumbers, asksToSend, PRICES, TOOLS, systemPrompt, readSendReply, sendChecks, HANDS_OFF_ORDERS } from "../agent/loop.mjs";
 import { fakeFlashpoint } from "../agent/fake-flashpoint.mjs";
 
 const recipients = [
@@ -564,4 +564,150 @@ test("a resumed mission remembers how many emails went out", async () => {
   const { commander } = desk();
   await runAgent({ objective: "o", recipients, cap: 20, llm: scripted([...oneRound(), debrief("another_round"), ...oneRound({ new_survey: true }), debrief(), finish]).llm, flashpoint: fakeFlashpoint(), commander, wait: async () => {}, save: (s) => saved.push(JSON.parse(JSON.stringify(s))) });
   assert.equal(saved.at(-1).emails, 2);
+});
+
+// ---- What the real Flashpoint says, and how it is read ----
+
+test("a reply that says the survey is live is not read as an email going out", () => {
+  // These four are real replies, kept in replies/.
+  assert.equal(readSendReply("The survey is live.\n\nPublic link: **flashpointopinions.com/0a4c06d5**"), "published");
+  assert.equal(readSendReply("v2 is live. The survey is active at **flashpointopinions.com/0a4c06d5**. The next synthetic panel run should complete normally."), "published");
+  assert.equal(readSendReply("Pushing v2 will replace the live survey immediately. Respondents will see the updated version. Please reply **confirm** once more."), "asks-confirm");
+  assert.equal(readSendReply("Invitations were sent to 3 panel members."), "sent");
+  assert.equal(readSendReply("I have emailed the survey to the panel."), "sent");
+  assert.equal(readSendReply("The survey has not been sent yet. It is ready to be sent."), "unclear");
+  assert.equal(readSendReply("Done."), "unclear");
+});
+
+// A Flashpoint that answers the way the real one did: a publish ends in "live", not "confirm".
+function wordy(sendReply = "Invitations were sent to 2 panel members.") {
+  const fake = fakeFlashpoint();
+  let confirms = 0;
+  return {
+    survey: async (args) => {
+      if (/^confirm$/i.test(args.message)) {
+        confirms += 1;
+        await fake.survey(args);
+        return { text: confirms === 1 ? "The survey is live.\n\nPublic link: flashpointopinions.com/abc. You can email it to the panel when ready." : sendReply };
+      }
+      return fake.survey(args);
+    },
+  };
+}
+
+test("publishing with a confirm does not use up an email or close the envelope", async () => {
+  const { commander, asked } = desk();
+  const out = await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), open(), debrief(), finish], { flashpoint: wordy(), commander });
+  assert.deepEqual(kinds(out, "flashpoint").map((s) => s.emailed), [false, false, true, false]);
+  assert.equal(kinds(out, "opened").length, 1);
+  assert.equal(asked.filter((a) => a.kind === "ask").length, 0, "nobody had to be asked what a clear reply meant");
+});
+
+test("a reply that does not say what happened is put to the commander, for free", async () => {
+  const { commander, asked } = desk({ reply: "yes" });
+  const out = await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), open(), debrief(), finish], { flashpoint: wordy("Done. Anything else?"), commander });
+  assert.match(asked.find((a) => a.kind === "ask").message, /Did that reply say the survey was emailed/);
+  assert.equal(kinds(out, "opened").length, 1);
+  assert.equal(out.spent, 2, "asking the commander cost nothing");
+
+  const no = desk({ reply: "no" });
+  const stuck = await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), open(), finish], { flashpoint: wordy("Done. Anything else?"), commander: no.commander });
+  assert.equal(kinds(stuck, "opened").length, 0, "not sent, so the envelope stays shut");
+});
+
+test("a survey is not sent if the answers could not be paid for, and a round is not started that cannot be finished", async () => {
+  const { commander, asked } = desk();
+  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 1.5, llm, flashpoint: fakeFlashpoint(), commander, wait: async () => {} });
+  assert.match(seen[4], /no money left to read the answers/);
+  assert.equal(approvals(asked), 0);
+  assert.equal(out.spent, 1);
+
+  const second = scripted([...oneRound(), debrief("another_round"), ask("Write a follow-up", "design", { new_survey: true }), finish]);
+  const two = await runAgent({ objective: "o", recipients, cap: 5, roundCost: 3.5, llm: second.llm, flashpoint: fakeFlashpoint(), commander: desk().commander, wait: async () => {} });
+  assert.match(second.seen[8], /a round costs about \$3\.50/);
+  assert.equal(two.spent, 2);
+});
+
+test("a results reply cannot take the place of the survey on the approval screen", async () => {
+  const { commander, asked } = desk();
+  const fake = fakeFlashpoint();
+  const flashpoint = { survey: async (args) => (/how is it going/i.test(args.message) ? { text: `${"Status: 0 of 2 answered so far. ".repeat(8)} Shall I remind them? Shall I wait?` } : fake.survey(args)) };
+  await run([ask("Write a survey", "design"), ask("How is it going?", "other"), seal(), ask("confirm", "publish"), ask("confirm", "send"), finish], { flashpoint, commander });
+  assert.match(asked.find((a) => a.kind === "approve_send").survey, /Which of these would you pick\?/);
+});
+
+// ---- The plan ----
+
+const plan = { name: "plan", input: { need_to_know: ["which event people want"], hunches: ["a social"], would_change_my_answer: "if most want a workshop", survey_idea: "five questions", budget_and_emails: "one round, hold $4 back" } };
+
+test("with planFirst, nothing is paid for until the agent has written a plan", async () => {
+  const { llm, seen } = scripted([ask("Write a survey", "design"), plan, ask("Write a survey", "design"), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, planFirst: true, llm, flashpoint: fakeFlashpoint(), wait: async () => {} });
+  assert.match(seen[1], /write your plan first/);
+  assert.equal(out.spent, 0.5);
+  assert.deepEqual(kinds(out, "plan")[0].needToKnow, ["which event people want"]);
+  assert.equal(kinds(out, "plan")[0].first, true);
+});
+
+// ---- Handed over ----
+
+test("the send checks pass a short plain survey and name what is wrong with a bad one", () => {
+  const good = `Drafted survey 1. ${"The questions, in full. ".repeat(8)} Q1 Which event would you come to? Q2 Why?`;
+  assert.deepEqual(sendChecks({ draft: good }), []);
+  assert.match(sendChecks({ draft: "Drafted." })[0], /has not shown the full list/);
+  assert.match(sendChecks({ draft: good, changes: ["Changed Q2."] })[0], /changed after/);
+  assert.match(sendChecks({ draft: `${good} Q3 What is your household income?` }).join(" "), /income/);
+  assert.match(sendChecks({ draft: `${good} Q3 What is your full name?` }).join(" "), /a name/);
+  assert.match(sendChecks({ draft: `${good} Do you get financial aid?` }).join(" "), /financial aid/);
+  assert.match(sendChecks({ draft: `${good} ${"Another one? ".repeat(10)}` }).join(" "), /too long/);
+  assert.match(sendChecks({ draft: `${good} ${"Another? ".repeat(4)}`, followUp: true }).join(" "), /a follow-up here should have 5/);
+});
+
+test("handed over, the agent sends without a person, and the code's checks are in the log", async () => {
+  const out = await run([plan, ...oneRound(), debrief(), finish], { handsOff: true, orders: HANDS_OFF_ORDERS, planFirst: true });
+  assert.equal(kinds(out, "flashpoint").filter((s) => s.emailed).length, 1);
+  assert.equal(kinds(out, "send-preapproved").length, 1);
+  assert.equal(kinds(out, "send-preapproved")[0].checks.length, 5);
+  assert.equal(kinds(out, "send-approved").length, 0);
+  assert.equal(kinds(out, "opened").length, 1);
+});
+
+test("handed over, a survey that asks for something personal is held back, and the agent can fix it", async () => {
+  const fake = fakeFlashpoint();
+  let fixed = false;
+  const flashpoint = {
+    survey: async (args) => {
+      const reply = await fake.survey(args);
+      if (/take the income question out/i.test(args.message)) fixed = true;
+      return /Drafted survey|Changed survey/.test(reply.text) && !fixed ? { text: reply.text.replace("| Q2 |", "| Q0 | Number | What is your household income? | (number) |\n| Q2 |") } : reply;
+    },
+  };
+  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, handsOff: true, llm, flashpoint, wait: async () => {} });
+  assert.equal(kinds(out, "send-held").length, 1);
+  assert.match(seen[4], /did not pass the send checks[\s\S]*income/);
+  assert.equal(kinds(out, "flashpoint").filter((s) => s.emailed).length, 0);
+  assert.equal(out.spent, 1, "the held send cost nothing");
+});
+
+test("without --hands-off and with nobody at the desk, still nothing is sent", async () => {
+  const out = await run([...oneRound(), finish]);
+  assert.equal(kinds(out, "flashpoint").filter((s) => s.emailed).length, 0);
+  assert.equal(kinds(out, "send-preapproved").length, 0);
+});
+
+test("the agent's prompt says who approves a send in each mode, and gives back what it remembered", () => {
+  assert.match(systemPrompt({ people: 3, cap: 8 }), /the commander is shown the survey and must approve it/);
+  const away = systemPrompt({ people: 3, cap: 8, handsOff: true, orders: HANDS_OFF_ORDERS, memory: ["On a small list, ask people to rank."] });
+  assert.match(away, /handed this mission over and is away/);
+  assert.doesNotMatch(away, /must approve it/);
+  assert.match(away, /What you learned on earlier missions\n[\s\S]*- On a small list, ask people to rank\./);
+  assert.match(systemPrompt({ people: 3, cap: 8, roundCost: 3.5 }), /costs about \$3\.50/);
+});
+
+test("the lessons the agent writes at the end are kept, three at most, with names taken out", async () => {
+  const done = { name: "finish", input: { ...finish.input, lessons: ["Ana showed that ranking beats picking one.", "", "Two.", "Three.", "Four."] } };
+  const out = await run([done]);
+  assert.deepEqual(out.answer.lessons, ["[person 1] showed that ranking beats picking one.", "Two.", "Three."]);
 });

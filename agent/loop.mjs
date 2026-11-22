@@ -24,7 +24,30 @@ export const DEFAULT_ORDERS = [
 
 const receipt = { type: "string", description: "The receipt: which decision of yours this step could change. One sentence." };
 
+// What the commander says when they hand the mission over and walk away.
+export const HANDS_OFF_ORDERS = [
+  "I am away. Do not wait for me: every decision is yours.",
+  "You may email the survey without asking me, as long as it passes the send checks.",
+];
+
 export const TOOLS = [
+  {
+    name: "plan",
+    description:
+      "Write down your plan before you spend anything. Free. Say what you need to find out, what you already suspect, what result would change your answer, and how you will split the budget and the emails. You can call it again later if what you learn changes the plan.",
+    input_schema: {
+      type: "object",
+      properties: {
+        need_to_know: { type: "array", items: { type: "string" }, description: "The two to four things you must find out to answer the mission." },
+        hunches: { type: "array", items: { type: "string" }, description: "What you already suspect the answer is, and why. These are guesses, not findings." },
+        would_change_my_answer: { type: "string", description: "The result that would make you recommend something different from your hunch." },
+        survey_idea: { type: "string", description: "The survey you intend to have made: who it goes to, about how many questions, and what kind." },
+        budget_and_emails: { type: "string", description: "How you will split the money and the emails across rounds, and what you are holding back." },
+      },
+      required: ["need_to_know", "hunches", "would_change_my_answer", "survey_idea", "budget_and_emails"],
+      additionalProperties: false,
+    },
+  },
   {
     name: "ask_flashpoint",
     description:
@@ -197,6 +220,7 @@ export const TOOLS = [
         },
         learned_between_rounds: { type: "string", description: "What the first envelope got wrong or left open, and what you asked next because of it. Say 'no second round' and why if there was none." },
         limits: { type: "string", description: "What this answer cannot tell the reader, including how few people answered." },
+        lessons: { type: "array", items: { type: "string" }, description: "One to three short lessons for your next mission, about method and not about this club: how your guesses tend to miss, what kind of question worked or failed, what you would do differently. They are saved and given back to you next time. No names." },
       },
       required: ["recommendation", "evidence", "scoreboard", "learned_between_rounds", "limits"],
       additionalProperties: false,
@@ -204,13 +228,20 @@ export const TOOLS = [
   },
 ];
 
-export function systemPrompt({ people, cap, orders = DEFAULT_ORDERS, canRehearse = true, canDeck = true, emailLimit = EMAIL_LIMIT }) {
+export function systemPrompt({ people, cap, orders = DEFAULT_ORDERS, canRehearse = true, canDeck = true, emailLimit = EMAIL_LIMIT, handsOff = false, memory = [], planFirst = false, roundCost = 4 * PRICES.survey }) {
+  const approval = handsOff
+    ? "The commander has handed this mission over and is away. Nobody will answer ask_commander. Sends are pre-approved, but the system checks each one first: the full survey must have been shown by Flashpoint after its last change, it must be short, and it must not ask for anything personal (a name, an address, income, financial aid and the like). If a check fails you are told which, and you fix the survey and try again."
+    : "One order is also enforced by the system: before the first email of each survey goes out, the commander is shown the survey and must approve it. That screen is the check for the order about emails, so do not also ask permission to send with ask_commander. If they refuse, their reason comes back to you.";
+  const remembered = memory.length > 0
+    ? `\n\nWhat you learned on earlier missions\nThese are your own notes from missions before this one. They are about method. Use them, and say in your plan which one you are acting on.\n${memory.map((lesson) => `- ${lesson}`).join("\n")}`
+    : "";
   const emailRule = emailLimit === 1
     ? "Nobody on the list may get more than one email in this whole mission. The system enforces this: after the survey has gone out, any further send, a reminder included, is refused. So there is one survey and no follow-up: make it count."
     : `Nobody on the list may get more than ${emailLimit} emails in this whole mission, and a reminder counts as one. The system enforces this: once the limit is reached, any further send is refused. With ${emailLimit}, that is ${emailLimit === 2 ? "one survey and one short follow-up, or one survey and one reminder" : "a survey, a follow-up and little else"}. Which to spend them on is your call.`;
   const tools = [
-    `- ask_flashpoint ($${PRICES.survey.toFixed(2)} a message): Flashpoint's survey agent. In plain words it can make a first-party panel from a list of names and emails, write a survey from a brief, change it, publish it, email it to the panel, report how many have answered, and give results. Publishing and sending each need a second message that says only "confirm"; you send it yourself when the reply asks for it and matches what you intended.`,
-    canRehearse ? `- rehearse_on_personas ($${PRICES.rehearsal.toFixed(2)}): runs your published, not yet sent, survey on AI personas first. It can catch a question that confuses or cuts people off, and it gives the personas a guess of their own for the envelope. It is slow (a few minutes) and can fail; the mission does not depend on it.` : null,
+    `- ask_flashpoint ($${PRICES.survey.toFixed(2)} a message): Flashpoint's survey agent. In plain words it can make a first-party panel from a list of names and emails, write a survey from a brief, change it, publish it, email it to the panel, report how many have answered, and give results. Publishing and sending each need a second message that says only "confirm", and sometimes a third; you send it yourself when the reply asks for it and matches what you intended. It can also report open-ended answers word for word and group them into themes.`,
+    canRehearse ? `- rehearse_on_personas ($${PRICES.rehearsal.toFixed(2)}): runs your published, not yet sent, survey on AI personas first. It can catch a question that confuses or cuts people off, and it gives the personas a guess of their own for the envelope. Reading what the personas answered is one more paid message. It is slow (a few minutes) and can fail; the mission does not depend on it.` : null,
+    "- plan (free): your plan, written down before you spend anything.",
     "- seal_predictions, open_envelope and debrief (free): the sealed envelope, explained below.",
     "- ask_commander (free): the commander is at the desk.",
     "- wait_for_replies (free).",
@@ -225,7 +256,10 @@ ${tools}
 
 The commander's standing orders
 ${orders.map((order) => `- ${order}`).join("\n")}
-These are rules, not steps. Between them, every decision is yours: do not ask the commander what to do next. When an order applies, go to them with ask_commander, quote the order, say what you found or decided, and ask only what you need. One order is also enforced by the system: before the first email of each survey goes out, the commander is shown the survey and must approve it. That screen is the check for the order about emails, so do not also ask permission to send with ask_commander. If they refuse, their reason comes back to you.
+These are rules, not steps. Between them, every decision is yours: do not ask the commander what to do next. When an order applies, go to them with ask_commander, quote the order, say what you found or decided, and ask only what you need. ${approval}${remembered}
+
+Plan first
+${planFirst ? "Your first step is plan. No paid step is allowed before it." : "Start with plan."} A plan names what you need to find out, what you already suspect, and the result that would change your answer. Then the survey has a job: to try to prove your hunch wrong.
 
 The sealed envelope
 Before each survey is sent, call seal_predictions with what you expect people to answer on its main questions. If you rehearsed on personas, put their answers in as the personas' guess. The commander seals a guess too, and you cannot see it. After the real results are in, call open_envelope, then debrief: who was wrong (yourself first), what surprised everyone, what is still unknown, and your next move. A wrong guess or a surprise is the most useful thing a round can give you. It marks what nobody understood yet, and that is what the next round should ask about. Often the surprise is that the thing you asked about is not what decides the matter; then the next round asks about the thing that does.
@@ -237,10 +271,10 @@ Their time
 These people are doing the commander a favour, and every email costs some of their goodwill. ${emailRule}${emailLimit > 1 ? " If you may run a follow-up, have the first survey's opening line say that one short follow-up may come, so it is not a surprise. A follow-up is three questions at most, and its opening line says it is the short follow-up and why it is worth a minute." : ""}
 
 Budget and receipts
-You have $${cap.toFixed(2)}. Every tool result tells you what is left. Each paid step needs a receipt: the decision of yours that it could change. If you cannot name one, the step is not worth its price, so skip it. Keep enough budget to read the results of anything you send. The budget is there to be used on steps that could change the answer: finishing with an open question you could have afforded to ask is a worse result than spending the money. Stop when no step you can afford could change your answer, and say that is why you stopped; what is left then goes back to the commander.
+You have $${cap.toFixed(2)}. Every tool result tells you what is left. Count before you plan: one round, from the first draft to reading the answers, costs about $${roundCost.toFixed(2)}, because publishing and sending each take a request and then one or two confirms. The system will not start a round you cannot pay for, and will not send a survey you could not afford to read. Each paid step needs a receipt: the decision of yours that it could change. If you cannot name one, the step is not worth its price, so skip it. Keep enough budget to read the results of anything you send. The budget is there to be used on steps that could change the answer: finishing with an open question you could have afforded to ask is a worse result than spending the money. Stop when no step you can afford could change your answer, and say that is why you stopped; what is left then goes back to the commander.
 
 How to do good research here
-First work out what you would need to know to answer the mission, and what the commander may already know (it is free to ask them once, early, if local knowledge would change the survey). Keep each survey short, since the same few people answer every round. Avoid screening and skip rules: they are what breaks a survey. You can email these people only a few times, so a question that turns out confusing wastes a round; a rehearsal on personas is the cheap way to find that out first. One round rarely settles a mission: expect to run a second. It should be shorter than the first and ask only about what the first envelope got wrong or left open; never repeat a first-round question. The same people answering a different question is not a repeat. A few people can still tell you why, even when they are too few to count. If nobody has answered yet, wait and check again rather than guessing.
+First work out what you would need to know to answer the mission, and what the commander may already know (it is free to ask them once, early, if local knowledge would change the survey). Keep each survey short, since the same few people answer every round. Avoid screening and skip rules: they are what breaks a survey. You can email these people only a few times, so a question that turns out confusing wastes a round; a rehearsal on personas is the cheap way to find that out first. One round rarely settles a mission: expect to run a second. It should be shorter than the first and ask only about what the first envelope got wrong or left open; never repeat a first-round question. The same people answering a different question is not a repeat. A few people can still tell you why, even when they are too few to count. If nobody has answered yet, wait and check again rather than guessing. On a list this small, single-choice questions tie. When you ask Flashpoint to draft, ask it to show the full wording of every question and every answer option, not a shortened version: that reply is what gets checked before a send. When you ask it to publish, say in the same message that you approve publishing with no quotas and no fraud screening, since this is a small invited list; it asks about both. A new survey (new_survey: true) starts a fresh Flashpoint conversation that remembers nothing: give it {{RECIPIENTS}} again and say again who these people are. Each check on how many have answered is a paid message, so wait long enough that one check is enough. So when a round splits evenly, do not ask people to pick one again: ask them to rank the options, or ask what would have to change for them to say yes, and ask for the reason in their own words. When you read results, ask Flashpoint for the open answers word for word, not only its summary: the reason people give is often worth more than the count. When Flashpoint asks you to confirm, reply with the one word "confirm": a longer reply can cost a second paid message.
 
 Honesty
 Report only what Flashpoint returned. Never fill in a number you did not get. Persona answers are synthetic: use them to fix the survey and to place a guess, and never count them as evidence. With this few people the answer is a direction, not a measurement, and your limits must say so.
@@ -304,6 +338,51 @@ export function asksToSend(message) {
   return /\b(send|sending|distribute|distributing|invite)\b/i.test(text) || /\be-?mail\s+(it|this|them|everyone|the survey|the panel|to|out)\b/i.test(text);
 }
 
+// What the code looks for before it lets a send go out with nobody watching.
+export const SEND_CHECKS = [
+  "Flashpoint showed the whole survey, and nothing changed after that",
+  "It is short: about 10 questions at most, and about 5 for a follow-up",
+  "It does not ask for a name, a contact detail, income, financial aid or anything else personal",
+  "The round's envelope is sealed",
+  "Nobody has had more emails than the limit, and the budget covers it",
+];
+const PERSONAL = [
+  [/\b(your|full|first|last|legal) name\b/i, "a name"],
+  [/\b(your e-?mail|e-?mail address|phone number|home address|mailing address|student id|date of birth|social security)\b/i, "a contact or identity detail"],
+  [/\b(household|family|parents?'?|your|annual) income\b|\bhow much (do|does) (you|your (family|parents)) (earn|make)\b|\bsalary\b/i, "income"],
+  [/\bfinancial aid\b|\bpell\b|\baid package\b|\bwork-?study\b/i, "financial aid"],
+  [/\b(religion|immigration status|sexual orientation|medical|diagnos|disabilit)/i, "something personal"],
+];
+// The problems with a drafted survey, in plain words. An empty list means it may go.
+export function sendChecks({ draft, changes = [], followUp = false }) {
+  const problems = [];
+  if (!draft || !listsQuestions(draft)) problems.push("Flashpoint has not shown the full list of questions, so nobody has read what would be sent.");
+  if (changes.length > 0) problems.push("The survey was changed after its questions were last shown in full. Ask Flashpoint to show the whole survey again.");
+  const questions = (String(draft).match(/\?/g) ?? []).length;
+  const most = followUp ? 5 : 10;
+  if (questions > most) problems.push(`It looks too long: about ${questions} questions, and ${followUp ? "a follow-up" : "a survey"} here should have ${most} at most.`);
+  for (const [pattern, what] of PERSONAL) {
+    const found = String(draft).match(pattern);
+    if (found) problems.push(`It seems to ask for ${what} ("${found[0]}"). Take that question out.`);
+  }
+  return problems;
+}
+
+// What Flashpoint's reply to a send-like message says happened. The real service
+// answers a first ask with "reply confirm", answers a publish with "The survey is
+// live", and only then, on a send, says that invitations went out. Anything that
+// fits none of these is "unclear", and a person is asked.
+const SAYS_SENT = /\b(sent|e-?mailed|invited|delivered|dispatched|queued|went out|gone out|on (its|their) way|invitations? (have|has|were|was|are) )/i;
+const NOT_SENT = /\b(not|n't|never|yet to be|ready to be|ready to|will be|to be|can be|could be|would be|before (it is|they are|being))\s+(yet\s+)?(been\s+)?(sent|e-?mailed|invited|delivered)\b/i;
+const SAYS_LIVE = /\b(is|are|now)\s+(live|published|active)\b|\bpublished\b|\bpublic link\b/i;
+export function readSendReply(text) {
+  const reply = String(text ?? "");
+  if (/\bconfirm\b/i.test(reply.slice(-300))) return "asks-confirm";
+  if (SAYS_SENT.test(reply) && !NOT_SENT.test(reply)) return "sent";
+  if (SAYS_LIVE.test(reply)) return "published";
+  return "unclear";
+}
+
 // Runs the mission to the end. Returns { answer, spent, steps }.
 //   llm({ system, tools, messages })   -> { content, stop_reason }
 //   flashpoint                         -> { survey({ message, newSurvey }), rehearse?({ audience, howMany, objective }), deck?({ title, findings }) }
@@ -315,11 +394,11 @@ export function asksToSend(message) {
 //   record(step)                       -> called for every step, already redacted
 //   save(snapshot)                     -> called whenever the mission's state changes, so a stopped run can be resumed
 //   resume                             -> a snapshot from an earlier save: the mission carries on from there
-export async function runAgent({ objective, recipients, cap, orders = DEFAULT_ORDERS, emailLimit = EMAIL_LIMIT, llm, flashpoint, commander = null, wait, record = () => {}, save = () => {}, resume = null }) {
+export async function runAgent({ objective, recipients, cap, orders = DEFAULT_ORDERS, emailLimit = EMAIL_LIMIT, handsOff = false, planFirst = false, memory = [], roundCost = 4 * PRICES.survey, llm, flashpoint, commander = null, wait, record = () => {}, save = () => {}, resume = null }) {
   const fp = typeof flashpoint === "function" ? { survey: flashpoint } : flashpoint;
   const redact = makeRedactor(recipients);
   const tools = TOOLS.filter((tool) => (tool.name !== "rehearse_on_personas" || fp.rehearse) && (tool.name !== "make_deck" || fp.deck));
-  const system = systemPrompt({ people: recipients.length, cap, orders, canRehearse: Boolean(fp.rehearse), canDeck: Boolean(fp.deck), emailLimit });
+  const system = systemPrompt({ people: recipients.length, cap, orders, canRehearse: Boolean(fp.rehearse), canDeck: Boolean(fp.deck), emailLimit, handsOff, memory, planFirst, roundCost });
   let messages = [{ role: "user", content: `Mission from the commander: ${redact(objective)}` }];
   const steps = [];
   let stepsBefore = 0; // steps taken before a resume, so the numbering carries on
@@ -327,6 +406,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   let spent = 0;
   let answer = null;
   let nudges = 0;
+  let planned = false; // the agent has written a plan
   let emails = 0; // how many emails each person on the list has had in this mission
   const emailsUsed = () => emails >= emailLimit;
   const NO_EMAILS_LEFT = `everyone on the list has already had ${emailLimit === 1 ? "their one email" : `${emailLimit} emails`} in this mission, and that is the limit. No further email can go out, a reminder included.`;
@@ -361,7 +441,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   // tool calls in the last message that have finished; a call with no result was in
   // progress when the snapshot was taken.
   const snapshot = (done) => ({
-    version: 1, savedAt: new Date().toISOString(), messages, done, given, spent, nudges, emails, steps: stepsBefore + steps.length,
+    version: 1, savedAt: new Date().toISOString(), messages, done, given, spent, nudges, emails, planned, steps: stepsBefore + steps.length,
     survey: { round, started, draft, changes, lastReply, approved, sent, sendUnsure, readAfterSend, envelope, opened, debriefed, challenged },
     flashpoint: fp.state ? fp.state() : null,
   });
@@ -370,6 +450,18 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   async function sendGate(input) {
     if (approved) return null;
     if (!envelope) return "Not sent: this message would email people, and the round's envelope is not sealed yet. Seal your predictions first, with seal_predictions. If you did not mean to email anyone, reword the message and say 'do not send yet'. Nothing was charged.";
+    // Handed over: the code reads the survey in the commander's place. A survey that
+    // fails a check is not sent, and the agent is told why so that it can fix it.
+    if (handsOff) {
+      const problems = sendChecks({ draft, changes, followUp: emails > 0 });
+      if (problems.length === 0) {
+        approved = true;
+        note({ kind: "send-preapproved", round, email: emails + 1, emailLimit, checks: SEND_CHECKS });
+        return null;
+      }
+      note({ kind: "send-held", round, problems });
+      return `Not sent: the commander is away, and the survey did not pass the send checks:\n${problems.map((problem) => `- ${problem}`).join("\n")}\nNothing was charged. Fix the survey, have Flashpoint show it in full, and try again.`;
+    }
     if (!commander) {
       note({ kind: "send-refused", round, reason: "Nobody was at the desk to approve the send." });
       return "Not sent: nobody is at the desk to approve the send, so no email can go out. Nothing was charged. Call finish with what you have.";
@@ -391,6 +483,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       note({ kind: "blocked", tool: "ask_flashpoint", why: input.why });
       return { text: `Not sent: this would go over the budget. ${left()} Call finish with what you have.`, failed: true };
     }
+    if (planFirst && !planned) return { text: `Not yet: write your plan first, with plan. It is free. Nothing was charged.\n\n${left()}`, failed: true };
     const newSurvey = input.new_survey === true;
     if (newSurvey && owesDebrief()) return { text: DEBRIEF_FIRST, failed: true };
     if (newSurvey && envelope && readAfterSend && !opened) return { text: "Not yet: this round's results are in and its envelope is still sealed. Open it and debrief before you start another round.", failed: true };
@@ -398,6 +491,10 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     if (newSurvey && started && emailsUsed()) {
       note({ kind: "email-limit", round, tried: "a new survey" });
       return { text: `Not started: ${NO_EMAILS_LEFT} A new survey could not be sent to anyone. Nothing was charged. Finish with what you have, and say in your limits what is still open.\n\n${left()}`, failed: true };
+    }
+    if (newSurvey && started && cap - spent < roundCost - 1e-9) {
+      note({ kind: "blocked", tool: "ask_flashpoint", why: input.why });
+      return { text: `Not started: a round costs about $${roundCost.toFixed(2)} from the first draft to reading the answers, and there is less than that left. A survey that is sent and never read helps nobody. Nothing was charged. Finish with what you have.\n\n${left()}`, failed: true };
     }
     if (newSurvey && started) {
       round += 1;
@@ -410,12 +507,16 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       note({ kind: "email-limit", round, tried: "a send" });
       return { text: `Not sent: ${NO_EMAILS_LEFT} Nothing was charged. Read the results you have, or finish.\n\n${left()}`, failed: true };
     }
+    if (sending && overBudget(2 * PRICES.survey)) {
+      note({ kind: "blocked", tool: "ask_flashpoint", why: input.why });
+      return { text: `Not sent: after this send there would be no money left to read the answers. Nothing was charged. Finish with what you have.\n\n${left()}`, failed: true };
+    }
     if (sending && sendUnsure) return { text: `Not sent: an earlier send was tried and nobody knows whether it went out. First ask Flashpoint where the survey stands, in a message that does not ask it to send anything. Nothing was charged.\n\n${left()}`, failed: true };
     if (sending) {
       const refusal = await sendGate(input);
       if (refusal) return { text: `${refusal}\n\n${left()}`, failed: true };
     }
-    const message = input.message.split("{{RECIPIENTS}}").join(recipientLines(recipients));
+    const message = input.message.replace(/\{\{\s*recipients\s*\}\}/gi, () => recipientLines(recipients));
     try {
       const reply = await fp.survey({ message, newSurvey });
       spent += PRICES.survey;
@@ -423,14 +524,33 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       const text = redact(reply.text);
       given.push(text);
       lastReply = text;
+      // The draft is the last reply that listed the survey's questions. A reply that reports
+      // answers has question marks in it too, and must not take the draft's place.
+      const reportsAnswers = /\b\d+\s+(of|out of)\s+\d+\b|\b(respondents?|responses|answered|completes?)\b/i.test(text);
       if (!sending && input.action !== "results") {
-        if (draft === "" || listsQuestions(text)) { draft = text; changes = []; }
+        if (listsQuestions(text) && !(reportsAnswers && input.action !== "design")) { draft = text; changes = []; }
+        else if (draft === "") draft = text;
         else if (input.action === "design" && !isConfirm(input.message)) changes.push(text);
       }
       if (sent && (!sending || input.action === "results")) readAfterSend = true;
       // Flashpoint often answers a request to send with "reply confirm". Then nothing has
       // gone out yet, and the commander's approval stands for the confirm that follows.
-      const emailed = sending && !/\bconfirm\b/i.test(text.slice(-300));
+      let emailed = false;
+      let asked = "";
+      if (sending) {
+        const outcome = readSendReply(text);
+        if (outcome === "sent") emailed = true;
+        else if (outcome === "unclear") {
+          // The reply neither asks for a confirm nor says plainly what happened. A person can
+          // read it; the code will not guess. This costs nothing.
+          const question = `The agent sent a message that may have emailed the survey. Flashpoint replied:\n\n${text}\n\nDid that reply say the survey was emailed to people? Answer yes or no.`;
+          const answer = commander ? await hear({ kind: "ask", message: question, order: null }) : null;
+          if (answer !== null) { given.push(answer); note({ kind: "commander", order: null, message: question, reply: answer }); }
+          // With nobody to ask, a message that was plainly a send is counted as one.
+          emailed = answer !== null ? saysYes(answer) : input.action === "send" || asksToSend(input.message) || !handsOff;
+          asked = emailed ? "\n\nThis reply did not say plainly what happened. It has been counted as the survey going out." : "\n\nThis reply did not say plainly what happened. It has been counted as NOT sent: if you meant to send, ask again and it will be checked again.";
+        }
+      }
       // One approval covers one send. A reminder, or a second try, is asked for again.
       if (emailed) { sent = true; approved = false; emails += 1; }
       // A changed survey is a different survey: the commander approves it again.
@@ -446,7 +566,12 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
         const answer = commander ? await hear({ kind: "ask", message: question, order: null }) : null;
         if (answer !== null) given.push(answer);
         note({ kind: "commander", order: null, message: question, reply: answer });
-        if (answer !== null && saysYes(answer)) {
+        if (answer === null && handsOff) {
+          // Nobody can say. Count it as an email, so that nobody can get one too many.
+          sent = true;
+          emails += 1;
+          settled = `\n\nNobody is at the desk to say whether that send went out, so it has been counted as one of the ${emailLimit} emails. Read Flashpoint's reply above: if it plainly says the survey was not sent, you may send it once more, and that counts as another email.`;
+        } else if (answer !== null && saysYes(answer)) {
           sent = true;
           emails += 1;
           settled = "\n\nThe commander confirms that the survey went out. Do not send it again. Wait, then read the results.";
@@ -454,7 +579,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
           settled = "\n\nThe commander has not confirmed that the survey went out, so it counts as not sent. If you send it, they will be asked to approve again.";
         }
       }
-      const count = emailed ? `\n\nEveryone on the list has now had ${emails} of the ${emailLimit} email${emailLimit === 1 ? "" : "s"} they may get in this mission.` : "";
+      const count = asked + (emailed ? `\n\nEveryone on the list has now had ${emails} of the ${emailLimit} email${emailLimit === 1 ? "" : "s"} they may get in this mission.` : "");
       return { text: `${text}${settled}${count}\n\n${left()}` };
     } catch (err) {
       const charged = err?.charged === true;
@@ -525,6 +650,13 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   }
 
   async function useTool(name, input) {
+    if (name === "plan") {
+      const lines = (value) => (Array.isArray(value) ? value : [value]).filter(Boolean).map((line) => redact(line));
+      const first = !planned;
+      planned = true;
+      note({ kind: "plan", first, needToKnow: lines(input.need_to_know), hunches: lines(input.hunches), wouldChange: redact(input.would_change_my_answer), surveyIdea: redact(input.survey_idea), budget: redact(input.budget_and_emails) });
+      return { text: `${first ? "Plan recorded." : "Plan updated."} ${left()}` };
+    }
     if (name === "ask_flashpoint") return askFlashpoint(input);
     if (name === "rehearse_on_personas") {
       if (draft === "") return { text: "There is no drafted survey to rehearse yet. Have Flashpoint write one first.", failed: true };
@@ -552,7 +684,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       // unknown and the money to ask about it, has to be argued for.
       const stillUnknown = redact(input.still_unknown);
       const openQuestion = !/^\W*(none|nothing|n\/a)\b/i.test(stillUnknown);
-      if (move === "finish" && round === 1 && !challenged && !emailsUsed() && openQuestion && cap - spent >= 4 * PRICES.survey - 1e-9) {
+      if (move === "finish" && round === 1 && !challenged && !emailsUsed() && openQuestion && cap - spent >= roundCost - 1e-9) {
         challenged = true;
         note({ kind: "challenge", round, stillUnknown, reason: redact(input.reason) });
         return { text: `Before you stop: you say this is still unknown: "${stillUnknown}". ${left()} That is enough for a short second round. Asking the same people a different question is not a repeat, and a few people can tell you why even when they are too few to count. If the thing the mission asked about turned out not to decide the matter, the mission is not answered until you ask what does. Call debrief again with your final decision: another_round, or finish with the reason no question you could ask would change what the commander does.`, failed: true };
@@ -587,6 +719,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
         scoreboard: (Array.isArray(input.scoreboard) ? input.scoreboard : []).map((row) => ({ ...row, question: redact(row.question), people_said: redact(row.people_said) })),
         learned_between_rounds: redact(input.learned_between_rounds),
         limits: redact(input.limits),
+        lessons: (Array.isArray(input.lessons) ? input.lessons : []).filter((lesson) => typeof lesson === "string" && lesson.trim() !== "").slice(0, 3).map((lesson) => redact(lesson.trim())),
       };
       const unbacked = unbackedNumbers(`${answer.recommendation} ${answer.evidence}`, given);
       note({ kind: "finish", ...answer, unbacked, spent, handedBack: Math.max(0, cap - spent) });
@@ -597,6 +730,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
 
   if (resume) {
     ({ messages, given, spent, nudges } = resume);
+    planned = resume.planned !== false;
     stepsBefore = resume.steps;
     ({ round, started, draft, changes, lastReply, approved, sent, readAfterSend, envelope, opened, debriefed, challenged } = resume.survey);
     sendUnsure = resume.survey.sendUnsure === true;

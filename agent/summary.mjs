@@ -26,6 +26,20 @@ export function score(scoreboard) {
   return { agent: count("agent"), personas: count("personas"), commander: count("commander") };
 }
 
+// How much of the mission the agent did without a person.
+export function autonomy(steps) {
+  const ALONE = ["plan", "flashpoint", "rehearsal", "deck", "sealed", "opened", "debrief", "wait", "finish"];
+  const approvals = steps.filter((s) => s.kind === "send-approved" || s.kind === "send-refused").length;
+  const questions = steps.filter((s) => s.kind === "commander" && s.reply !== null).length;
+  return {
+    alone: steps.filter((s) => ALONE.includes(s.kind)).length,
+    approvals,
+    questions,
+    person: approvals + questions,
+    codeStops: steps.filter((s) => ["blocked", "email-limit", "send-held"].includes(s.kind)).length,
+  };
+}
+
 // What happened in each round, in order.
 export function rounds(steps) {
   const numbers = [...new Set(steps.filter((s) => s.round !== undefined).map((s) => s.round))].sort((a, b) => a - b);
@@ -41,6 +55,8 @@ export function rounds(steps) {
       rehearsed: mine.some((s) => s.kind === "rehearsal"),
       sealed: sealed ? sealed.envelope.predictions.map((p) => p.question) : [],
       // Newer runs record the step on which the email went out. Older ones only have the label.
+      preapproved: mine.some((s) => s.kind === "send-preapproved"),
+      held: mine.filter((s) => s.kind === "send-held").length,
       emailed: sent.some((s) => (s.emailed === undefined ? s.action === "send" : s.emailed)) || mine.some((s) => s.kind === "commander" && /Did the survey go out/.test(s.message ?? "") && /^\W*y/i.test(s.reply ?? "")),
       refused: mine.filter((s) => s.kind === "send-refused").length,
       opened: mine.some((s) => s.kind === "opened"),
@@ -61,7 +77,19 @@ export function summarize(run) {
   lines.push(`**The mission:** ${run.objective}`, "");
   lines.push(`**Given to the agent:** ${run.people} people to ask, a ${money(run.cap)} budget cap, and ${run.orders.length} standing orders.${run.emailLimit ? ` Nobody could be emailed more than ${times(run.emailLimit)}, reminders included.` : ""} Model: ${run.model}.`, "");
 
+  if (run.memory?.length > 0) lines.push("**What it remembered from earlier missions:**", "", ...run.memory.map((lesson) => `- ${lesson}`), "");
+
+  const own = autonomy(steps);
+  lines.push("## How much it did alone", "", `The agent took **${own.alone} steps on its own**. ${own.person === 0 ? "It did not stop for a person once." : `A person was needed ${times(own.person)}: ${own.approvals} send approval${own.approvals === 1 ? "" : "s"} and ${own.questions} question${own.questions === 1 ? "" : "s"} the agent chose to ask.`}${own.codeStops > 0 ? ` The code stopped it ${times(own.codeStops)}.` : ""}`, "");
+
   lines.push("## What the agent decided", "");
+  const plan = steps.find((s) => s.kind === "plan");
+  if (plan) {
+    lines.push("**Its plan, before it spent anything.**", "");
+    lines.push(`- It needed to find out: ${plan.needToKnow.map(cell).join("; ")}`);
+    lines.push(`- It already suspected: ${plan.hunches.map(cell).join("; ")}`);
+    lines.push(`- What would change its answer: ${cell(plan.wouldChange)}`, "");
+  }
   if (list.length === 0) lines.push("The agent wrote no survey.", "");
   for (const r of list) {
     lines.push(`**Round ${r.round}.**`, "");
@@ -69,7 +97,8 @@ export function summarize(run) {
     if (r.rehearsed) lines.push("- It rehearsed the survey on AI personas first. Their answers are synthetic.");
     if (r.sealed.length > 0) lines.push(`- Before sending, it sealed guesses on: ${r.sealed.map((q) => `"${cell(q)}"`).join("; ")}.`);
     if (r.refused > 0) lines.push(`- The commander refused the send ${times(r.refused)}.`);
-    lines.push(r.emailed ? "- The commander approved, and the survey was emailed." : "- The survey was not emailed, as far as the run can tell.");
+    if (r.held > 0) lines.push(`- The code held the send back ${times(r.held)}, because the survey did not pass its checks. The agent fixed the survey.`);
+    lines.push(r.emailed ? (r.preapproved ? "- The code checked the survey in the commander's place, and it was emailed." : "- The commander approved, and the survey was emailed.") : "- The survey was not emailed, as far as the run can tell.");
     if (r.debrief) {
       lines.push(`- Who was wrong: ${cell(r.debrief.whoWasWrong)}`);
       lines.push(`- Biggest surprise: ${cell(r.debrief.surprise)}`);
@@ -91,7 +120,9 @@ export function summarize(run) {
   if (talks.length > 0) lines.push("");
   const stopped = steps.filter((s) => s.kind === "email-limit").length;
   if (stopped > 0) lines.push(`The email limit refused the agent ${times(stopped)}: it tried to email people who had already had every email they may get.`, "");
-  if (run.practiceCommander) lines.push("Nobody was at the keyboard for this run, so the commander's replies and approvals were canned.", "");
+  if (run.handsOff) lines.push("The commander handed the mission over and was away, so nobody answered the agent and no person approved a send.", "");
+  else if (run.standInCommander) lines.push("Nobody was at the keyboard for this run, so an AI stand-in played the commander. Its replies and guesses are invented.", "");
+  else if (run.practiceCommander) lines.push("Nobody was at the keyboard for this run, so the commander's replies and approvals were canned.", "");
 
   lines.push("## The answer", "");
   if (!finish) {
@@ -108,6 +139,7 @@ export function summarize(run) {
       lines.push(`The agent marked these itself, its own guesses included. With ${run.people} people asked, the scoreboard shows how the method works. It does not show who is the better guesser.`, "");
     }
     lines.push(`**What changed between rounds.** ${finish.learned_between_rounds}`, "", `**Limits.** ${finish.limits}`, "");
+    if (finish.lessons?.length > 0) lines.push("**What it wrote down for its next mission.**", "", ...finish.lessons.map((lesson) => `- ${lesson}`), "");
   }
 
   lines.push("## The bill", "", "| Paid for | How many | Cost |", "|---|---|---|");

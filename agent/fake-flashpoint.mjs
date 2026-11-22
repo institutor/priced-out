@@ -12,7 +12,7 @@
 export const FAKE_TAG = "[FAKE FLASHPOINT: practice reply, no real survey or answers]";
 
 const cannedWriter = {
-  draft: async ({ survey, people }) => `Panel has ${people || "the listed"} members. Drafted survey ${survey} from your brief, with the questions as you described them and no skip rules.`,
+  draft: async ({ survey, people }) => `Panel has ${people || "the listed"} members. Drafted survey ${survey} from your brief, with no skip rules. The questions, in full:\n| Label | Type | Text | Options |\n| Q1 | Single choice | Which of these would you pick? | The lower option; The higher option |\n| Q2 | Open text | What is the main reason for your choice? | (free text) |`,
   change: async ({ survey }) => `Changed survey ${survey} as you asked.`,
   send: async () => {},
   results: async ({ survey }) => (survey === 1
@@ -67,6 +67,7 @@ export function fakeFlashpoint({ rehearsalFails = false, writer = cannedWriter, 
     }
 
     if (rehearsed > 0 && /persona|synthetic|rehears/.test(text)) return say(await writer.rehearsalResults({ survey, howMany: rehearsed, request: message }));
+    if (sent && /\bremind/.test(text)) return say(`A reminder for survey ${survey} was emailed to everyone who has not answered yet.`);
     if (sent) return say(await writer.results({ survey, people, request: message }));
 
     if (/\b(send|email)\b/.test(text) && published) {
