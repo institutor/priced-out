@@ -24,7 +24,7 @@ export function writeLessons(mode, entry, file = fileOf(mode)) {
   fs.mkdirSync(new URL("./", file), { recursive: true });
   if (!fs.existsSync(file)) {
     fs.writeFileSync(file, mode === "real"
-      ? "# What the agent has learned\n\nThe agent writes these itself at the end of each real mission, and reads the latest ones at the start of the next. Names and addresses are removed.\n"
+      ? "# What the agent has learned\n\nThe agent writes these itself at the end of each real run, and reads the latest ones at the start of the next. Names and addresses are removed.\n"
       : "# Practice notebook\n\nLessons from practice runs, where every answer was invented. They are kept apart from the real notebook.\n");
   }
   fs.appendFileSync(file, lessonEntry(entry));

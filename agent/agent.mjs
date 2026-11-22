@@ -79,7 +79,7 @@ const atDesk = Boolean(process.stdin.isTTY);
 const handsOff = resumed ? resumed.head.handsOff === true : argv.includes("--hands-off");
 
 if (!objective || !(cap > 0) || !Number.isInteger(emailLimit) || emailLimit < 1) {
-  console.log('usage: node agent/agent.mjs "<objective>" [--practice | --fake] [--cap 9] [--emails 2] [--hands-off] [--recipients file] [--orders file]\n       node agent/agent.mjs --resume agent/runs/<folder>');
+  console.log('usage: node agent/agent.mjs "<objective>" [--practice | --fake] [--cap 9] [--emails 2] [--hands-off] [--quiet 3] [--recipients file] [--orders file]\n       node agent/agent.mjs --resume agent/runs/<folder>');
   process.exit(1);
 }
 if (!fake && !atDesk) {

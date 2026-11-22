@@ -21,7 +21,7 @@ with a recommendation.
 | **What surprised it** | The social dinner came last. A skills workshop and a guest speaker tied for first. Shift work and "cliquey" socials kept people away. |
 | **Survey 2, on that surprise** | Three questions: workshop, speaker, or the two combined? The most you would pay? Which topic? |
 | **The recommendation** | A weekday evening with a professional guest: a short talk, then a hands-on part, free or cheap. Skip the social dinner. |
-| **How much it did alone** | 20 steps on its own. It did not stop for a person once. The code checked both sends in a person's place and never had to hold one back or push the agent on. (The log has 22 steps: the other two are those checks.) |
+| **How much it did alone** | 20 steps on its own. It did not stop for a person once. The code checked both sends in a person's place and never had to hold one back or push the agent on. (The log numbers a few more steps. Those are the code's, such as the check on each send.) |
 | **Cost** | Nothing, as a practice run. At real prices its ten messages come to $5.00 of the $9.00 budget. A real run needs a few more messages, about $7 for two rounds. |
 
 **That example is a practice run.** An AI stand-in played Flashpoint and invented every
@@ -105,8 +105,8 @@ node agent/check.mjs
 
 **A real run.** It emails the people on the list and spends Flashpoint credit. Before each
 send you see the survey and the exact message the agent would send to Flashpoint. Only a
-plain `yes` sends it. Anything else, such as "ok but change question 2", stops the send
-and goes back to the agent as your reason:
+plain yes sends it (`yes`, `ok`, `go ahead`). A reply with anything more in it, such as
+"ok but change question 2", stops the send and goes back to the agent as your reason:
 
 ```bash
 node agent/agent.mjs "Figure out the best event to put on for our club next spring."
@@ -175,7 +175,7 @@ They are in [`orders.md`](orders.md), and you can change them:
 
 When an order applies, the agent stops, quotes the order, says what it found, and waits
 for your reply. Between orders it does not ask what to do next. With `--hands-off` the
-orders become "I am away. Every decision is yours", unless you give your own file.
+orders become "I am away. Do not wait for me: every decision is yours", unless you give your own file.
 
 ## It learns from one run to the next
 
@@ -370,7 +370,7 @@ Five more practice runs are kept beside it, and the page can show each of them:
 ### What a run leaves behind
 
 Every run writes three things into its folder under `agent/runs/`: `log.md` (every
-message, reply and receipt), `summary.md` (one page on what the agent decided, and how
+message, reply and slip), `summary.md` (one page on what the agent decided, and how
 much it did alone), and `steps.json` (the same steps as data). A folder that starts with
 `practice-` or `fake-` is a practice run. It holds no real answers and is not in the
 repository.

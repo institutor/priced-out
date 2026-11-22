@@ -234,7 +234,7 @@ It chose to finish after one round with budget left and this still unknown: Whet
 
 Its reason: Direction is clear enough: free Saturday outdoor event. A follow-up could split picnic vs trip but picnic is already ahead and free fits budget constraints; I'll leave that to the commander.
 
-The loop asks this once per mission. The decision stays the agent's.
+The loop asks this once per run. The decision stays the agent's.
 
 ### Step 12: what the round 1 envelope taught the agent
 

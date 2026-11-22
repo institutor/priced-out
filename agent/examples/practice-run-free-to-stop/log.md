@@ -260,7 +260,7 @@ It chose to finish after one round with budget left and this still unknown: Whet
 
 Its reason: The workshop lead is clear and price and timing are settled enough; a follow-up on topic would need club-specific options I don't have, so more spend is unlikely to change the recommendation.
 
-The loop asks this once per mission. The decision stays the agent's.
+The loop asks this once per run. The decision stays the agent's.
 
 ### Step 12: what the round 1 envelope taught the agent
 

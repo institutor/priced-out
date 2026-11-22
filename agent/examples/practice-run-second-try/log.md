@@ -264,7 +264,7 @@ It chose to finish after one round with budget left and this still unknown: Whet
 
 Its reason: Workshop leads clearly; a follow-up on topic is possible but the answer would barely change, and the goodwill cost isn't worth it.
 
-The loop asks this once per mission. The decision stays the agent's.
+The loop asks this once per run. The decision stays the agent's.
 
 ### Step 12: what the round 1 envelope taught the agent
 

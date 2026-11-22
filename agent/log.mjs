@@ -79,7 +79,7 @@ export function logEntry(step) {
     case "resumed":
       return `${n} the run was resumed after ${step.away}\n\n${step.cutOff.length > 0 ? `It had been stopped during: ${step.cutOff.join(", ")}. The agent was told that step's outcome is not known, and its price was counted as spent to be safe.` : "It had been stopped between steps."}\n`;
     case "challenge":
-      return `${n} the agent was asked to think again before stopping\n\nIt chose to finish after one round with budget left and this still unknown: ${step.stillUnknown}\n\nIts reason: ${step.reason}\n\nThe loop asks this once per mission. The decision stays the agent's.\n`;
+      return `${n} the agent was asked to think again before stopping\n\nIt chose to finish after one round with budget left and this still unknown: ${step.stillUnknown}\n\nIts reason: ${step.reason}\n\nThe loop asks this once per run. The decision stays the agent's.\n`;
     case "send-approved":
       return `${n} the commander approved the round ${step.round} send\n\n*Commander:* ${step.reply}\n`;
     case "send-refused":

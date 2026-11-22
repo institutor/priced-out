@@ -238,7 +238,7 @@ It chose to finish after one round with budget left and this still unknown: Whet
 
 Its reason: Both top options point to one newcomer-onboarding fix; a follow-up on 8 people would likely still tie, and the answer is actionable.
 
-The loop asks this once per mission. The decision stays the agent's.
+The loop asks this once per run. The decision stays the agent's.
 
 ### Step 12: what the round 1 envelope taught the agent
 

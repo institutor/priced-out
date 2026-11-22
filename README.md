@@ -86,7 +86,7 @@ It was run hands-off, with nobody at the keyboard. What the agent decided:
   It said the choice between the two "is still soft", and that 8 people give a
   direction, not a measurement.
 - **How much it did alone.** 20 steps on its own. It did not stop for a person once.
-  (The log has 22 steps: the other two are the code checking each send.)
+  (The log numbers a few more steps. Those are the code's, such as the check on each send.)
 - **What it learned.** It began with six lessons from two earlier runs and ended by
   writing three more.
 - **The bill.** Ten messages to Flashpoint: $5.00 of a $9.00 budget. A real run needs a
