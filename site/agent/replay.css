@@ -1081,3 +1081,24 @@ html.present .m-beat .sub {
 html.present #glance .section-body > p:first-child {
   display: none;
 }
+
+/* The label ------------------------------------------------------------------------ */
+
+/* On this page the label sits at the top and scrolls away with the page. The
+   parts that left room for a pinned label leave none. */
+#banner {
+  position: static;
+}
+
+:root {
+  --banner: 0px !important;
+}
+
+/* As screens it is on every one, so there it says the same thing in fewer words. */
+:root.present .banner .long {
+  display: none;
+}
+
+:root.present .banner .short {
+  display: inline;
+}
