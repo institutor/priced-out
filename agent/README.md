@@ -349,6 +349,7 @@ labelled as one above everything else on the page.
 | `summary.mjs` | Turns the steps into a one-page summary of what the agent decided. |
 | `check.mjs` | The free check before a real run. |
 | `publish-run.mjs` | Puts one run on the page, `../site/agent/`. |
+| `../site/agent/` | The page: `story.js` groups a run's steps into parts, `replay.js` tells them, `draw.js` and `vignette.js` draw, `present.js` is present mode and the self-playing explainer. |
 | `real-flashpoint.mjs` | Talks to the real Flashpoint over MCP and pays for each call. |
 | `fake-flashpoint.mjs` | The stand-in Flashpoint: the same draft, confirm, send, results steps as the real one. |
 | `practice-writer.mjs` | For `--practice`: a small AI model writes the stand-in's survey text and invents the answers. |

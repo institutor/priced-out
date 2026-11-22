@@ -636,8 +636,14 @@ site/js/ui/           one module per section of the page, plus the title page (c
 site/js/ingest/       CSV reader, Flashpoint export reader, MaxDiff scoring, aggregation:
                       the page and the build script both read an export with these.
                       club.js is the reader the page uses for a club's own file
+agent/                the Sealed Envelope, the agent for the MCP Challenge (its README
+                      lists every file), with its example runs in agent/examples/
+site/agent/           the agent's page: the run told part by part (replay.js, story.js),
+                      its drawings (draw.js, vignette.js, scene.js) and present mode
+                      (present.js). The runs it shows are site/data/agent-run*.json
 scripts/              build-data (export to dataset), evaluate (the check against made-up
-                      clubs), make-example (the made-up club), make-sample, dev server
+                      clubs), make-example (the made-up club), make-sample, dev server,
+                      draw-loop (the agent's loop drawing for the READMEs)
 site/data/            dataset.json (the published answers), evaluation.json (what the check
                       found), example-club.csv (the made-up club)
 test/                 node:test suites
