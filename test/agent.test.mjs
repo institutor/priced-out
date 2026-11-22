@@ -801,3 +801,10 @@ test("a two-letter name is taken out as well", () => {
   assert.equal(redact("Li answered first, then Wu."), "[person 1] answered first, then [person 1].");
   assert.equal(redact("An answer came in. Do not send."), "An answer came in. Do not send.");
 });
+
+test("after a rehearsal the agent is told how to make it count", async () => {
+  const { llm, seen } = scripted([ask("Write a survey", "design"), ask("confirm", "publish"), { name: "rehearse_on_personas", input: { audience: "club members", how_many: 8, why: "catch broken questions", could_change: "the wording" } }, finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), commander: desk().commander, wait: async () => {} });
+  assert.match(seen[3], /ask Flashpoint for the persona results/);
+  assert.doesNotMatch(kinds(out, "rehearsal")[0].reply, /make the rehearsal count/, "the hint is the code's, so it is kept out of Flashpoint's logged reply");
+});

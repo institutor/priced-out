@@ -618,7 +618,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   }
 
   // The rehearsal and the deck are extras. If one fails the mission carries on.
-  async function paidExtra({ kind, tool, price, input, run, unavailable }) {
+  async function paidExtra({ kind, tool, price, input, run, unavailable, next = "" }) {
     if (!run) return { text: unavailable, failed: true };
     if (overBudget(price)) {
       note({ kind: "blocked", tool, why: input.why });
@@ -630,7 +630,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       const text = redact(reply.text);
       given.push(text);
       note({ kind, round, why: input.why, couldChange: input.could_change ?? "", reply: text, receipts: reply.receipts ?? [], price, spent, ...(reply.file ? { file: reply.file } : {}) });
-      return { text: `${text}\n\n${left()}` };
+      return { text: `${text}${next}\n\n${left()}` };
     } catch (err) {
       if (err?.charged === true) spent += price;
       const text = redact(err?.message ?? err);
@@ -690,6 +690,8 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
         kind: "rehearsal", tool: name, price: PRICES.rehearsal, input,
         run: fp.rehearse && (() => fp.rehearse({ audience: String(input.audience ?? ""), howMany, objective })),
         unavailable: "Persona rehearsals are not available in this run. Carry on without one.",
+        // A rehearsal nobody reads is money spent on a tick mark.
+        next: "\n\nThis says whether the personas got through the survey, not what they answered. To make the rehearsal count, ask Flashpoint for the persona results (one more paid message), fix any question that tripped them, and put what they answered into personas_guess when you seal the envelope.",
       });
     }
     if (name === "make_deck") {
