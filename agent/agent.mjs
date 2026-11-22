@@ -6,7 +6,7 @@
 //                                               invents the answers. No emails, no credit.
 //   node agent/agent.mjs "<mission>" --fake     the same with fixed canned replies (used by the tests)
 //
-//   --cap 8            most the run may spend on Flashpoint, in USDC (default 8)
+//   --cap 9            most the run may spend on Flashpoint, in USDC (default 9)
 //   --emails 2         most emails anyone on the list may get, reminders included (default 2)
 //   --recipients file  who to survey, one "Name, email" per line (default agent/recipients.txt)
 //   --orders file      your standing orders, one "- order" per line (default agent/orders.md)
@@ -61,7 +61,7 @@ if (resumeDir) {
   }
 }
 const objective = resumed ? resumed.head.objective : argv.find((arg, i) => !arg.startsWith("--") && !valueFlags.includes(argv[i - 1]));
-const cap = Number(flag("--cap") ?? resumed?.head.cap ?? 8);
+const cap = Number(flag("--cap") ?? resumed?.head.cap ?? 9);
 // A resumed run keeps the limit it started with: it is a promise to the people on the list.
 const emailLimit = Number(resumed ? resumed.head.emailLimit ?? EMAIL_LIMIT : flag("--emails") ?? EMAIL_LIMIT);
 // A resumed run reads the list it started with, unless told otherwise.
@@ -72,7 +72,7 @@ const atDesk = Boolean(process.stdin.isTTY);
 const handsOff = resumed ? resumed.head.handsOff === true : argv.includes("--hands-off");
 
 if (!objective || !(cap > 0) || !Number.isInteger(emailLimit) || emailLimit < 1) {
-  console.log('usage: node agent/agent.mjs "<mission>" [--practice | --fake] [--cap 8] [--emails 2] [--hands-off] [--recipients file] [--orders file]\n       node agent/agent.mjs --resume agent/runs/<folder>');
+  console.log('usage: node agent/agent.mjs "<mission>" [--practice | --fake] [--cap 9] [--emails 2] [--hands-off] [--recipients file] [--orders file]\n       node agent/agent.mjs --resume agent/runs/<folder>');
   process.exit(1);
 }
 if (!fake && !atDesk) {

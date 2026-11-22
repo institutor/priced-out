@@ -1,8 +1,8 @@
-# Mission summary 2026-11-22T09-03-06
+# Run summary 2026-11-22T09-03-06
 
 **This was a practice run. An AI stand-in played Flashpoint and invented every answer. No survey was sent and no real person answered. Nothing below is a finding.**
 
-**The mission:** Figure out the best event to put on for our club next spring.
+**The objective:** Figure out the best event to put on for our club next spring.
 
 **Given to the agent:** 8 people to ask, a $9.00 budget cap, and 3 standing orders. Nobody could be emailed more than 2 times, reminders included. Model: claude-sonnet-5-5.
 

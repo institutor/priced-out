@@ -68,7 +68,7 @@ test("a practice run's summary says so before anything else, and a real one does
   const steps = await twoRounds();
   for (const mode of ["practice", "fake"]) {
     const text = summarize({ ...head, mode, practiceCommander: true, steps });
-    assert.ok(text.indexOf("No survey was sent and no real person answered") < text.indexOf("The mission:"), mode);
+    assert.ok(text.indexOf("No survey was sent and no real person answered") < text.indexOf("The objective:"), mode);
     assert.match(text, /Nothing below is a finding/);
     assert.match(text, /This practice run paid nothing/);
     assert.match(text, /replies and approvals were canned/);

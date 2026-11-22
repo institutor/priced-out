@@ -1,6 +1,6 @@
-# Mission log 2026-11-22T09-03-06 (practice run: an AI stand-in played Flashpoint and invented every answer. No real survey, no real people.)
+# Run log 2026-11-22T09-03-06 (practice run: an AI stand-in played Flashpoint and invented every answer. No real survey, no real people.)
 
-**Mission from the commander:** Figure out the best event to put on for our club next spring.
+**The objective, from the commander:** Figure out the best event to put on for our club next spring.
 
 **People on the list:** 8. **Budget cap:** $9.00. **Most emails to any one person:** 2, reminders included. **Model:** claude-sonnet-5-5.
 

@@ -72,9 +72,9 @@ export function summarize(run) {
   const list = rounds(steps);
   const talks = steps.filter((s) => s.kind === "commander");
   const spent = steps.reduce((most, s) => Math.max(most, s.spent ?? 0), 0);
-  const lines = [`# Mission summary ${run.stamp}`, ""];
+  const lines = [`# Run summary ${run.stamp}`, ""];
   if (PRACTICE[run.mode]) lines.push(PRACTICE[run.mode], "");
-  lines.push(`**The mission:** ${run.objective}`, "");
+  lines.push(`**The objective:** ${run.objective}`, "");
   lines.push(`**Given to the agent:** ${run.people} people to ask, a ${money(run.cap)} budget cap, and ${run.orders.length} standing orders.${run.emailLimit ? ` Nobody could be emailed more than ${times(run.emailLimit)}, reminders included.` : ""} Model: ${run.model}.`, "");
 
   if (run.memory?.length > 0) lines.push("**What it remembered from earlier missions:**", "", ...run.memory.map((lesson) => `- ${lesson}`), "");

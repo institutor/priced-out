@@ -25,7 +25,7 @@ test("an empty list is a problem", () => {
 });
 
 test("the cap is turned into rounds at about two dollars each", () => {
-  assert.deepEqual(whatCapBuys(8), { rounds: 4, withRehearsal: 3 });
-  assert.deepEqual(whatCapBuys(3), { rounds: 1, withRehearsal: 0 });
-  assert.equal(whatCapBuys(1.5).rounds, 0);
+  assert.deepEqual(whatCapBuys(9), { rounds: 2, withRehearsal: 2 });
+  assert.deepEqual(whatCapBuys(4), { rounds: 1, withRehearsal: 0 });
+  assert.equal(whatCapBuys(3).rounds, 0);
 });

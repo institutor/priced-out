@@ -31,8 +31,13 @@ export function listProblems(text) {
 }
 
 // What a budget cap pays for. A round is a survey written, published, sent and read.
+// A real round is about seven messages: write the survey, publish it (the
+// real Flashpoint asks for a confirm or two on the way), email it, confirm,
+// and read the results.
+export const REAL_ROUND = 7 * PRICES.survey;
+
 export function whatCapBuys(cap) {
-  const round = 4 * PRICES.survey;
+  const round = REAL_ROUND;
   return { rounds: Math.floor(cap / round), withRehearsal: Math.floor((cap - PRICES.rehearsal - PRICES.survey) / round) };
 }
 
@@ -40,7 +45,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const root = new URL("../", import.meta.url);
   const argv = process.argv.slice(2);
   const flag = (name) => (argv.includes(name) ? argv[argv.indexOf(name) + 1] : undefined);
-  const cap = Number(flag("--cap") ?? 8);
+  const cap = Number(flag("--cap") ?? 9);
   const recipientsFile = flag("--recipients") ?? new URL("agent/recipients.txt", root);
   const ordersFile = flag("--orders") ?? new URL("agent/orders.md", root);
 
@@ -111,8 +116,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       if (usdc < PRICES.survey) bad(`The wallet holds ${usdc} USDC, which is less than one step.`);
       else if (usdc < cap) warn(`The wallet holds ${usdc} USDC, which is less than the $${cap.toFixed(2)} cap. The run would stop when the wallet is empty.`);
       else ok(`The wallet holds ${usdc} USDC. This run may spend up to $${cap.toFixed(2)} of it.`);
-      if (buys.rounds < 1) warn("That is not enough for one full round (write, publish, send, read: about $2.00).");
-      else ok(`That is enough for about ${buys.rounds} round${buys.rounds === 1 ? "" : "s"}${buys.withRehearsal >= 1 ? `, or ${buys.withRehearsal} with a persona rehearsal` : ""}. A round is about $2.00.`);
+      if (buys.rounds < 1) warn(`That is not enough for one full round (write, publish, send, read: about $${REAL_ROUND.toFixed(2)}).`);
+      else ok(`That is enough for about ${buys.rounds} round${buys.rounds === 1 ? "" : "s"}${buys.withRehearsal >= 1 ? `, or ${buys.withRehearsal} with a persona rehearsal` : ""}. A round is about $${REAL_ROUND.toFixed(2)}, and a follow-up round needs the same again.`);
     } catch (err) {
       bad(`Flashpoint could not be reached: ${String(err?.message ?? err).slice(0, 200)}`);
     }

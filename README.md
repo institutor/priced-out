@@ -1,6 +1,6 @@
 # Priced Out
 
-> **Here for the MCP Challenge?** The agent is the Sealed Envelope: [what it does](#mcp-challenge-an-agent-that-does-the-research-with-you), [a mission you can replay step by step](https://institutor.github.io/priced-out/agent/), and [how to run it](agent/README.md).
+> **Here for the MCP Challenge?** The agent is the Sealed Envelope. Give it one objective and it runs the survey research through the Flashpoint MCP: [what it does](#mcp-challenge-an-agent-that-does-the-research-with-you), [a run you can watch part by part](https://institutor.github.io/priced-out/agent/), and [how to run it, with the objective given and what the agent decided](agent/README.md).
 
 During my time in high school, I found myself often faced with times where I couldn't
 exactly afford to pay for certain club dues, and I wish I could have done something about
@@ -63,40 +63,43 @@ treasurer loads the export in the browser and every number becomes their members
 ## MCP Challenge: an agent that does the research with you
 
 `agent/` holds a second tool, built for the MCP Challenge. It is called the Sealed
-Envelope. You are the commander: you give it a mission and a few standing orders. It
-decides what survey to make, has Flashpoint build it, may rehearse it on AI personas,
-emails it once you approve, reads the answers, and runs a second round on what it
-learned. It comes to you only when an order says so.
+Envelope.
 
-Before each survey goes out, the agent, the AI personas and you each seal a guess of what
-people will say. When the real answers are in, the envelope is opened, and whatever was
+**One objective in, an answer out.** You give the agent one sentence, a list of people to
+email and a budget. Through the Flashpoint MCP it decides what survey to make, sends it
+to the list, reads the answers, runs a follow-up round on what it learned, and comes back
+with a recommendation. It comes to you only when one of your standing orders says so, or
+not at all with `--hands-off`.
+
+Before each survey goes out, the agent seals a guess of what people will say. You can
+seal one too. When the real answers are in, the envelope is opened, and whatever was
 guessed wrong is what the next round asks about.
 
-**Watch a mission, step by step:** <https://institutor.github.io/priced-out/agent/>
+**Watch a run, part by part:** <https://institutor.github.io/priced-out/agent/>
+(press **P** there for present mode)
 
 ### What the agent decides, and what it cannot
 
 | The agent decides | The code holds, whatever the agent says |
 |---|---|
-| What to ask, and how to word it | No email goes out until the commander has seen the survey and typed yes |
-| Whether to rehearse on AI personas first | A budget cap. A paid step that would pass it is refused |
-| What it expects people to answer | The commander's guess stays hidden from the agent until the envelope is opened |
-| Who was wrong, and what that means | A guess cannot be sealed or changed after the survey is sent |
-| Whether to run another round, and on what | Addresses never reach the model or the logs, and the names on the list are taken out |
-| When to stop, and the final recommendation | Every paid step is logged with its price and the decision it could change |
-| | Nobody gets more than two emails in a mission, reminders included. A third is refused |
+| What to ask, and how to word it | No email goes out until you have typed yes, or, hands-off, until the survey passes fixed checks |
+| Whether to rehearse on AI personas first | A budget. A paid step that would go over it is refused |
+| What it expects people to answer | Nobody gets more than two emails in a run, reminders included |
+| Who was wrong, and what that means | Your guess stays hidden from the agent until the envelope is opened |
+| Whether to run another round, and on what | A guess cannot be sealed or changed after the survey is sent |
+| When to stop, and the final recommendation | Addresses never reach the model or the logs, and names on the list are taken out |
+| What to remember for its next run | Every paid step is logged with its price and the decision it could change |
 
-**People's time.** The agent can run a follow-up round, and a follow-up is one more email to
-people who are doing you a favour. So the code counts: by default nobody gets more than two
-emails in a mission (`--emails` changes it), and you approve each one. The agent is told to
-say in the first survey that one short follow-up may come, and to keep the follow-up to three
-questions at most.
+**People's time.** A follow-up round is one more email to people who are doing you a
+favour. So the code counts: by default nobody gets more than two emails in a run
+(`--emails` changes it). The agent is told to say in the first survey that one short
+follow-up may come, and to keep the follow-up to three questions at most.
 
 ### How to run it
 
 ```bash
 npm install
-node agent/agent.mjs "Find the ticket price for our spring formal that keeps the most members coming." --practice
+node agent/agent.mjs "Figure out the best event to put on for our club next spring." --practice
 ```
 
 `--practice` is a practice run: an AI stand-in plays Flashpoint and invents the answers,
@@ -108,39 +111,40 @@ run is ready. The rest is in [agent/README.md](agent/README.md).
 
 **No real run has been made yet.** What follows is a practice run, kept as an example
 of what a run produces. An AI stand-in played Flashpoint and invented every answer, and
-nobody was at the keyboard, so the commander's replies were canned. Nothing in it is a
+another played the commander because nobody was at the keyboard. Nothing in it is a
 finding.
 
 The objective given:
 
-> We want more members at our weekly meetings. What is the one change that would bring
-> the most people back?
+> Figure out the best event to put on for our club next spring.
 
 What the agent decided, in that practice run:
 
-- **Survey 1.** It asked the commander what changes were on the table, then had
-  Flashpoint write a short survey: which one change would bring you back, and why. Its
-  opening line told people that one short follow-up might come later.
-- **The envelope.** It guessed that a different day or time would win.
-- **What came back.** A three-way split between a closer venue, shorter meetings and
-  more varied content. Nobody picked day or time, so the agent's guess was wrong.
-- **Going to the commander.** The split set off the order "Come to me if the answers
-  split evenly", so the agent stopped and reported before going on.
-- **Survey 2.** A short follow-up on what round one left open: if only one of these
-  could happen, which would you want? It added a new option that came out of people's
-  own words, a flexible drop-in. Its opening line said it was the follow-up and why it
-  was worth a minute.
-- **Stopping.** Round two split again. Everyone had now had their two emails, so the
-  agent could not send a third survey, and it said so.
-- **The recommendation.** No single change won. If one must be picked, make attending
-  easier, with a closer venue or a drop-in option. It said plainly that three people
-  give a direction, not a measurement.
-- **The bill.** Nine messages to Flashpoint: $4.50 of an $8.00 cap, at the prices a
-  real run would have paid.
+- **The plan.** Before spending anything, it wrote down what it needed to know: which
+  kind of event members prefer, and what would make them come.
+- **Survey 1.** Rank five kinds of event, pick a day and time, the most you would pay,
+  and one open question. Its opening line said one short follow-up might come.
+- **The envelope.** It guessed a social evening or a picnic would lead, and that most
+  people would pay up to $10.
+- **What came back.** The picnic ranked first and the social evening last. All 8 chose
+  Saturday daytime. Money worries came up again and again. The agent wrote "I was wrong".
+- **Stop or go on?** It first chose to stop. The code asked it once to think again, and
+  it chose a follow-up.
+- **Survey 2.** Three questions on what round 1 left open: a free picnic, a subsidised
+  day trip, a small event plus an aid fund, or no event, and what would stop you coming.
+- **Stopping.** Round 2 split, with cost the top barrier. Everyone had now had their two
+  emails, so there could be no third survey, and the agent said so.
+- **The recommendation.** A free or very cheap Saturday daytime outdoor event with kids
+  welcome. A picnic is the safe choice, and a subsidised day trip is close behind. It
+  said plainly that 8 people give a direction, not a measurement.
+- **How much it did alone.** 20 steps on its own. It went to a person 4 times: 2
+  approvals to send, and 2 updates its standing orders asked for.
+- **The bill.** Ten messages to Flashpoint: $5.00 of a $9.00 budget, at the prices a
+  real run pays.
 
 The full example is in [agent/examples/practice-run/](agent/examples/practice-run/):
 [the one-page summary](agent/examples/practice-run/summary.md) and
-[the log](agent/examples/practice-run/log.md), with every message, reply, receipt,
+[the log](agent/examples/practice-run/log.md), with every message, reply, slip,
 envelope and debrief.
 
 ## Try it yourself, in a few minutes

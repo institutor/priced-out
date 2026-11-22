@@ -19,9 +19,9 @@ const PRACTICE_NOTE = {
 
 export function logHeader({ objective, people, cap, emailLimit, model, orders, mode = "real", practiceCommander, standInCommander, handsOff, memory = [], stamp }) {
   const lines = [
-    `# Mission log ${stamp}${PRACTICE_NOTE[mode] ?? ""}`,
+    `# Run log ${stamp}${PRACTICE_NOTE[mode] ?? ""}`,
     "",
-    `**Mission from the commander:** ${objective}`,
+    `**The objective, from the commander:** ${objective}`,
     "",
     `**People on the list:** ${people}. **Budget cap:** ${money(cap)}.${emailLimit ? ` **Most emails to any one person:** ${emailLimit}, reminders included.` : ""} **Model:** ${model}.`,
     "",
