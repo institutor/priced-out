@@ -236,7 +236,17 @@ function typed(prompt, { timeoutMs = 0 } = {}) {
   });
 }
 
-const rule = (label) => console.log(`\n── ${label} ${"─".repeat(Math.max(3, 66 - label.length))}`);
+// A little colour when a person is watching; plain text when piped to a file.
+const colour = process.stdout.isTTY && !process.env.NO_COLOR;
+const paint = (code, text) => (colour ? `\x1b[${code}m${text}\x1b[0m` : text);
+const bold = (text) => paint("1", text);
+const dim = (text) => paint("2", text);
+const rule = (label) => console.log(`\n${bold(`── ${label} ${"─".repeat(Math.max(3, 66 - label.length))}`)}`);
+// The step number in cyan, the first line as it is, the lines under it dimmed.
+const printStep = (text) => {
+  const [first, ...rest] = text.split("\n");
+  console.log([first.replace(/^\[[ \d]+\]/, (tag) => paint("36", tag)), ...rest.map(dim)].join("\n"));
+};
 const indent = (text) => String(text).split("\n").map((line) => `  ${line}`).join("\n");
 
 function show(request) {
@@ -249,10 +259,11 @@ function show(request) {
     rule(`Approve the round ${request.round} send?`);
     console.log(`  The agent wants to email this survey to ${request.people} ${request.people === 1 ? "person" : "people"}. It cannot be undone.\n`);
     console.log(indent(request.survey || "(Flashpoint has not shown a draft.)"));
+    if (request.changes?.length > 0) console.log(`\n  Changes Flashpoint reported after that:\n\n${request.changes.map((change) => indent(change)).join("\n\n")}`);
   }
   if (request.kind === "guess") {
-    rule(`Sealed envelope, round ${request.round}: your guess`);
-    console.log("  The agent has sealed its own guess and cannot see yours until the results are in.\n");
+    rule(`Sealed envelope, round ${request.round}: your guess (${request.number} of ${request.of})`);
+    if (request.number === 1) console.log("  The agent has written down its own guess. It cannot see yours until the results are in.\n");
     console.log(indent(request.question));
   }
 }
@@ -289,7 +300,7 @@ function record(step) {
   fs.writeFileSync(new URL("steps.json", runDir), JSON.stringify({ ...head, steps }, null, 2));
   if (step.kind === "sealed") fs.writeFileSync(new URL(`envelope-round-${step.round}.json`, runDir), JSON.stringify(step.envelope));
   fs.appendFileSync(logFile, `${logEntry(step)}\n`);
-  console.log(shortLine(step));
+  printStep(shortLine(step));
 }
 
 fs.writeFileSync(logFile, logHeader(head));

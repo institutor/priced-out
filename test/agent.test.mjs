@@ -259,3 +259,15 @@ test("a message that tells Flashpoint to email people is gated, whatever it is l
   assert.equal(out.spent, 0);
   assert.match(seen[1], /would email people, and the round's envelope is not sealed/);
 });
+
+test("the commander approves from the latest full survey, plus any changes since", async () => {
+  const long = (name) => `${name}: Q1 What would you pay? Q2 Would you come? ${"x".repeat(200)}`;
+  const replies = [long("first draft"), long("second draft"), "Reworded Q2 as asked.", "Publishing makes it live. Reply confirm.", "Sent."];
+  const flashpoint = async () => ({ text: replies.shift() });
+  const { commander, asked } = desk();
+  await run([ask("Write a survey", "design"), ask("Shorten it and show it again", "design"), ask("Reword Q2", "design"), seal(), ask("publish it", "publish"), ask("confirm", "send"), finish], { flashpoint, commander });
+  const approval = asked.find((a) => a.kind === "approve_send");
+  assert.match(approval.survey, /^second draft/);
+  assert.deepEqual(approval.changes, ["Reworded Q2 as asked."]);
+  assert.deepEqual(asked.filter((a) => a.kind === "guess").map((a) => [a.number, a.of]), [[1, 1]]);
+});

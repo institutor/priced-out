@@ -121,7 +121,7 @@ export function shortLine(step) {
   const tag = `[${String(step.n).padStart(2, " ")}]`;
   const paid = (step) => `${money(step.price)}, ${money(step.spent)} spent`;
   switch (step.kind) {
-    case "thinking": return `${tag} ${step.text}`;
+    case "thinking": return `${tag} Agent: ${step.text}`;
     case "flashpoint": return `${tag} Flashpoint: ${ACTIONS[step.action] ?? "a message"} (${paid(step)})\n       could change: ${step.couldChange || "(none given)"}`;
     case "flashpoint-failed": return `${tag} Flashpoint failed, not charged: ${step.error}`;
     case "rehearsal": return `${tag} Dress rehearsal on AI personas (${paid(step)})\n       could change: ${step.couldChange || "(none given)"}`;

@@ -226,7 +226,7 @@ The sealed envelope
 Before each survey is sent, call seal_predictions with what you expect people to answer on its main questions. If you rehearsed on personas, put their answers in as the personas' guess. The commander seals a guess too, and you cannot see it. After the real results are in, call open_envelope, then debrief: who was wrong (yourself first), what surprised everyone, what is still unknown, and your next move. A wrong guess or a surprise is the most useful thing a round can give you. It marks what nobody understood yet, and that is what the next round should ask about. Often the surprise is that the thing you asked about is not what decides the matter; then the next round asks about the thing that does.
 
 The people
-There are ${people} people on the list. They have agreed to be surveyed. You never see their addresses: write {{RECIPIENTS}} in a message to Flashpoint and the list is put in for you. Survey only these people. Emailing them cannot be undone, so have Flashpoint draft first (tell it "do not publish or send yet"), and read the survey it wrote before you ask to send it.
+There are ${people} people on the list. They have agreed to be surveyed. You never see their addresses: write {{RECIPIENTS}} in a message to Flashpoint and the list is put in for you. Survey only these people. Emailing them cannot be undone, so have Flashpoint draft first (tell it "do not publish or send yet"), and read the survey it wrote before you ask to send it. The commander approves from the last full list of questions Flashpoint showed, so if you change the survey, ask Flashpoint to show the full survey again.
 
 Budget and receipts
 You have $${cap.toFixed(2)}. Every tool result tells you what is left. Each paid step needs a receipt: the decision of yours that it could change. If you cannot name one, the step is not worth its price, so skip it. Keep enough budget to read the results of anything you send. The budget is there to be used on steps that could change the answer: finishing with an open question you could have afforded to ask is a worse result than spending the money. Stop when no step you can afford could change your answer, and say that is why you stopped; what is left then goes back to the commander.
@@ -267,6 +267,7 @@ export function unbackedNumbers(text, sources) {
 }
 
 const saysYes = (text) => /^\W*(y|yes|yep|yeah|ok|okay|approve|approved|go|go ahead|send|send it|do it)\b/i.test(String(text ?? ""));
+const listsQuestions = (text) => text.length > 200 && (text.match(/\?/g) ?? []).length >= 2;
 const isConfirm = (text) => /^\W*confirm\W*$/i.test(text);
 // True when a message tells Flashpoint to email people now. "Names and emails" and
 // "do not send yet" do not count.
@@ -299,7 +300,8 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   // The state of the current round's survey.
   let round = 1;
   let started = false; // a Flashpoint step has happened in this round
-  let draft = ""; // the latest survey text Flashpoint showed
+  let draft = ""; // the latest reply in which Flashpoint showed the survey's questions
+  let changes = []; // what Flashpoint said it changed since then
   let lastReply = "";
   let approved = false; // the commander approved emailing this survey
   let sent = false;
@@ -327,7 +329,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       note({ kind: "send-refused", round, reason: "Nobody was at the desk to approve the send." });
       return "Not sent: nobody is at the desk to approve the send, so no email can go out. Nothing was charged. Call finish with what you have.";
     }
-    const reply = await hear({ kind: "approve_send", round, people: recipients.length, survey: draft, why: redact(input.why) });
+    const reply = await hear({ kind: "approve_send", round, people: recipients.length, survey: draft, changes, why: redact(input.why) });
     given.push(reply);
     if (!saysYes(reply)) {
       note({ kind: "send-refused", round, reason: reply || "(no reason given)" });
@@ -348,7 +350,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     if (newSurvey && owesDebrief()) return { text: DEBRIEF_FIRST, failed: true };
     if (newSurvey && started) {
       round += 1;
-      started = false; draft = ""; lastReply = ""; approved = false; sent = false; readAfterSend = false; envelope = null; opened = false; debriefed = false;
+      started = false; draft = ""; changes = []; lastReply = ""; approved = false; sent = false; readAfterSend = false; envelope = null; opened = false; debriefed = false;
     }
     // A bare "confirm" does whatever Flashpoint last offered. Unless that was plainly
     // publishing and nothing else, treat it as a send, whatever the model called it.
@@ -366,7 +368,10 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       const text = redact(reply.text);
       given.push(text);
       lastReply = text;
-      if (input.action === "design" || draft === "") draft = text;
+      if (!sending && input.action !== "results") {
+        if (draft === "" || listsQuestions(text)) { draft = text; changes = []; }
+        else if (input.action === "design") changes.push(text);
+      }
       if (sending) sent = true;
       else if (sent) readAfterSend = true;
       note({ kind: "flashpoint", round, action: input.action ?? "other", why: input.why, couldChange: input.could_change ?? "", message: redact(message), reply: text, receipts: reply.receipts ?? [], price: PRICES.survey, spent });
@@ -407,7 +412,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     const predictions = [];
     for (const item of list) {
       const question = redact(item.question);
-      const guess = commander ? await hear({ kind: "guess", round, question }) : "";
+      const guess = commander ? await hear({ kind: "guess", round, question, number: predictions.length + 1, of: list.length }) : "";
       predictions.push({ question, agent: redact(item.agent_guess), personas: item.personas_guess ? redact(item.personas_guess) : null, commander: guess === "" ? null : guess });
     }
     const content = { round, sealed_at: new Date().toISOString(), predictions };
