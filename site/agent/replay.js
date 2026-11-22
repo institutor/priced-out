@@ -12,7 +12,7 @@ import * as contents from "../js/ui/contents.js";
 import * as cover from "../js/ui/cover.js";
 import * as scene from "./scene.js";
 import { aboutRun, autonomy, glance, lastOf, money, partsOf, roundsIn, runFor, short } from "./story.js";
-import { arrowTo, card, envelope, meter, numbered, slip, stamp, verdict } from "./draw.js";
+import { arrowTo, card, envelope, loop, meter, numbered, slip, stamp, verdict } from "./draw.js";
 import * as present from "./present.js";
 import { vignette } from "./vignette.js";
 
@@ -437,8 +437,11 @@ function drawHow(body, run) {
     ["The envelope is opened", "Each guess is laid beside the real answers, and the agent says who was wrong, itself first."],
     ["The agent decides the next move", `A short follow-up survey on whatever surprised everyone, or the answer. Nobody gets more than ${inWords(limit)} ${limit === 1 ? "email" : "emails"}.`],
   ];
-  put(body, 
-    el("ol", { class: "steps" }, steps.map(([title, text], index) => el("li", { class: "step" }, numbered(index + 1), el("div", { class: "step-body" }, el("h3", { class: "sub", text: title }), el("p", { text }))))),
+  put(body,
+    el("div", { class: "m-how" },
+      el("ol", { class: "steps" }, steps.map(([title, text], index) => el("li", { class: "step" }, numbered(index + 1), el("div", { class: "step-body" }, el("h3", { class: "sub", text: title }), el("p", { text }))))),
+      el("figure", { class: "m-how-loop" }, loop(), el("figcaption", { class: "visually-hidden", text: "A drawing of the loop. One objective comes in. The agent writes a survey, seals its guess, sends it out, opens the envelope and decides. From there an arrow labelled another round goes back to writing a survey, and another leaves for the answer. In the middle: what it guessed wrong is what it asks next." })),
+    ),
     el("p", { class: "m-foot", text: "Every paid step prints a slip first: what it costs, and the decision it could change." }),
   );
 }

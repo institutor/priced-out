@@ -130,3 +130,66 @@ export function card(node, name) {
   ]);
   return node;
 }
+
+// The loop the agent runs, as a ring of five labels with arrows between
+// them. One objective comes in at the top. The arrow that closes the ring,
+// from "decides" back to "writes a survey", is the follow-up round, and is
+// drawn in the other pen. The way out, to the answer, leaves at the bottom.
+export function loop(seed = 3) {
+  const WIDTH = 520;
+  const HEIGHT = 380;
+  const centre = [290, 244];
+  // Where each label sits, going round.
+  const spots = [[300, 88], [425, 178], [408, 340], [182, 340], [135, 190]];
+  const names = ["writes a survey", "seals its guess", "sends it out", "opens the envelope", "decides"];
+  const parts = [];
+  let from = 0;
+  const pen = (d, className) => {
+    const drawn = drawnIn(d, className, { from });
+    from += drawn.length;
+    parts.push(...drawn);
+  };
+  const word = (text, x, y, className = "m-loop-word") => parts.push(svg("text", { class: className, x, y, "text-anchor": "middle", text }));
+  const boxes = names.map((name, index) => {
+    const [x, y] = spots[index];
+    const width = name.length * 9.6 + 28;
+    return { x, y, width, height: 38 };
+  });
+
+  // The objective comes in.
+  word("one objective", boxes[0].x, 24, "m-loop-word soft");
+  pen(sketch.arrow(boxes[0].x, 32, boxes[0].x, boxes[0].y - 24, { seed: seed + 40, head: 9, rough: 0.8, bend: 0.06 }), "m-loop-line");
+
+  // The arrows round the ring. Each starts and ends a little way off the
+  // labels it joins.
+  boxes.forEach((box, index) => {
+    const next = boxes[(index + 1) % boxes.length];
+    const dx = next.x - box.x;
+    const dy = next.y - box.y;
+    const length = Math.hypot(dx, dy);
+    const gap = (side) => Math.min(0.42, (Math.abs(dx) > Math.abs(dy) ? side.width / 2 + 10 : side.height / 2 + 12) / length);
+    const a = gap(box);
+    const b = gap(next);
+    const again = index === boxes.length - 1;
+    pen(sketch.arrow(box.x + dx * a, box.y + dy * a, next.x - dx * b, next.y - dy * b, { seed: seed + index, head: 10, rough: 1, bend: -0.16 }), again ? "m-loop-line round" : "m-loop-line");
+  });
+
+  // The labels, each on its own scrap of paper.
+  boxes.forEach((box, index) => {
+    parts.push(path(sketch.blob(box.x - box.width / 2, box.y - box.height / 2, box.width, box.height, { seed: seed + 10 + index, rough: 0.9, round: 0.12 }), "m-loop-paper"));
+    pen(sketch.rect(box.x - box.width / 2, box.y - box.height / 2, box.width, box.height, { seed: seed + 20 + index, rough: 1.2, passes: 1, over: 2 }), "m-loop-line thin");
+    word(names[index], box.x, box.y + 7);
+  });
+
+  // What the ring is for, in the middle.
+  word("what it guessed wrong", centre[0], centre[1] - 6, "m-loop-word big");
+  word("is what it asks next", centre[0], centre[1] + 22, "m-loop-word big");
+  word("another round", 112, 120, "m-loop-word round");
+
+  // The way out.
+  const last = boxes[4];
+  pen(sketch.arrow(last.x - last.width / 2 - 8, last.y + 6, 62, 256, { seed: seed + 50, head: 10, rough: 0.9, bend: -0.22 }), "m-loop-line");
+  parts.push(...drawnIn(sketch.underline(12, 294, 112, { seed: seed + 51, rough: 1 }), "m-loop-line round", { from }));
+  word("the answer", 62, 284, "m-loop-word big");
+  return art("m-loop", WIDTH, HEIGHT, parts);
+}

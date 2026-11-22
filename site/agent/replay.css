@@ -759,6 +759,83 @@ code {
   }
 }
 
+/* How one round goes: the steps, and the loop drawn beside them -------------------- */
+
+.m-how {
+  display: grid;
+  grid-template-columns: minmax(0, 30rem) minmax(19rem, 32rem);
+  gap: 1rem 2.5rem;
+  align-items: start;
+  max-width: 72rem;
+}
+
+.m-how-loop {
+  margin: 0;
+  position: sticky;
+  top: calc(var(--banner, 4rem) + 1.5rem);
+}
+
+.m-loop {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.m-loop-line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.m-loop-line.thin {
+  stroke-width: 1.6;
+}
+
+.m-loop-line.round {
+  stroke: var(--mark-2);
+  stroke-width: 2.6;
+}
+
+.m-loop-paper {
+  fill: var(--paper);
+  stroke: none;
+}
+
+.m-loop-word {
+  font: 400 19px var(--font-display);
+  letter-spacing: 0.03em;
+  fill: var(--ink);
+}
+
+.m-loop-word.soft {
+  fill: var(--ink-soft);
+}
+
+.m-loop-word.big {
+  font-size: 23px;
+  fill: var(--series);
+}
+
+.m-loop-word.round {
+  font: 400 16px var(--font-receipt);
+  letter-spacing: 0;
+  fill: var(--mark-2);
+}
+
+@media (max-width: 62rem) {
+  .m-how {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .m-how-loop {
+    position: static;
+    order: -1;
+    max-width: 24rem;
+  }
+}
+
 /* The foot ----------------------------------------------------------------------- */
 
 .colophon-mark .doodle {
