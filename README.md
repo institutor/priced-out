@@ -1,64 +1,6 @@
 # Priced Out
 
-> **Here for the MCP Challenge?** The agent is the Sealed Envelope. Give it one objective and it runs the survey research through the Flashpoint MCP: [what it does](#mcp-challenge-an-agent-that-does-the-research-for-you), [a run you can watch part by part](https://institutor.github.io/priced-out/agent/), and [how to run it, with the objective given and what the agent decided](agent/README.md).
-
-During my time in high school, I found myself often faced with times where I couldn't
-exactly afford to pay for certain club dues, and I wish I could have done something about
-it. For instance, my school's Science Olympiad competitions often cost hundreds of dollars
-for just travel and hotels alone, a cost that I could not afford to pay at all.
-
-Priced Out is the idea I dreamt up that I wish the people setting those costs had had. It
-could have shown them, before the price went out, how many of us it would leave behind and
-which way of offering a lower price we would have used, without anyone having to say they
-couldn't pay. Because, you know, if thirty students pay twenty dollars for an event,
-that's actually more money netted than fifteen students paying thirty dollars.
-
-Students who can't afford a club's dues, formal or trip rarely say so. They say they're
-busy, and stop showing up. The people setting the price never find out. Published work
-on both points is listed under [Sources](#sources).
-
-Priced Out is a calculator for club treasurers. It takes a survey that asks students for
-the price at which that happens, and gives the treasurer the answer before the price is
-announced: at this price, in a club this size, about this many members would skip it.
-
-Built by one person for the Flashpoint AI x Columbia AI Club hackathon (November 2026),
-Engineering & Product track.
-
-**Try it: https://institutor.github.io/priced-out/** · [Write-up](docs/submission/write-up.md) ·
-[The survey](https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a)
-
-![The title page: a drawing of stick figures in which two club officers call out “Come to our formal! $45 a ticket.”, members cheer, and one says “Sorry, can't make it.” with a note beside them reading “(can't afford it)”. Under it, the question “What if you could see that before you set the price?” and the words Priced Out, with a banner saying the numbers come from simulated students](docs/screenshot.jpg)
-
-![The price check: a formal ticket at $45 in a club of 60, drawn as a room of seats, 19 of them empty](docs/screenshot-answer.jpg)
-
-![The note for the board: a card headed “A formal ticket at $45, in a club of 60” and labelled “simulated students, not real answers”, with six lines on who the price leaves out, the price that keeps nine in ten, two prices or one, the room for error, how to offer a lower price and what members would cover themselves, and a last line saying where the numbers come from](docs/screenshot-note.jpg)
-
-## Read this first: the numbers are simulated
-
-**No real student has answered the survey.** Every number on the site comes from a
-Flashpoint synthetic panel: 120 AI personas that Flashpoint generated to resemble Columbia
-and Barnard undergraduates, each answered by a language model (`gpt-5.4-mini`). Flashpoint
-itself marks the panel `uncalibrated`, meaning it has not been checked against real
-answers.
-
-**Why I did not survey students.** Three reasons.
-
-- **Only a club can survey a club.** Getting a whole club to answer takes someone its
-  members listen to, which means its own officers. I could not have done that for one club
-  from the outside, let alone for every club that might use this.
-- **Every club is different.** The price where members drop out depends on the club and on
-  who is in it. One club's answers would not carry over to the next, and a survey of
-  whichever students I could reach would have described no club in particular.
-- **The point is that any club can use it.** Priced Out is the instrument: a three-minute
-  survey and the page that reads it, for a club to run on its own members. So here 120 AI
-  personas stand in for one club, and show it working from end to end.
-
-So the site is a working product on simulated input, not a finding about students. It says
-so in a banner on every screen, in every part that shows a number, on the printed receipt,
-in the note it writes for a club's board and at the top of a copied message for members.
-The survey is live, and the page reads a club's own answers as soon as there are any: a
-treasurer loads the export in the browser and every number becomes their members' (see
-[Run it for your own club](#run-it-for-your-own-club)).
+> **Two things live here.** The **Sealed Envelope** is an AI agent for the MCP Challenge: give it one objective and it runs the survey research through the Flashpoint MCP. It comes first below, with [a run you can watch part by part](https://institutor.github.io/priced-out/agent/) and [its own README](agent/README.md). **Priced Out** is the calculator the agent grew out of. It starts at [Priced Out, the calculator](#priced-out-the-calculator).
 
 ## MCP Challenge: an agent that does the research for you
 
@@ -148,6 +90,66 @@ The full example is in [agent/examples/practice-run/](agent/examples/practice-ru
 [the one-page summary](agent/examples/practice-run/summary.md) and
 [the log](agent/examples/practice-run/log.md), with every message, reply, slip,
 envelope and debrief.
+
+## Priced Out, the calculator
+
+During my time in high school, I found myself often faced with times where I couldn't
+exactly afford to pay for certain club dues, and I wish I could have done something about
+it. For instance, my school's Science Olympiad competitions often cost hundreds of dollars
+for just travel and hotels alone, a cost that I could not afford to pay at all.
+
+Priced Out is the idea I dreamt up that I wish the people setting those costs had had. It
+could have shown them, before the price went out, how many of us it would leave behind and
+which way of offering a lower price we would have used, without anyone having to say they
+couldn't pay. Because, you know, if thirty students pay twenty dollars for an event,
+that's actually more money netted than fifteen students paying thirty dollars.
+
+Students who can't afford a club's dues, formal or trip rarely say so. They say they're
+busy, and stop showing up. The people setting the price never find out. Published work
+on both points is listed under [Sources](#sources).
+
+Priced Out is a calculator for club treasurers. It takes a survey that asks students for
+the price at which that happens, and gives the treasurer the answer before the price is
+announced: at this price, in a club this size, about this many members would skip it.
+
+Built by one person for the Flashpoint AI x Columbia AI Club hackathon (November 2026),
+Engineering & Product track.
+
+**Try it: https://institutor.github.io/priced-out/** · [Write-up](docs/submission/write-up.md) ·
+[The survey](https://flashpointopinions.com/0a4c06d5-1ea1-43dd-89d7-2458c955b58a)
+
+![The title page: a drawing of stick figures in which two club officers call out “Come to our formal! $45 a ticket.”, members cheer, and one says “Sorry, can't make it.” with a note beside them reading “(can't afford it)”. Under it, the question “What if you could see that before you set the price?” and the words Priced Out, with a banner saying the numbers come from simulated students](docs/screenshot.jpg)
+
+![The price check: a formal ticket at $45 in a club of 60, drawn as a room of seats, 19 of them empty](docs/screenshot-answer.jpg)
+
+![The note for the board: a card headed “A formal ticket at $45, in a club of 60” and labelled “simulated students, not real answers”, with six lines on who the price leaves out, the price that keeps nine in ten, two prices or one, the room for error, how to offer a lower price and what members would cover themselves, and a last line saying where the numbers come from](docs/screenshot-note.jpg)
+
+## Read this first: the calculator's numbers are simulated
+
+**No real student has answered the survey.** Every number on the site comes from a
+Flashpoint synthetic panel: 120 AI personas that Flashpoint generated to resemble Columbia
+and Barnard undergraduates, each answered by a language model (`gpt-5.4-mini`). Flashpoint
+itself marks the panel `uncalibrated`, meaning it has not been checked against real
+answers.
+
+**Why I did not survey students.** Three reasons.
+
+- **Only a club can survey a club.** Getting a whole club to answer takes someone its
+  members listen to, which means its own officers. I could not have done that for one club
+  from the outside, let alone for every club that might use this.
+- **Every club is different.** The price where members drop out depends on the club and on
+  who is in it. One club's answers would not carry over to the next, and a survey of
+  whichever students I could reach would have described no club in particular.
+- **The point is that any club can use it.** Priced Out is the instrument: a three-minute
+  survey and the page that reads it, for a club to run on its own members. So here 120 AI
+  personas stand in for one club, and show it working from end to end.
+
+So the site is a working product on simulated input, not a finding about students. It says
+so in a banner on every screen, in every part that shows a number, on the printed receipt,
+in the note it writes for a club's board and at the top of a copied message for members.
+The survey is live, and the page reads a club's own answers as soon as there are any: a
+treasurer loads the export in the browser and every number becomes their members' (see
+[Run it for your own club](#run-it-for-your-own-club)).
 
 ## Try it yourself, in a few minutes
 

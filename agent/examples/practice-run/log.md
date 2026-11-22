@@ -45,7 +45,7 @@ The agent chose every step below. The commander speaks only where the log says s
 
 ### Step 2: Flashpoint, write or change the survey (round 1)
 
-| Receipt | |
+| Slip | |
 |---|---|
 | Paid for | one message to Flashpoint's survey agent |
 | Price | $0.50 |
@@ -86,7 +86,7 @@ The agent chose every step below. The commander speaks only where the log says s
 
 ### Step 3: Flashpoint, publish the survey (round 1)
 
-| Receipt | |
+| Slip | |
 |---|---|
 | Paid for | one message to Flashpoint's survey agent |
 | Price | $0.50 |
@@ -126,7 +126,7 @@ The hash lets this run check, when the envelope is opened, that no guess was cha
 
 ### Step 5: Flashpoint, publish the survey (round 1)
 
-| Receipt | |
+| Slip | |
 |---|---|
 | Paid for | one message to Flashpoint's survey agent |
 | Price | $0.50 |
@@ -157,7 +157,7 @@ The commander was away. This is email 1 of the 2 each person may get. The checks
 
 ### Step 7: Flashpoint, email the survey (round 1)
 
-| Receipt | |
+| Slip | |
 |---|---|
 | Paid for | one message to Flashpoint's survey agent |
 | Price | $0.50 |
@@ -182,7 +182,7 @@ The commander was away. This is email 1 of the 2 each person may get. The checks
 
 ### Step 9: Flashpoint, read results (round 1)
 
-| Receipt | |
+| Slip | |
 |---|---|
 | Paid for | one message to Flashpoint's survey agent |
 | Price | $0.50 |
@@ -277,7 +277,7 @@ The envelope's hash matches the one recorded when it was sealed.
 
 ### Step 13: Flashpoint, write or change the survey (round 2)
 
-| Receipt | |
+| Slip | |
 |---|---|
 | Paid for | one message to Flashpoint's survey agent |
 | Price | $0.50 |
@@ -317,7 +317,7 @@ The envelope's hash matches the one recorded when it was sealed.
 
 ### Step 14: Flashpoint, publish the survey (round 2)
 
-| Receipt | |
+| Slip | |
 |---|---|
 | Paid for | one message to Flashpoint's survey agent |
 | Price | $0.50 |
@@ -356,7 +356,7 @@ The hash lets this run check, when the envelope is opened, that no guess was cha
 
 ### Step 16: Flashpoint, publish the survey (round 2)
 
-| Receipt | |
+| Slip | |
 |---|---|
 | Paid for | one message to Flashpoint's survey agent |
 | Price | $0.50 |
@@ -387,7 +387,7 @@ The commander was away. This is email 2 of the 2 each person may get. The checks
 
 ### Step 18: Flashpoint, email the survey (round 2)
 
-| Receipt | |
+| Slip | |
 |---|---|
 | Paid for | one message to Flashpoint's survey agent |
 | Price | $0.50 |
@@ -412,7 +412,7 @@ The commander was away. This is email 2 of the 2 each person may get. The checks
 
 ### Step 20: Flashpoint, read results (round 2)
 
-| Receipt | |
+| Slip | |
 |---|---|
 | Paid for | one message to Flashpoint's survey agent |
 | Price | $0.50 |

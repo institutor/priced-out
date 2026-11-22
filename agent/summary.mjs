@@ -154,7 +154,7 @@ export function summarize(run) {
   for (const row of tally(steps)) lines.push(`| ${row.label} | ${row.count} | ${money(row.cost)} |`);
   lines.push(`| **Spent** | | **${money(spent)}** of the ${money(run.cap)} cap |`, "");
   if (PRACTICE[run.mode]) lines.push("These are the prices a real run would have paid. This practice run paid nothing.", "");
-  lines.push("The full log, with every message, reply and receipt, is `log.md` in the same folder.", "");
+  lines.push("The full log, with every message, reply and slip, is `log.md` in the same folder.", "");
   return lines.join("\n");
 }
 

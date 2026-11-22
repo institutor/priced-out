@@ -95,4 +95,4 @@ The agent marked these itself, its own guesses included. With 8 people asked, th
 
 These are the prices a real run would have paid. This practice run paid nothing.
 
-The full log, with every message, reply and receipt, is `log.md` in the same folder.
+The full log, with every message, reply and slip, is `log.md` in the same folder.

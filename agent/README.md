@@ -22,7 +22,7 @@ with a recommendation.
 | **Survey 2, on that surprise** | Three questions: workshop, speaker, or the two combined? The most you would pay? Which topic? |
 | **The recommendation** | A weekday evening with a professional guest: a short talk, then a hands-on part, free or cheap. Skip the social dinner. |
 | **How much it did alone** | 20 steps on its own. It did not stop for a person once, and the code never had to step in. |
-| **Cost** | $5.00 of a $9.00 budget in practice. A real run needs a few more messages, about $7 for two rounds. |
+| **Cost** | Nothing, as a practice run. At real prices its ten messages come to $5.00 of the $9.00 budget. A real run needs a few more messages, about $7 for two rounds. |
 
 **That example is a practice run.** An AI stand-in played Flashpoint and invented every
 answer, so it is not a finding. It shows what the agent decides and how. No real run has

@@ -7,7 +7,7 @@ const cell = (text) => String(text ?? "").replace(/\|/g, "/").replace(/\n+/g, " 
 
 // The receipt printed before every paid step.
 function receipt(step, what) {
-  return `| Receipt | |\n|---|---|\n| Paid for | ${what} |\n| Price | ${money(step.price)} |\n| Decision it could change | ${cell(step.couldChange || "(none given)")} |\n| Spent so far | ${money(step.spent)} |`;
+  return `| Slip | |\n|---|---|\n| Paid for | ${what} |\n| Price | ${money(step.price)} |\n| Decision it could change | ${cell(step.couldChange || "(none given)")} |\n| Spent so far | ${money(step.spent)} |`;
 }
 
 const ACTIONS = { design: "write or change the survey", publish: "publish the survey", send: "email the survey", results: "read results", other: "a message" };
