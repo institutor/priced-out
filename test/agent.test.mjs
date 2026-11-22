@@ -37,6 +37,7 @@ function desk({ approve = ["yes"], guess = "about half", reply = "carry on" } = 
 const ask = (message, action = "other", extra = {}) => ({ name: "ask_flashpoint", input: { message, action, why: "because", could_change: "what I ask next", ...extra } });
 const seal = (question = "What will most people pick?") => ({ name: "seal_predictions", input: { predictions: [{ question, agent_guess: "the lower option" }], why: "it decides the answer" } });
 const open = (people_said = "2 of 3 picked the lower option") => ({ name: "open_envelope", input: { results: [{ question: "What will most people pick?", people_said }] } });
+const debrief = (next_move = "finish") => ({ name: "debrief", input: { who_was_wrong: "me", biggest_surprise: "none", still_unknown: "why", next_move, reason: "r" } });
 const pause = { name: "wait_for_replies", input: { minutes: 5, why: "let them answer" } };
 const finish = { name: "finish", input: { recommendation: "r", evidence: "e", scoreboard: [], learned_between_rounds: "l", limits: "x" } };
 const kinds = (out, kind) => out.steps.filter((s) => s.kind === kind);
@@ -55,6 +56,7 @@ test("a full two-round mission: rehearse, seal, approve, send, open, learn, repe
     pause,
     ask("Show the results", "results"),
     open(),
+    debrief("another_round"),
     { name: "ask_commander", input: { message: "I guessed right. Round two will ask why.", order: "Tell me what you learned before you start a second round.", why: "the order" } },
     ask("Write a follow-up survey for {{RECIPIENTS}}", "design", { new_survey: true }),
     seal("Why?"),
@@ -62,6 +64,7 @@ test("a full two-round mission: rehearse, seal, approve, send, open, learn, repe
     ask("confirm", "send"),
     ask("Show the results", "results"),
     { name: "open_envelope", input: { results: [{ question: "Why?", people_said: "All 3 gave the same reason" }] } },
+    debrief(),
     { name: "finish", input: { ...finish.input, scoreboard: [{ round: 1, question: "q", people_said: "2 of 3", agent: "right", personas: "no guess", commander: "wrong" }] } },
   ], { commander, wait: async (m) => { waits.push(m); } });
 
@@ -74,6 +77,7 @@ test("a full two-round mission: rehearse, seal, approve, send, open, learn, repe
   assert.match(asked.find((a) => a.kind === "approve_send").survey, /Drafted survey 1/);
   assert.deepEqual(kinds(out, "sealed").map((s) => s.round), [1, 2]);
   assert.deepEqual(kinds(out, "opened").map((s) => s.intact), [true, true]);
+  assert.deepEqual(kinds(out, "debrief").map((s) => s.nextMove), ["another_round", "finish"]);
   assert.match(kinds(out, "rehearsal")[0].reply, /SYNTHETIC/);
   const replies = kinds(out, "flashpoint").map((s) => s.reply);
   assert.match(replies[1], /SYNTHETIC rehearsal of survey 1/);
@@ -170,8 +174,11 @@ test("with nobody at the desk, no email is sent", async () => {
 
 test("the commander's guess stays sealed until the envelope is opened", async () => {
   const { commander } = desk({ guess: "the pricey one, I bet" });
-  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), open(), ask("confirm", "publish"), ask("confirm", "send"), seal(), ask("Show the results", "results"), open(), finish]);
+  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), open(), ask("confirm", "publish"), ask("confirm", "send"), seal(), ask("Show the results", "results"), open(), finish, ask("Round two", "design", { new_survey: true }), debrief(), finish]);
   const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), commander, wait: async () => {} });
+  assert.match(seen[9], /have not debriefed/, "finish is refused until the envelope is debriefed");
+  assert.match(seen[10], /have not debriefed/, "so is a new round");
+  assert.ok(out.answer);
   const sealed = kinds(out, "sealed")[0];
   assert.equal(sealed.hash, envelopeHash(sealed.envelope));
   assert.equal(sealed.envelope.predictions[0].commander, "the pricey one, I bet");
@@ -230,7 +237,7 @@ test("the practice writer plays Flashpoint without ever seeing an address", asyn
     ask("Make a panel from {{RECIPIENTS}} and ask about price", "design"),
     { name: "rehearse_on_personas", input: { audience: "members", how_many: 5, why: "w", could_change: "c" } },
     ask("Show the persona rehearsal results", "results"),
-    seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), open(), finish,
+    seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), open(), debrief(), finish,
   ], { flashpoint, commander });
   assert.doesNotMatch(prompts.join("\n"), /@example\.com/);
   assert.match(prompts[0], /Invent exactly 2 members/);

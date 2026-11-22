@@ -63,6 +63,8 @@ export function logEntry(step) {
       const rows = step.rows.map((row) => `| ${cell(row.question)} | ${cell(row.people_said)} | ${cell(row.agent)} | ${cell(row.personas ?? "no guess")} | ${cell(row.commander ?? "no guess")} |`);
       return `${n} the round ${step.round} envelope is opened\n\nThe envelope's hash ${step.intact ? "matches the one recorded when it was sealed" : "DOES NOT MATCH the one recorded when it was sealed"}.\n\n| Question | What people said | The agent guessed | AI personas guessed (synthetic) | The commander guessed |\n|---|---|---|---|---|\n${rows.join("\n")}\n`;
     }
+    case "debrief":
+      return `${n} what the round ${step.round} envelope taught the agent\n\n| Debrief | |\n|---|---|\n| Who was wrong | ${cell(step.whoWasWrong)} |\n| Biggest surprise | ${cell(step.surprise)} |\n| Still unknown | ${cell(step.stillUnknown)} |\n| Next move | ${step.nextMove === "another_round" ? "another round" : "finish"} |\n| Why | ${cell(step.reason)} |\n`;
     case "send-approved":
       return `${n} the commander approved the round ${step.round} send\n\n*Commander:* ${step.reply}\n`;
     case "send-refused":
@@ -129,6 +131,7 @@ export function shortLine(step) {
     case "blocked": return `${tag} The budget cap refused a paid step`;
     case "sealed": return `${tag} Envelope sealed for round ${step.round}: ${step.hash.slice(0, 16)}…`;
     case "opened": return `${tag} Envelope opened for round ${step.round}\n${step.rows.map((row) => `       ${row.question}\n         people:    ${row.people_said}\n         agent:     ${row.agent}\n         personas:  ${row.personas ?? "no guess"}\n         commander: ${row.commander ?? "no guess"}`).join("\n")}`;
+    case "debrief": return `${tag} Debrief: ${step.nextMove === "another_round" ? "another round" : "finish"}, because ${step.reason}\n       wrong:     ${step.whoWasWrong}\n       surprise:  ${step.surprise}\n       unknown:   ${step.stillUnknown}`;
     case "send-approved": return `${tag} Send approved by the commander`;
     case "send-refused": return `${tag} Send refused: ${step.reason}`;
     case "commander": return `${tag} Commander replied: ${step.reply ?? "(nobody at the desk)"}`;

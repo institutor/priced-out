@@ -14,6 +14,7 @@ const calls = [
   { name: "wait_for_replies", input: { minutes: 2, why: "they answer fast" } },
   { name: "ask_flashpoint", input: { message: "Show the results", action: "results", why: "read", could_change: "the answer" } },
   { name: "open_envelope", input: { results: [{ question: "Which | price?", people_said: "2 of 3 picked the lower option" }] } },
+  { name: "debrief", input: { who_was_wrong: "I was", biggest_surprise: "dinner", still_unknown: "why", next_move: "finish", reason: "budget" } },
   { name: "ask_commander", input: { message: "I was wrong.", order: "Tell me what you learned before you start a second round.", why: "the order" } },
   { name: "make_deck", input: { title: "Findings", findings: "2 of 3", why: "to keep", could_change: "nothing" } },
   { name: "finish", input: { recommendation: "Charge less.", evidence: "2 of 3 picked the lower option; 40% said so", scoreboard: [{ round: 1, question: "Which price?", people_said: "2 of 3 lower", agent: "wrong", personas: "partly", commander: "right" }], learned_between_rounds: "no second round", limits: "3 people" } },
@@ -32,7 +33,7 @@ async function mission() {
 test("every kind of step gets a log entry and a short line", async () => {
   const out = await mission();
   const kinds = new Set(out.steps.map((s) => s.kind));
-  for (const kind of ["thinking", "flashpoint", "rehearsal", "sealed", "send-approved", "wait", "opened", "commander", "deck", "finish"]) assert.ok(kinds.has(kind), kind);
+  for (const kind of ["thinking", "flashpoint", "rehearsal", "sealed", "send-approved", "wait", "opened", "debrief", "commander", "deck", "finish"]) assert.ok(kinds.has(kind), kind);
   for (const step of out.steps) {
     assert.notEqual(logEntry(step), "", step.kind);
     assert.match(shortLine(step), /^\[ ?\d+\]/);
@@ -42,6 +43,7 @@ test("every kind of step gets a log entry and a short line", async () => {
   assert.match(log, /The commander sealed a guess on 1; the agent cannot see it/);
   assert.doesNotMatch(log.split("is opened")[0], /\$15/, "the commander's guess is not in the log before the envelope opens");
   assert.match(log, /\| Which \/ price\? \| 2 of 3 picked the lower option \| \$20 \| \$25 \| \$15 \|/);
+  assert.match(log, /\| Biggest surprise \| dinner \|/);
   assert.match(log, /Standing order:\* "Tell me what you learned/);
   assert.match(log, /Commander, while waiting:\* ask about dinner/);
   assert.match(log, /Check these numbers.*: 40\./);

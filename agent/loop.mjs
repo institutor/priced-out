@@ -108,6 +108,23 @@ export const TOOLS = [
     },
   },
   {
+    name: "debrief",
+    description:
+      "Right after opening an envelope, write down what it taught you. Free. A new round and finish are both refused until this is done, because this is where the next step gets decided.",
+    input_schema: {
+      type: "object",
+      properties: {
+        who_was_wrong: { type: "string", description: "Who guessed wrong on what, yourself first. Say so plainly." },
+        biggest_surprise: { type: "string", description: "The one thing in the real answers that nobody sealed a guess for, or that every guess missed. Say 'none' if there was none." },
+        still_unknown: { type: "string", description: "What you would still need to know for the mission's answer to be one the commander can act on." },
+        next_move: { type: "string", enum: ["another_round", "finish"] },
+        reason: { type: "string", description: "Why that move. For another round: the one thing it will ask about. For finish: why no affordable step could change the answer." },
+      },
+      required: ["who_was_wrong", "biggest_surprise", "still_unknown", "next_move", "reason"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "ask_commander",
     description:
       "Speak to the commander and wait for their reply. Free. Use it when a standing order says to, or when something only they can know or decide would change what you do next. Do not use it to ask what to do next: that is your job. Do not ask for their guess: seal_predictions does that.",
@@ -189,7 +206,7 @@ export function systemPrompt({ people, cap, orders = DEFAULT_ORDERS, canRehearse
   const tools = [
     `- ask_flashpoint ($${PRICES.survey.toFixed(2)} a message): Flashpoint's survey agent. In plain words it can make a first-party panel from a list of names and emails, write a survey from a brief, change it, publish it, email it to the panel, report how many have answered, and give results. Publishing and sending each need a second message that says only "confirm"; you send it yourself when the reply asks for it and matches what you intended.`,
     canRehearse ? `- rehearse_on_personas ($${PRICES.rehearsal.toFixed(2)}): runs your draft on AI personas first. It can catch a question that confuses or cuts people off, and it gives the personas a guess of their own for the envelope. It is slow (a few minutes) and can fail; the mission does not depend on it.` : null,
-    "- seal_predictions and open_envelope (free): the sealed envelope, explained below.",
+    "- seal_predictions, open_envelope and debrief (free): the sealed envelope, explained below.",
     "- ask_commander (free): the commander is at the desk.",
     "- wait_for_replies (free).",
     canDeck ? `- make_deck ($${PRICES.deck.toFixed(2)}): an optional slide deck at the end.` : null,
@@ -206,16 +223,16 @@ ${orders.map((order) => `- ${order}`).join("\n")}
 These are rules, not steps. Between them, every decision is yours: do not ask the commander what to do next. When an order applies, go to them with ask_commander, quote the order, say what you found or decided, and ask only what you need. One order is also enforced by the system: before the first email of each survey goes out, the commander is shown the survey and must approve it. That screen is the check for the order about emails, so do not also ask permission to send with ask_commander. If they refuse, their reason comes back to you.
 
 The sealed envelope
-Before each survey is sent, call seal_predictions with what you expect people to answer on its main questions. If you rehearsed on personas, put their answers in as the personas' guess. The commander seals a guess too, and you cannot see it. After the real results are in, call open_envelope. Then say plainly who was right and who was wrong, yourself included. A wrong guess is the most useful thing a round can give you: it marks what nobody understood yet, and that is what a second round should ask about. If every guess was right, say so and consider whether a second round would change anything.
+Before each survey is sent, call seal_predictions with what you expect people to answer on its main questions. If you rehearsed on personas, put their answers in as the personas' guess. The commander seals a guess too, and you cannot see it. After the real results are in, call open_envelope, then debrief: who was wrong (yourself first), what surprised everyone, what is still unknown, and your next move. A wrong guess or a surprise is the most useful thing a round can give you. It marks what nobody understood yet, and that is what the next round should ask about. Often the surprise is that the thing you asked about is not what decides the matter; then the next round asks about the thing that does.
 
 The people
 There are ${people} people on the list. They have agreed to be surveyed. You never see their addresses: write {{RECIPIENTS}} in a message to Flashpoint and the list is put in for you. Survey only these people. Emailing them cannot be undone, so read the survey Flashpoint wrote before you ask to send it.
 
 Budget and receipts
-You have $${cap.toFixed(2)}. Every tool result tells you what is left. Each paid step needs a receipt: the decision of yours that it could change. If you cannot name one, the step is not worth its price, so skip it. Keep enough budget to read the results of anything you send. Stop when no step you can afford could change your answer, and say that is why you stopped. Unspent budget is a good thing to hand back.
+You have $${cap.toFixed(2)}. Every tool result tells you what is left. Each paid step needs a receipt: the decision of yours that it could change. If you cannot name one, the step is not worth its price, so skip it. Keep enough budget to read the results of anything you send. The budget is there to be used on steps that could change the answer: finishing with an open question you could have afforded to ask is a worse result than spending the money. Stop when no step you can afford could change your answer, and say that is why you stopped; what is left then goes back to the commander.
 
 How to do good research here
-First work out what you would need to know to answer the mission, and what the commander may already know (it is free to ask them once, early, if local knowledge would change the survey). Keep each survey short, since the same few people answer every round. Avoid screening and skip rules: they are what breaks a survey. You can email these people only a few times, so a question that turns out confusing wastes a round; a rehearsal on personas is the cheap way to find that out first. A second round should be shorter than the first and ask only about what the first envelope got wrong or left open; never repeat a first-round question. If nobody has answered yet, wait and check again rather than guessing.
+First work out what you would need to know to answer the mission, and what the commander may already know (it is free to ask them once, early, if local knowledge would change the survey). Keep each survey short, since the same few people answer every round. Avoid screening and skip rules: they are what breaks a survey. You can email these people only a few times, so a question that turns out confusing wastes a round; a rehearsal on personas is the cheap way to find that out first. One round rarely settles a mission: expect to run a second. It should be shorter than the first and ask only about what the first envelope got wrong or left open; never repeat a first-round question. A few people can still tell you why, even when they are too few to count. If nobody has answered yet, wait and check again rather than guessing.
 
 Honesty
 Report only what Flashpoint returned. Never fill in a number you did not get. Persona answers are synthetic: use them to fix the survey and to place a guess, and never count them as evidence. With this few people the answer is a direction, not a measurement, and your limits must say so.
@@ -283,6 +300,9 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   let readAfterSend = false;
   let envelope = null; // { hash, content }
   let opened = false;
+  let debriefed = false;
+  const owesDebrief = () => opened && !debriefed;
+  const DEBRIEF_FIRST = "Not yet: you opened an envelope and have not debriefed it. Call debrief first.";
 
   const note = (step) => {
     const kept = { n: steps.length + 1, at: new Date().toISOString(), ...step };
@@ -319,9 +339,10 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       return { text: `Not sent: this would go over the budget. ${left()} Call finish with what you have.`, failed: true };
     }
     const newSurvey = input.new_survey === true;
+    if (newSurvey && owesDebrief()) return { text: DEBRIEF_FIRST, failed: true };
     if (newSurvey && started) {
       round += 1;
-      started = false; draft = ""; lastReply = ""; approved = false; sent = false; readAfterSend = false; envelope = null; opened = false;
+      started = false; draft = ""; lastReply = ""; approved = false; sent = false; readAfterSend = false; envelope = null; opened = false; debriefed = false;
     }
     // A bare "confirm" does whatever Flashpoint last offered. Unless that was plainly
     // publishing and nothing else, treat it as a send, whatever the model called it.
@@ -386,6 +407,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     const content = { round, sealed_at: new Date().toISOString(), predictions };
     envelope = { hash: envelopeHash(content), content };
     opened = false;
+    debriefed = false;
     const fromCommander = predictions.filter((p) => p.commander !== null).length;
     note({ kind: "sealed", round, why: input.why, hash: envelope.hash, envelope: content });
     return { text: `Sealed the round ${round} envelope with ${predictions.length} question${predictions.length === 1 ? "" : "s"}. SHA-256 ${envelope.hash}. The commander sealed a guess on ${fromCommander} of them; you cannot see it until you open the envelope.` };
@@ -404,7 +426,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     opened = true;
     note({ kind: "opened", round, hash: envelope.hash, intact, rows });
     const lines = rows.map((row, i) => `Question ${i + 1}: ${row.question}\n  People said: ${row.people_said}\n  You guessed: ${row.agent}\n  Personas guessed (synthetic): ${row.personas ?? "no guess"}\n  Commander guessed: ${row.commander ?? "no guess"}`);
-    return { text: `The round ${round} envelope is open${intact ? " and its hash matches" : ", BUT ITS HASH DOES NOT MATCH"}.\n\n${lines.join("\n\n")}\n\nSay plainly who was right and who was wrong. What was guessed wrong is where there is something to learn: decide whether another round should ask about it, and mind the standing orders.` };
+    return { text: `The round ${round} envelope is open${intact ? " and its hash matches" : ", BUT ITS HASH DOES NOT MATCH"}.\n\n${lines.join("\n\n")}\n\nNow call debrief: say plainly who was wrong, what surprised everyone, what is still unknown, and your next move. Mind the standing orders.` };
   }
 
   async function useTool(name, input) {
@@ -427,6 +449,13 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     }
     if (name === "seal_predictions") return sealPredictions(input);
     if (name === "open_envelope") return openEnvelope(input);
+    if (name === "debrief") {
+      if (!opened) return { text: "There is no opened envelope to debrief.", failed: true };
+      debriefed = true;
+      const move = input.next_move === "another_round" ? "another_round" : "finish";
+      note({ kind: "debrief", round, whoWasWrong: redact(input.who_was_wrong), surprise: redact(input.biggest_surprise), stillUnknown: redact(input.still_unknown), nextMove: move, reason: redact(input.reason) });
+      return { text: `Debrief recorded. ${move === "another_round" ? "Start the next round with new_survey: true when you are ready." : "Call finish when you are ready."} Mind the standing orders. ${left()}` };
+    }
     if (name === "ask_commander") {
       const message = redact(input.message);
       if (!commander) {
@@ -446,6 +475,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       return { text: `Waited.${typed !== "" ? ` While you waited, the commander said: "${typed}"` : ""} ${left()}` };
     }
     if (name === "finish") {
+      if (owesDebrief()) return { text: DEBRIEF_FIRST, failed: true };
       answer = {
         recommendation: redact(input.recommendation),
         evidence: redact(input.evidence),
