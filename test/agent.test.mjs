@@ -422,3 +422,9 @@ test("a mission stopped between steps resumes without inventing a result", async
   assert.equal(JSON.parse(second.seen[0]).length, before, "no message is added when nothing was cut off");
   assert.equal(state.survey.envelope !== null, true, "the sealed envelope is in the saved state");
 });
+
+test("after a debrief the agent is shown its standing orders again", async () => {
+  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), open(), debrief(), finish]);
+  await runAgent({ objective: "o", recipients, cap: 8, orders: ["Come to me if the answers split evenly."], llm, flashpoint: fakeFlashpoint(), commander: desk().commander, wait: async () => {} });
+  assert.match(seen[7], /read your standing orders again[^"]*- Come to me if the answers split evenly\./);
+});

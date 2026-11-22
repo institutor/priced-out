@@ -510,7 +510,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       }
       debriefed = true;
       note({ kind: "debrief", round, whoWasWrong: redact(input.who_was_wrong), surprise: redact(input.biggest_surprise), stillUnknown: redact(input.still_unknown), nextMove: move, reason: redact(input.reason) });
-      return { text: `Debrief recorded. ${move === "another_round" ? "Start the next round with new_survey: true when you are ready." : "Call finish when you are ready."} Mind the standing orders. ${left()}` };
+      return { text: `Debrief recorded. ${move === "another_round" ? "Start the next round with new_survey: true when you are ready." : "Call finish when you are ready."}\n\nFirst read your standing orders again, against what this round found:\n${orders.map((order) => `- ${order}`).join("\n")}\nIf one of them applies now, go to the commander with ask_commander and quote it, before your next step.\n\n${left()}` };
     }
     if (name === "ask_commander") {
       const message = redact(input.message);
