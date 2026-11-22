@@ -287,7 +287,7 @@ Before each tool call, say in a sentence or two what you are deciding and why. T
 // list, since a run log is public: the full name in any letter case, and each
 // part of it (a first name, a surname) as it was written. A part that is also
 // an everyday word is left alone, or "One of 3 answered" would lose its "One".
-const EVERYDAY = new Set(["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "test", "tester", "user", "member", "person", "people", "the", "and", "club", "team"]);
+const EVERYDAY = new Set(["an", "do", "so", "my", "be", "he", "me", "we", "no", "to", "in", "on", "at", "by", "of", "or", "if", "is", "it", "as", "us", "up", "go", "am", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "test", "tester", "user", "member", "person", "people", "the", "and", "club", "team"]);
 const wholeWord = (word, flags) => new RegExp(`(?<![\\p{L}\\p{N}])${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}])`, flags);
 export function makeRedactor(recipients) {
   return (text) => {
@@ -298,7 +298,7 @@ export function makeRedactor(recipients) {
     });
     recipients.forEach((r, i) => {
       for (const part of String(r.name ?? "").split(/\s+/)) {
-        if (part.length >= 3 && !EVERYDAY.has(part.toLowerCase())) out = out.replace(wholeWord(part, "gu"), `[person ${i + 1}]`);
+        if (part.length >= 2 && !EVERYDAY.has(part.toLowerCase())) out = out.replace(wholeWord(part, "gu"), `[person ${i + 1}]`);
       }
     });
     return out.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[email]");
@@ -322,6 +322,8 @@ export function unbackedNumbers(text, sources) {
 }
 
 const saysYes = (text) => /^\W*(y|yes|yep|yeah|ok|okay|approve|approved|go|go ahead|send|send it|do it)\b/i.test(String(text ?? ""));
+// Approving a send takes a plain yes and nothing else. "ok but change Q2 first" is not one.
+export const approves = (text) => /^\W*(y|yes|yep|yeah|ok|okay|approve|approved|go|go ahead|send|send it|do it|yes,? (please|send|send it|go ahead|approved?|do it))\W*$/i.test(String(text ?? ""));
 // Whether a reply shows a survey's questions. Two question marks are enough.
 // A short follow-up may have only one, or word a question as "Rank these", so
 // a reply laid out as a table or a numbered list of questions counts as well.
@@ -330,7 +332,8 @@ export const listsQuestions = (text) => {
   const marks = (text.match(/\?/g) ?? []).length;
   if (marks >= 2) return true;
   const rows = text.split("\n").filter((line) => /^\s*\|.*\|\s*$/.test(line) && !/^\s*\|[\s:|-]+\|\s*$/.test(line)).length;
-  const numbered = text.split("\n").filter((line) => /^\s*(Q\d+|\d+)[.):]\s+\S/.test(line)).length;
+  // "1. Reworded question 2" reports a change. It is not a question.
+  const numbered = text.split("\n").filter((line) => /^\s*(Q\d+|\d+)[.):]\s+\S/.test(line) && !/^\s*(Q\d+|\d+)[.):]\s+\**(reworded|removed|added|changed|updated|replaced|fixed|shortened|renamed|dropped|moved|merged|split|deleted|edited)\b/i.test(line)).length;
   return rows >= 3 || numbered >= 2 || (marks === 1 && (rows >= 2 || numbered >= 1));
 };
 // A short go-ahead: "confirm", "Yes, confirm.", "Confirmed, go ahead".
@@ -346,8 +349,12 @@ export function asksToSend(message) {
     .replace(/\b(do not|don't|not|never|without|before|until)\s+(yet\s+)?(publish(ing)?\s+(or|and)\s+)?(send|e-?mail|distribut|invit)\w*/gi, "")
     .replace(/\bsend(ing)?\s+(me|us|back|over)\b/gi, "")
     .replace(/\bsend(ing)?\s+(me\s+)?(the\s+|a\s+|an\s+)?(results?|summary|export|report|counts?|numbers|data|link|status)\b/gi, "");
-  return /\b(send|sending|distribute|distributing|invite)\b/i.test(text) || /\be-?mail\s+(it|this|them|everyone|the survey|the panel|to|out)\b/i.test(text);
+  return /\b(send|sending|distribute|distributing|invite)\b/i.test(text) || /\be-?mail\s+(it|this|them|everyone|the survey|the panel|to|out)\b/i.test(text)
+    || /\b(remind|nudge|notify|follow up with|mail)\s+(it to\s+)?(the\s+|all\s+)?(them|everyone|everybody|panel|list|people|recipients|those|members|non-?respon\w+)\b/i.test(text)
+    || /\b(launch|share)\s+(it\s+|this\s+|the survey\s+)?(to|with)\s+(them|everyone|everybody|the panel|the list|people|recipients)\b/i.test(text);
 }
+
+const EDITS = /\b(change|edit|fix|reword|rewrite|rephrase|remove|delete|add|replace|drop|swap|shorten|rename|insert|update)\b/i;
 
 // What the code looks for before it lets a send go out with nobody watching.
 export const SEND_CHECKS = [
@@ -384,12 +391,14 @@ export function sendChecks({ draft, changes = [], followUp = false }) {
 // live", and only then, on a send, says that invitations went out. Anything that
 // fits none of these is "unclear", and a person is asked.
 const SAYS_SENT = /\b(sent|e-?mailed|invited|delivered|dispatched|queued|went out|gone out|on (its|their) way|invitations? (have|has|were|was|are) )/i;
-const NOT_SENT = /\b(not|n't|never|yet to be|ready to be|ready to|will be|to be|can be|could be|would be|before (it is|they are|being))\s+(yet\s+)?(been\s+)?(sent|e-?mailed|invited|delivered)\b/i;
+const NOT_SENT = /\b(not|n't|never|no \w+ (?:have|has|were|was)|nothing (?:has|was)|nobody (?:has|was)|yet to be|ready to be|ready to|will be|to be|can be|could be|would be|before (it is|they are|being))\s+(yet\s+)?(been\s+)?(sent|e-?mailed|invited|delivered)\b/i;
 const SAYS_LIVE = /\b(is|are|now)\s+(live|published|active)\b|\bpublished\b|\bpublic link\b/i;
 export function readSendReply(text) {
   const reply = String(text ?? "");
-  if (/\bconfirm\b/i.test(reply.slice(-300))) return "asks-confirm";
-  if (SAYS_SENT.test(reply) && !NOT_SENT.test(reply)) return "sent";
+  const went = SAYS_SENT.test(reply) && !NOT_SENT.test(reply);
+  // "Sent. Reply confirm if you want a reminder too" says both. A person reads that one.
+  if (/\bconfirm\b/i.test(reply.slice(-300))) return went ? "unclear" : "asks-confirm";
+  if (went) return "sent";
   if (SAYS_LIVE.test(reply)) return "published";
   return "unclear";
 }
@@ -477,11 +486,11 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       note({ kind: "send-refused", round, reason: "Nobody was at the desk to approve the send." });
       return "Not sent: nobody is at the desk to approve the send, so no email can go out. Nothing was charged. Call finish with what you have.";
     }
-    const reply = await hear({ kind: "approve_send", round, people: recipients.length, survey: draft, changes, why: redact(input.why), email: emails + 1, emailLimit });
+    const reply = await hear({ kind: "approve_send", round, people: recipients.length, survey: draft, changes, message: redact(input.message), why: redact(input.why), email: emails + 1, emailLimit });
     given.push(reply);
-    if (!saysYes(reply)) {
+    if (!approves(reply)) {
       note({ kind: "send-refused", round, reason: reply || "(no reason given)" });
-      return `Not sent: the commander did not approve this send. They said: "${reply || "no"}". Nothing was charged. Change the survey or talk to them, then try again.`;
+      return `Not sent: the commander did not approve this send. They said: "${reply || "no"}". Nothing was charged. Only a plain yes approves a send. Do what they asked or talk to them, then try again.`;
     }
     approved = true;
     note({ kind: "send-approved", round, reply });
@@ -497,6 +506,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     if (planFirst && !planned) return { text: `Not yet: write your plan first, with plan. It is free. Nothing was charged.\n\n${left()}`, failed: true };
     const newSurvey = input.new_survey === true;
     if (newSurvey && owesDebrief()) return { text: DEBRIEF_FIRST, failed: true };
+    if (newSurvey && sent && !readAfterSend) return { text: "Not yet: this round's survey went out and its answers have not been read. Starting a new survey now would lose them. Wait, read the results, open the envelope and debrief first. Nothing was charged.", failed: true };
     if (newSurvey && envelope && readAfterSend && !opened) return { text: "Not yet: this round's results are in and its envelope is still sealed. Open it and debrief before you start another round.", failed: true };
     // A new survey that could never be sent is money spent on nothing.
     if (newSurvey && started && emailsUsed()) {
@@ -527,6 +537,8 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       const refusal = await sendGate(input);
       if (refusal) return { text: `${refusal}\n\n${left()}`, failed: true };
     }
+    // An edit is an edit whatever the agent called the step: "fix question 2, then publish".
+    const edits = input.action === "design" || EDITS.test(input.message);
     const message = input.message.replace(/\{\{\s*recipients\s*\}\}/gi, () => recipientLines(recipients));
     try {
       const reply = await fp.survey({ message, newSurvey });
@@ -541,7 +553,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       if (!sending && input.action !== "results") {
         if (listsQuestions(text) && !(reportsAnswers && input.action !== "design")) { draft = text; changes = []; }
         else if (draft === "") draft = text;
-        else if (input.action === "design" && !isConfirm(input.message)) changes.push(text);
+        else if (edits && !isConfirm(input.message)) changes.push(text);
       }
       if (sent && (!sending || input.action === "results")) readAfterSend = true;
       // Flashpoint often answers a request to send with "reply confirm". Then nothing has
@@ -565,7 +577,9 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       // One approval covers one send. A reminder, or a second try, is asked for again.
       if (emailed) { sent = true; approved = false; emails += 1; }
       // A changed survey is a different survey: the commander approves it again.
-      else if (input.action === "design" && !sent) approved = false;
+      else if (edits && !sent) approved = false;
+      // Putting the survey live emails nobody. The send that follows is approved by itself.
+      if (sending && !emailed && readSendReply(text) === "published") approved = false;
       note({ kind: "flashpoint", round, action: input.action ?? "other", why: input.why, couldChange: input.could_change ?? "", message: redact(message), reply: text, receipts: reply.receipts ?? [], price: PRICES.survey, spent, emailed });
       // After a send whose outcome was not known, the agent asks Flashpoint where the survey
       // stands. Only the commander can then say that it went out: the code does not guess.

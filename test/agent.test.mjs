@@ -722,3 +722,82 @@ test("a short follow-up with one question mark still counts as a shown survey", 
   assert.equal(listsQuestions(`Survey 2 is published and has not been sent. Nothing was changed. ${pad}${pad}`), false);
   assert.equal(listsQuestions(`${pad}${pad} Shall I publish it?`), false);
 });
+
+// ---- Found by a read-through of the real-run path before the first real send ----
+
+// A Flashpoint that answers with fixed replies, in order.
+const SURVEY_TEXT = `Here is the survey.\n\n1. Which event would you come to?\n2. What would stop you coming?\n${"It is short and plain. ".repeat(12)}`;
+const says = (...texts) => { let i = 0; return { survey: async () => ({ text: texts[Math.min(i++, texts.length - 1)] }) }; };
+
+test("a reply that says sent and also says confirm is put to a person, not read as a question", async () => {
+  assert.equal(readSendReply("Invitations were sent to 8 people. Reply confirm if you would like a reminder to go out too."), "unclear");
+  assert.equal(readSendReply("I will send it to 8 people. Reply confirm to go ahead."), "asks-confirm");
+  const { commander, asked } = desk({ reply: "yes" });
+  const flashpoint = says(SURVEY_TEXT, "The survey is live.", "Invitations were sent to 2 people. Reply confirm if you want a reminder sent as well.", "A reminder was sent to 2 people.");
+  const out = await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("Send it to the list", "send"), ask("confirm", "send"), finish], { flashpoint, commander });
+  assert.deepEqual(kinds(out, "flashpoint").map((s) => s.emailed), [false, false, true, true]);
+  assert.equal(approvals(asked), 3, "the publish, the send and the reminder were each approved by themselves");
+});
+
+test("only a plain yes approves a send", async () => {
+  const { approves } = await import("../agent/loop.mjs");
+  for (const text of ["yes", "Yes.", "y", "ok", "go ahead", "send it", "yes, send it", "Yes please"]) assert.ok(approves(text), text);
+  for (const text of ["ok but change Q2 first", "go back", "send after fixing the typo", "yes if you drop question 3", "no", ""]) assert.ok(!approves(text), text);
+  const { commander } = desk({ approve: ["ok but change question 2 first"] });
+  const out = await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), finish], { commander });
+  assert.equal(kinds(out, "send-refused").length, 1);
+  assert.equal(kinds(out, "flashpoint").some((s) => s.emailed), false);
+});
+
+test("an edit made under another step name still shows on the approval screen and is approved again", async () => {
+  const { commander, asked } = desk();
+  const flashpoint = says(SURVEY_TEXT, "I will send it to 2 people. Reply confirm to go ahead.", "Done: a question about income was put in, and v2 is live.", "Invitations were sent to 2 people.");
+  const out = await run([ask("Write a survey", "design"), seal(), ask("Send it to the list", "send"), ask("Fix question 2 and add one about income, then publish", "publish"), ask("confirm", "send"), finish], { flashpoint, commander });
+  const screens = asked.filter((a) => a.kind === "approve_send");
+  assert.equal(screens.length, 2, "the edit took the first approval away");
+  assert.match(screens[1].changes.join(" "), /income/);
+  assert.equal(kinds(out, "flashpoint").filter((s) => s.emailed).length, 1);
+});
+
+test("the approval screen is given the message that would go to Flashpoint", async () => {
+  const { commander, asked } = desk();
+  await run([ask("Write a survey", "design"), seal(), ask("Send it to Ana now, and remind everyone in a day", "send"), finish], { commander });
+  assert.equal(asked.find((a) => a.kind === "approve_send").message, "Send it to [person 1] now, and remind everyone in a day");
+});
+
+test("a publish that says no invitations went out is not an email, and the send after it is approved by itself", async () => {
+  assert.equal(readSendReply("The survey is live. No invitations have been sent yet."), "published");
+  assert.equal(readSendReply("The survey is live. Nothing has been sent."), "published");
+  const { commander, asked } = desk();
+  const flashpoint = says(SURVEY_TEXT, "Shall I publish it, ready to share with the panel? Reply confirm.", "The survey is live. No invitations have been sent yet.", "Invitations were sent to 2 people.");
+  const out = await run([ask("Write a survey", "design"), seal(), ask("Publish it", "publish"), ask("confirm", "publish"), ask("confirm", "send"), finish], { flashpoint, commander });
+  assert.deepEqual(kinds(out, "flashpoint").map((s) => s.emailed), [false, false, false, true]);
+  assert.equal(approvals(asked), 2);
+});
+
+test("other ways of telling Flashpoint to email people are gated too", () => {
+  for (const text of ["Remind everyone who has not answered", "Nudge the non-responders", "Launch it to the panel", "Share the survey with everyone", "Notify the list", "Mail it to them", "Follow up with those who have not replied"]) assert.ok(asksToSend(text), text);
+  for (const text of ["Add a question: what would remind you to come?", "Would they share a table at dinner?", "Launch date question: spring or autumn?", "What did people say about the mailing list?"]) assert.ok(!asksToSend(text), text);
+});
+
+test("a list of changes is not taken for the survey", async () => {
+  const { listsQuestions } = await import("../agent/loop.mjs");
+  const pad = "The survey was updated as asked and is ready for you to look at again. ".repeat(3);
+  assert.equal(listsQuestions(`${pad}\n1. Reworded question 2 to be shorter.\n2. Removed the question about dinner.`), false);
+  assert.equal(listsQuestions(`${pad}\n1. Rank these changes.\n2. Say why in a sentence.`), true);
+});
+
+test("a new survey cannot be started while a sent one is still unread", async () => {
+  const { commander } = desk();
+  const { llm, seen } = scripted([...oneRound().slice(0, 4), ask("Write another survey", "design", { new_survey: true }), ask("Show the results", "results"), open(), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), commander, wait: async () => {} });
+  assert.match(seen[5], /answers have not been read/);
+  assert.equal(kinds(out, "opened").length, 1, "round 1 could still be read and opened");
+  assert.equal(out.spent, 2, "the refused step cost nothing");
+});
+
+test("a two-letter name is taken out as well", () => {
+  const redact = makeRedactor([{ name: "Li Wu", email: "li@example.com" }, { name: "An Do", email: "an@example.com" }]);
+  assert.equal(redact("Li answered first, then Wu."), "[person 1] answered first, then [person 1].");
+  assert.equal(redact("An answer came in. Do not send."), "An answer came in. Do not send.");
+});

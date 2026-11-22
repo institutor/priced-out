@@ -32,6 +32,13 @@ import { logEntry, logHeader, logFooter, shortLine } from "./log.mjs";
 const root = new URL("../", import.meta.url);
 const argv = process.argv.slice(2);
 const valueFlags = ["--cap", "--emails", "--recipients", "--orders", "--resume", "--quiet"];
+// A flag the agent does not know stops the run. A typo of --practice must never start a real one.
+const KNOWN = [...valueFlags, "--practice", "--fake", "--hands-off"];
+const strange = argv.filter((word) => word.startsWith("--") && !KNOWN.includes(word));
+if (strange.length > 0) {
+  console.error(`Not started: ${strange.join(", ")} is not an option here. Options: ${KNOWN.join(", ")}. A value goes after a space, as in --cap 5.`);
+  process.exit(1);
+}
 const flag = (name) => {
   const at = argv.indexOf(name);
   return at === -1 ? undefined : argv[at + 1];
@@ -243,6 +250,7 @@ function show(request) {
     if (request.emailLimit) console.log(`  This would be email ${request.email} of the ${request.emailLimit} each person may get in this mission.${request.email === request.emailLimit ? " After it, nothing more can be sent to them." : ""}`);
     console.log("");
     console.log(indent(request.survey || "(Flashpoint has not shown a draft.)"));
+    if (request.message) console.log(`\n  The message the agent would send to Flashpoint now:\n\n${indent(request.message)}`);
     if (request.changes?.length > 0) console.log(`\n  Changes Flashpoint reported after that:\n\n${request.changes.map((change) => indent(change)).join("\n\n")}`);
   }
   if (request.kind === "guess") {
@@ -270,7 +278,7 @@ async function commander(request) {
     console.log(`\n  (practice commander, ${standIn ? "AI stand-in" : "canned reply"}) ${reply || "(no guess)"}`);
     return reply;
   }
-  if (request.kind === "approve_send") return typed("\n  yes, or no and why > ");
+  if (request.kind === "approve_send") return typed("\n  yes to send it as shown, or anything else to stop it (say why) > ");
   if (request.kind === "guess") return typed("\n  your guess (Enter to skip) > ");
   return typed("\n  you > ");
 }
