@@ -21,7 +21,7 @@ with a recommendation.
 | **What surprised it** | The social dinner came last. A skills workshop and a guest speaker tied for first. Shift work and "cliquey" socials kept people away. |
 | **Survey 2, on that surprise** | Three questions: workshop, speaker, or the two combined? The most you would pay? Which topic? |
 | **The recommendation** | A weekday evening with a professional guest: a short talk, then a hands-on part, free or cheap. Skip the social dinner. |
-| **How much it did alone** | 20 steps on its own. It did not stop for a person once, and the code never had to step in. |
+| **How much it did alone** | 20 steps on its own. It did not stop for a person once. The code checked both sends in a person's place and never had to hold one back or push the agent on. (The log has 22 steps: the other two are those checks.) |
 | **Cost** | Nothing, as a practice run. At real prices its ten messages come to $5.00 of the $9.00 budget. A real run needs a few more messages, about $7 for two rounds. |
 
 **That example is a practice run.** An AI stand-in played Flashpoint and invented every
@@ -116,12 +116,12 @@ node agent/agent.mjs "Figure out the best event to put on for our club next spri
 | `--quiet 3` | Practice only: 3 of the invented people do not answer the first survey until they are reminded, so you can watch the agent meet a low response. | 0 |
 | `--cap 9` | The most the run may spend on Flashpoint, in USDC | 9 |
 | `--emails 2` | The most emails anyone on the list may get, reminders included | 2 |
-
-An option the agent does not know stops it before anything starts, so a typing mistake
-in `--practice` cannot begin a real run. A value goes after a space: `--cap 5`.
 | `--recipients file` | Who to survey, one `Name, email` per line | `agent/recipients.txt` |
 | `--orders file` | Your standing orders, one `- order` per line | `agent/orders.md` |
 | `--resume folder` | Carry on a real run that was stopped | off |
+
+An option the agent does not know stops it before anything starts, so a typing mistake
+in `--practice` cannot begin a real run. A value goes after a space: `--cap 5`.
 
 **What a round costs.** Each message to Flashpoint's survey tool is $0.50. A real round
 is about seven messages (write, publish, email, a confirm or two on the way, read the
@@ -300,7 +300,8 @@ It was run hands-off, so nobody was at the keyboard. What the agent decided:
 - **Stopping.** Everyone had had their two emails, so there could be no third survey. It
   said so, and said the choice between speaker and workshop "is still soft".
 - **The recommendation.** A practical career and money skills evening with a
-  professional guest: a short talk, then a hands-on part. Weekday evening, free or under
+  professional guest: a short talk, then a hands-on part. Five of the 8 had picked a
+  format with a professional guest, so it kept the guest and added the hands-on part. Weekday evening, free or under
   about $10 to $25. Skip the social dinner. It said plainly that 8 people give a
   direction, not a measurement.
 - **Its lessons for next time.** Do not assume social events are the favourite. A
@@ -369,13 +370,13 @@ labelled as one above everything else on the page.
 
 ## Limits
 
-- The people surveyed here are a few test addresses, so an answer is a direction and not
-  a measurement, and the scoreboard shows the method working, not a finding. The agent is
-  told to say so.
+- No real person has answered yet. The first real run will go to a few test addresses,
+  so its answer will be a direction and not a measurement, and its scoreboard will show
+  the method working, not a finding. The agent is told to say so.
 - The commander's guess is only a fair bet when other people answer the survey. If you are
   answering it yourself from test addresses, press Enter to skip your guess.
-- Flashpoint's guide says to allow about a day for replies. A short wait works here only
-  because the testers answer straight away.
+- Flashpoint's guide says to allow about a day for replies. A short wait only works when
+  the people on the list are testers who answer straight away.
 - The agent reads Flashpoint's written summary of the results, not the raw export.
 - A persona rehearsal is slow and can fail. The run carries on without it, and the
   personas then have no guess in the envelope.

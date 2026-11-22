@@ -1,4 +1,4 @@
-# Priced Out
+# The Sealed Envelope and Priced Out
 
 > **Two things live here.** The **Sealed Envelope** is an AI agent for the MCP Challenge: give it one objective and it runs the survey research through the Flashpoint MCP. It comes first below, with [a run you can watch part by part](https://institutor.github.io/priced-out/agent/) and [its own README](agent/README.md). **Priced Out** is the calculator the agent grew out of. It starts at [Priced Out, the calculator](#priced-out-the-calculator).
 
@@ -76,11 +76,14 @@ It was run hands-off, with nobody at the keyboard. What the agent decided:
 - **Survey 2.** Workshop, speaker, or the two combined? The most you would pay? Which
   topic?
 - **Stopping.** Speaker 3, combined 2, workshop 1, none 2. Everyone had now had their
-  two emails, so there could be no third survey, and the agent said so.
+  two emails, so the code allowed no third survey, and the agent said so.
 - **The recommendation.** A weekday evening with a professional guest: a short talk,
-  then a hands-on part, free or cheap. Skip the social dinner. It said plainly that 8
-  people give a direction, not a measurement.
+  then a hands-on part, free or cheap. Skip the social dinner. Five of the 8 picked a
+  format with a professional guest, so it kept the guest and added the hands-on part.
+  It said the choice between the two "is still soft", and that 8 people give a
+  direction, not a measurement.
 - **How much it did alone.** 20 steps on its own. It did not stop for a person once.
+  (The log has 22 steps: the other two are the code checking each send.)
 - **What it learned.** It began with six lessons from two earlier runs and ended by
   writing three more.
 - **The bill.** Ten messages to Flashpoint: $5.00 of a $9.00 budget. A real run needs a

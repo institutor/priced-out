@@ -200,7 +200,7 @@ export const TOOLS = [
     input_schema: {
       type: "object",
       properties: {
-        recommendation: { type: "string", description: "The answer to the mission, in two to four plain sentences." },
+        recommendation: { type: "string", description: "The answer to the mission, in two to four plain sentences. If you recommend something other than the option most people picked, say why in one of them." },
         evidence: { type: "string", description: "The real survey results the answer rests on, with the counts. Keep synthetic persona answers out, or label them synthetic." },
         scoreboard: {
           type: "array",

@@ -28,7 +28,7 @@ const WIDE = {
   agent: { ...AGENT, x: 408, height: 142 },
   guess: { lines: ["I'll ask them. First,", "my guess goes in here."], size: 23, centre: 488, top: 34 },
   members: [
-    { ...MEMBER, x: 712, height: 136, left: "up", right: "down", mouth: "open", says: { lines: ["Trivia night!"], size: 23, centre: 690, top: 76 } },
+    { ...MEMBER, x: 712, height: 136, left: "up", right: "down", mouth: "open", says: { lines: ["Skills night!"], size: 23, centre: 690, top: 76 } },
     { ...MEMBER, x: 796, height: 148, left: "down", right: "wave" },
     { ...MEMBER, x: 880, height: 132, left: "pocket", right: "neck", mouth: "open", says: { lines: ["Only if it's free."], size: 23, centre: 912, top: 60 } },
   ],
