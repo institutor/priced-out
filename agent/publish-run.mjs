@@ -20,7 +20,7 @@ export function forSite(run) {
     return { ...rest, questions: envelope.predictions.map((p) => p.question), commanderGuessed: envelope.predictions.filter((p) => p.commander !== null).length };
   });
   const out = {
-    objective: run.objective, mode: run.mode, model: run.model, cap: run.cap, orders: run.orders,
+    objective: run.objective, mode: run.mode, model: run.model, cap: run.cap, emailLimit: run.emailLimit ?? null, orders: run.orders,
     people: run.people, stamp: run.stamp, practiceCommander: run.practiceCommander === true, steps,
   };
   const found = JSON.stringify(out).match(ADDRESS);

@@ -64,6 +64,7 @@ node agent/agent.mjs "Find the ticket price for our spring formal that keeps the
 | `--practice` | Practice run. An AI stand-in plays Flashpoint and invents the answers. | off |
 | `--fake` | Practice run with fixed canned replies. This is what the tests use. | off |
 | `--cap 8` | The most the run may spend on Flashpoint, in USDC | 8 |
+| `--emails 2` | The most emails anyone on the list may get, reminders included | 2 |
 | `--recipients file` | Who to survey, one `Name, email` per line | `agent/recipients.txt` |
 | `--orders file` | Your standing orders, one `- order` per line | `agent/orders.md` |
 | `--resume folder` | Carry on a real run that was stopped | off |
@@ -139,6 +140,13 @@ agent's that the step could change. If it cannot name one, it is told to skip th
 - **The envelope is honest.** Your guess is kept from the model until the envelope opens.
   A guess cannot be sealed after the survey is sent. The envelope's SHA-256 is written to
   the log when it is sealed and checked when it is opened.
+- **A limit on emails.** A follow-up round means a second email to the same people, who are
+  doing you a favour. The code counts every send and refuses one that would pass the limit:
+  two emails each by default, reminders included (`--emails 1` allows a single survey and
+  no follow-up). The approval screen says which email it is, for example "email 2 of the 2
+  each person may get". The agent is also told to say in the first survey that one short
+  follow-up may come, and to keep a follow-up to three questions at most. That part is an
+  instruction to the agent and not a rule in the code, so check it when you approve.
 - **A hard budget cap.** The code refuses any paid step that would pass the cap. A call
   that fails is not counted.
 - **The model never sees a name or an email address.** It writes `{{RECIPIENTS}}` and the
@@ -181,10 +189,9 @@ The mission given:
 
 What the agent decided is in [examples/practice-run/summary.md](examples/practice-run/summary.md),
 and every step is in [examples/practice-run/log.md](examples/practice-run/log.md). In
-short: it rehearsed the survey on AI personas, guessed that day or time would win, got a
-three-way split with a write-in nobody had guessed (the cost of travel), went to the
-commander because an order covers split answers, and ran a second round that asked
-people to rank the three changes. You can replay the same mission step by step at
+short: it guessed that day or time would win, got a three-way split in which nobody
+picked day or time, went to the commander because an order covers split answers, ran one
+short follow-up round, and stopped there because everyone had had their two emails. You can replay the same mission step by step at
 <https://institutor.github.io/priced-out/agent/>.
 
 ### What a run leaves behind

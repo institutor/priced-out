@@ -84,6 +84,13 @@ guessed wrong is what the next round asks about.
 | Who was wrong, and what that means | A guess cannot be sealed or changed after the survey is sent |
 | Whether to run another round, and on what | Addresses never reach the model or the logs, and the names on the list are taken out |
 | When to stop, and the final recommendation | Every paid step is logged with its price and the decision it could change |
+| | Nobody gets more than two emails in a mission, reminders included. A third is refused |
+
+**People's time.** The agent can run a follow-up round, and a follow-up is one more email to
+people who are doing you a favour. So the code counts: by default nobody gets more than two
+emails in a mission (`--emails` changes it), and you approve each one. The agent is told to
+say in the first survey that one short follow-up may come, and to keep the follow-up to three
+questions at most.
 
 ### How to run it
 
@@ -112,20 +119,24 @@ The objective given:
 What the agent decided, in that practice run:
 
 - **Survey 1.** It asked the commander what changes were on the table, then had
-  Flashpoint write a short survey: which one change would bring you back, and why.
-- **Rehearsal.** A standing order said to rehearse first, so it ran the survey on AI
-  personas and put their answers in the envelope as the personas' guess.
+  Flashpoint write a short survey: which one change would bring you back, and why. Its
+  opening line told people that one short follow-up might come later.
 - **The envelope.** It guessed that a different day or time would win.
-- **What came back.** A three-way split, and one person wrote in something nobody had
-  offered: help with the cost of travel. Neither the agent nor the personas had guessed it.
+- **What came back.** A three-way split between a closer venue, shorter meetings and
+  more varied content. Nobody picked day or time, so the agent's guess was wrong.
 - **Going to the commander.** The split set off the order "Come to me if the answers
   split evenly", so the agent stopped and reported before going on.
-- **Survey 2.** It asked only about what round one got wrong: rank the three changes
-  that surfaced, travel cost included.
-- **The recommendation.** Try a different day or time first, and look at travel cost. It
-  said plainly that three people give a direction, not a measurement.
-- **The bill.** Nine messages to Flashpoint and one rehearsal: $5.10 of an $8.00 cap, at
-  the prices a real run would have paid.
+- **Survey 2.** A short follow-up on what round one left open: if only one of these
+  could happen, which would you want? It added a new option that came out of people's
+  own words, a flexible drop-in. Its opening line said it was the follow-up and why it
+  was worth a minute.
+- **Stopping.** Round two split again. Everyone had now had their two emails, so the
+  agent could not send a third survey, and it said so.
+- **The recommendation.** No single change won. If one must be picked, make attending
+  easier, with a closer venue or a drop-in option. It said plainly that three people
+  give a direction, not a measurement.
+- **The bill.** Nine messages to Flashpoint: $4.50 of an $8.00 cap, at the prices a
+  real run would have paid.
 
 The full example is in [agent/examples/practice-run/](agent/examples/practice-run/):
 [the one-page summary](agent/examples/practice-run/summary.md) and

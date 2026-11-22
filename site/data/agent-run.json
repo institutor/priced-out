@@ -3,315 +3,312 @@
  "mode": "practice",
  "model": "claude-sonnet-5-5",
  "cap": 8,
+ "emailLimit": 2,
  "orders": [
   "Check with me before any email goes out.",
   "Come to me if the answers split evenly and you cannot call it.",
-  "Tell me what you learned before you start a second round.",
-  "Rehearse the first survey on AI personas before real people see it."
+  "Tell me what you learned before you start a second round."
  ],
  "people": 3,
- "stamp": "2026-11-22T03-18-43",
+ "stamp": "2026-11-22T06-34-33",
  "practiceCommander": true,
  "steps": [
   {
    "n": 1,
-   "at": "2026-11-22T03:18:46.472Z",
+   "at": "2026-11-22T06:34:36.907Z",
    "kind": "thinking",
-   "text": "I'm deciding what to ask first. Local knowledge could shape the survey, and it's free to ask the commander, so I'll ask which changes are realistic."
+   "text": "I'm deciding what the candidate changes are. The commander knows the club, so I'll ask them before I write the survey."
   },
   {
    "n": 2,
-   "at": "2026-11-22T03:18:46.474Z",
+   "at": "2026-11-22T06:34:36.909Z",
    "kind": "commander",
    "order": null,
-   "why": "Answer options should be changes the commander can actually make.",
-   "message": "Before I draft: which candidate changes are realistically on the table for the weekly meetings (e.g. day/time, location, format, length, food, topics)? I'll offer those as options so people pick among changes you could actually make. I'll also add a free-text \"why\" question.",
+   "why": "Their reply sets the answer options so the survey tests real, feasible changes.",
+   "message": "Before I draft the survey: which 3-5 changes are you actually considering for the weekly meetings (e.g. different day/time, new venue, shorter meetings, food, more activities)? Also, is there a reason you suspect people stopped coming?",
    "reply": "Nobody is at the keyboard for this practice run. Use your own judgement and carry on."
   },
   {
    "n": 3,
-   "at": "2026-11-22T03:18:55.743Z",
+   "at": "2026-11-22T06:34:47.283Z",
    "kind": "flashpoint",
    "round": 1,
    "action": "design",
-   "why": "Get a draft survey to read.",
-   "couldChange": "The wording and options of the survey that gets sent.",
-   "message": "Make a panel from [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>. Draft a short survey (do not publish or send yet) for members of a club about weekly meetings. Q1 (single choice): Which ONE change would make you most likely to come back more often? Options: Different day or time; Different location; Shorter meetings; More social time/food; More interesting topics or activities; Better communication/reminders; Other (please say). Q2 (open): Why did you pick that? Q3 (single choice): How often do you attend now? Almost every week / Sometimes / Rarely. No skip rules. Show me the full survey.",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 1.\n\nThe panel has 3 members.\n\n| Label | Type | Question text | Answer options |\n|---|---|---|---|\n| Q1 | Single choice | Which ONE change would make you most likely to come back more often? | Different day or time; Different location; Shorter meetings; More social time/food; More interesting topics or activities; Better communication/reminders; Other (please say) |\n| Q2 | Open text | Why did you pick that? | None (open text) |\n| Q3 | Single choice | How often do you attend now? | Almost every week; Sometimes; Rarely |\n\nValidation: 0 blockers.\nIt is not published. Reply confirm to publish it.",
+   "why": "Get a draft to review before anything is sent.",
+   "couldChange": "The wording and options of the survey I send.",
+   "message": "Make a panel from [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>. Draft (do not publish or send yet) a short survey. Opening line: we want more people at our weekly meetings; this is a short survey and one short follow-up may come later. Questions: 1) Which ONE change would most make you come to more weekly meetings? (single choice: different day; different start time; better/closer venue; shorter meetings; more social time/food; more interesting content/activities; other - please say) 2) In a sentence, why? (free text) 3) How many of the last 4 meetings did you attend? (0,1,2,3,4). No skip logic. Show me the full survey.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 1.\n\nPanel: 3 members.\n\n| Label | Type | Text | Answer options |\n|---|---|---|---|\n| Intro | Display (no answer) | We want more people at our weekly meetings. This is a short survey, and one short follow-up may come later. | None |\n| Q1 | Single choice | Which ONE change would most make you come to more weekly meetings? | Different day / Different start time / Better or closer venue / Shorter meetings / More social time or food / More interesting content or activities / Other (please say) |\n| Q2 | Free text | In a sentence, why? | Open text |\n| Q3 | Single choice | How many of the last 4 meetings did you attend? | 0 / 1 / 2 / 3 / 4 |\n\nValidation: 0 blockers. Survey 1 is saved as a draft and has not been published or sent.\nIt is not published. Reply confirm to publish it.",
    "receipts": [],
    "price": 0.5,
-   "spent": 0.5
+   "spent": 0.5,
+   "emailed": false
   },
   {
    "n": 4,
-   "at": "2026-11-22T03:18:57.994Z",
-   "kind": "flashpoint",
-   "round": 1,
-   "action": "publish",
-   "why": "Publish so personas can rehearse; emails nobody.",
-   "couldChange": "Whether rehearsal can run.",
-   "message": "confirm",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 1 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
-   "receipts": [],
-   "price": 0.5,
-   "spent": 1
-  },
-  {
-   "n": 5,
-   "at": "2026-11-22T03:19:07.016Z",
-   "kind": "rehearsal",
-   "round": 1,
-   "why": "Catch confusing questions and get a guess for the envelope.",
-   "couldChange": "Survey wording before real people see it.",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSYNTHETIC rehearsal: 5 AI personas took survey 1. 5 of 5 finished and none was cut off. Ask the survey agent for the rehearsal results to see what they answered.",
-   "receipts": [],
-   "price": 0.6,
-   "spent": 1.6
-  },
-  {
-   "n": 6,
-   "at": "2026-11-22T03:19:15.109Z",
-   "kind": "flashpoint",
-   "round": 1,
-   "action": "results",
-   "why": "Get personas' answers for the envelope.",
-   "couldChange": "My sealed prediction.",
-   "message": "Show the rehearsal (persona) results for survey 1.",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSYNTHETIC rehearsal of survey 1: 5 of 5 AI personas finished, none was cut off. These are AI personas, not people.\n\n**Q1: Which ONE change would make you most likely to come back more often?** (n = 5)\n\n| Answer option | Count |\n|---|---|\n| Different day or time | 1 |\n| Different location | 0 |\n| Shorter meetings | 1 |\n| More social time/food | 0 |\n| More interesting topics or activities | 1 |\n| Better communication/reminders | 1 |\n| Other (please say) | 1 |\n\n**Q3: How often do you attend now?** (n = 5)\n\n| Answer option | Count |\n|---|---|\n| Almost every week | 1 |\n| Sometimes | 3 |\n| Rarely | 1 |\n\n**Q2: Why did you pick that?** (open text, n = 5)\n\nThemes:\n- **Evening timing and length (2 personas):** Weeknight 7pm clashes with bedtime, and two hours after a long workday is too long. Both would attend more with a Saturday morning or an earlier finish.\n- **Stale format (1):** Same format for years; a guest speaker or hands-on project would bring them back weekly.\n- **Missed updates (1):** Missed the last two meetings because a time change wasn't noticed.\n- **Childcare and social connection (1):** Wants a crèche or kids' corner, plus social time and food. Mei's \"Other\" answer covers childcare, which no listed option includes.\n- **Willingness to pay (3):** Would pay a small fee for a kids' corner, for materials, or toward a better venue.\n\n**Questions the personas found unclear:**\n- **Q1 (double-barrelled):** Priya said \"come back more often\" and \"ONE change\" pull in different directions, so she picked the change most likely to work rather than the one she preferred.\n- **Q3 (vague frequency):** Tom asked whether \"Sometimes\" means once or twice a month. The option has no defined frequency.\n- **Q1 (coverage gap, not wording):** Mei could only answer through \"Other\" because no option covers childcare. This is a gap in the answer list rather than unclear wording.",
-   "receipts": [],
-   "price": 0.5,
-   "spent": 2.1
-  },
-  {
-   "n": 7,
-   "at": "2026-11-22T03:19:16.936Z",
+   "at": "2026-11-22T06:34:49.550Z",
    "kind": "sealed",
    "round": 1,
-   "why": "Q1 is the mission's core question.",
-   "hash": "3dd8c6ac1136c2a276f383179748684adf5ebdc4aa42beb6f47c9f9a17c99032",
+   "why": "Main question of the mission.",
+   "hash": "b0bf411f80d47e3a1278bc6568c0706b2c52aa1dbe2ec6c62fc8c6262c056797",
    "questions": [
-    "Which ONE change would make you most likely to come back more often?"
+    "Which ONE change would most make you come to more weekly meetings?"
    ],
    "commanderGuessed": 0
   },
   {
-   "n": 8,
-   "at": "2026-11-22T03:19:18.293Z",
+   "n": 5,
+   "at": "2026-11-22T06:34:50.802Z",
    "kind": "send-approved",
    "round": 1,
    "reply": "yes"
   },
   {
-   "n": 9,
-   "at": "2026-11-22T03:19:22.999Z",
+   "n": 6,
+   "at": "2026-11-22T06:34:50.802Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "publish",
+   "why": "Publish survey.",
+   "couldChange": "Whether the survey can be sent.",
+   "message": "confirm publish (publish only; do not send)",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nPublishing survey 1 makes it live. Reply confirm to publish it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 1,
+   "emailed": false
+  },
+  {
+   "n": 7,
+   "at": "2026-11-22T06:34:52.116Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "publish",
+   "why": "Complete publish.",
+   "couldChange": "Whether the survey can be sent.",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 1 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 1.5,
+   "emailed": false
+  },
+  {
+   "n": 8,
+   "at": "2026-11-22T06:34:59.008Z",
    "kind": "flashpoint",
    "round": 1,
    "action": "send",
-   "why": "Send survey 1 to the 3 real members; commander approval screen applies.",
+   "why": "Send survey 1 to the panel; the commander approval screen will appear.",
    "couldChange": "Whether I get real answers.",
    "message": "confirm",
    "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 1 was emailed to every panel member who can receive it.",
    "receipts": [],
    "price": 0.5,
-   "spent": 2.6
+   "spent": 2,
+   "emailed": true
   },
   {
-   "n": 10,
-   "at": "2026-11-22T03:19:23.910Z",
+   "n": 9,
+   "at": "2026-11-22T06:34:59.988Z",
    "kind": "wait",
    "why": "Give members time to answer.",
    "minutes": 10
   },
   {
+   "n": 10,
+   "at": "2026-11-22T06:35:04.255Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "results",
+   "why": "Read responses.",
+   "couldChange": "Whether I recommend a change or need a follow-up.",
+   "message": "Show results for survey 1: counts for each question and all free-text answers.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 1 results** (3 responses; draft, not published or sent)\n\n**Intro:** Display only, no answer.\n\n**Q1: Which ONE change would most make you come to more weekly meetings?** (3 answered)\n\n| Answer option | Count |\n|---|---|\n| Different day | 0 |\n| Different start time | 0 |\n| Better or closer venue | 1 |\n| Shorter meetings | 1 |\n| More social time or food | 0 |\n| More interesting content or activities | 1 |\n| Other (please say) | 0 |\n\n**Q2: In a sentence, why?** (3 answered, open text, quoted in full)\n\n- **Respondent 1:** \"I like the people and the work we do, but the sessions can feel samey, and I'd come more if there was more variety.\"\n- **Respondent 2:** \"I work evenings and the bus fare adds up, so a closer place would make it much easier to come.\"\n- **Respondent 3:** \"A weekly commitment is hard to keep up with alongside everything else, so when I'm unsure I can make it, I tend to let it slide.\"\n\n**Q3: How many of the last 4 meetings did you attend?** (3 answered)\n\n| Answer option | Count |\n|---|---|\n| 0 | 1 |\n| 1 | 0 |\n| 2 | 1 |\n| 3 | 1 |\n| 4 | 0 |",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 2.5,
+   "emailed": false
+  },
+  {
    "n": 11,
-   "at": "2026-11-22T03:19:28.113Z",
-   "kind": "flashpoint",
-   "round": 1,
-   "action": "results",
-   "why": "Read real answers.",
-   "couldChange": "The recommendation.",
-   "message": "Show the results for survey 1, including open text and response count.",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 1: Results**\n\n**Responses received:** 3 (all 3 panel members answered all three questions)\n\n**Q1. Which ONE change would make you most likely to come back more often?** (single choice)\n\n| Option | Count |\n|---|---|\n| Different day or time | 1 |\n| Different location | 0 |\n| Shorter meetings | 1 |\n| More social time/food | 0 |\n| More interesting topics or activities | 0 |\n| Better communication/reminders | 0 |\n| Other (please say) | 1 |\n| **Total** | **3** |\n\n**Q2. Why did you pick that?** (open text, 3 responses)\n\n- **Respondent 1:** \"I'd like the club to put some of its money toward a travel bursary for members who can't afford the fares, because cost is what keeps some people from coming, and that matters more to me than more food.\"\n- **Respondent 2:** \"Meetings feel like they come too often, and I'd rather have fewer that are tighter and focused on something useful. I get my social time elsewhere, so I'd come more if the format were lighter.\"\n- **Respondent 3:** \"My work schedule makes the current time hard to manage, so a different day or time would make it much easier for me to get there.\"\n\n**Q3. How often do you attend now?** (single choice)\n\n| Option | Count |\n|---|---|\n| Almost every week | 1 |\n| Sometimes | 1 |\n| Rarely | 1 |\n| **Total** | **3** |",
-   "receipts": [],
-   "price": 0.5,
-   "spent": 3.1
-  },
-  {
-   "n": 12,
-   "at": "2026-11-22T03:19:29.870Z",
+   "at": "2026-11-22T06:35:06.148Z",
    "kind": "opened",
    "round": 1,
-   "hash": "3dd8c6ac1136c2a276f383179748684adf5ebdc4aa42beb6f47c9f9a17c99032",
+   "hash": "b0bf411f80d47e3a1278bc6568c0706b2c52aa1dbe2ec6c62fc8c6262c056797",
    "intact": true,
    "rows": [
     {
-     "question": "Which ONE change would make you most likely to come back more often?",
-     "people_said": "3 responses: Different day or time 1; Shorter meetings 1; Other (travel bursary for cost) 1; all others 0.",
-     "agent": "Different day or time, since scheduling conflicts are the most common reason for missing meetings.",
-     "personas": "Split across 5 options, 1 each: day/time, shorter, topics, communication, other (childcare).",
-     "commander": null
-    }
-   ]
-  },
-  {
-   "n": 13,
-   "at": "2026-11-22T03:19:33.003Z",
-   "kind": "commander",
-   "order": "Come to me if the answers split evenly and you cannot call it. / Tell me what you learned before you start a second round.",
-   "why": "Both standing orders apply; their reply decides whether to run round 2.",
-   "message": "Round 1 (3 of 3 answered) split three ways, 1 each: different day/time (work schedule), shorter/fewer tighter meetings, and a travel bursary for members who can't afford fares. I can't call a single winner. The common thread is that each person's barrier is different: time, burden, and cost. Cost wasn't in my options at all. I could run a short round 2 asking each person to rank those three changes (plus cost) and say which they'd actually need. With 3 people it would only show direction. Should I do that, or would you rather stop and decide from the split?",
-   "reply": "Nobody is at the keyboard for this practice run. Use your own judgement and carry on."
-  },
-  {
-   "n": 14,
-   "at": "2026-11-22T03:19:36.128Z",
-   "kind": "debrief",
-   "round": 1,
-   "whoWasWrong": "Me: I guessed day/time would win; it got 1 of 3 and tied with two others. Personas also guessed a spread but included options (topics, communication) no real person chose. Commander gave no guess.",
-   "surprise": "A travel-cost bursary: nobody, including me and the personas, had cost of getting there as an option.",
-   "stillUnknown": "Whether the three barriers (time, length/frequency, cost) can be ranked, and whether any single change would help more than one person.",
-   "nextMove": "another_round",
-   "reason": "Round 2 asks only: rank the three surfaced changes and say if each would get them to come, to break the tie."
-  },
-  {
-   "n": 15,
-   "at": "2026-11-22T03:19:41.755Z",
-   "kind": "flashpoint",
-   "round": 2,
-   "action": "design",
-   "why": "Draft the tie-breaking ranking round.",
-   "couldChange": "Which change I recommend.",
-   "message": "Make a new short survey for [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]> (do not publish or send yet). Q1 (ranking, 1 = most helpful): Rank these changes by how much each would get you to come more often: Move the meeting to a different day/time; Fewer or shorter, more focused meetings; Club money for a travel bursary to cover fares. Q2 (single choice): If the club made only your top-ranked change, would you come more often? Yes definitely / Probably / No. No skip rules. Show the full survey.",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 2.\n\nPanel: 3 members.\n\n| Label | Type | Text | Answer options |\n|---|---|---|---|\n| Q1 | Ranking (1 = most helpful) | Rank these changes by how much each would get you to come more often. | Move the meeting to a different day/time; Fewer or shorter, more focused meetings; Club money for a travel bursary to cover fares |\n| Q2 | Single choice | If the club made only your top-ranked change, would you come more often? | Yes, definitely; Probably; No |\n\nValidation: 0 blockers. Survey 2 is a draft and has not been published or sent.\nIt is not published. Reply confirm to publish it.",
-   "receipts": [],
-   "price": 0.5,
-   "spent": 3.6
-  },
-  {
-   "n": 16,
-   "at": "2026-11-22T03:19:43.961Z",
-   "kind": "sealed",
-   "round": 2,
-   "why": "Core question of round 2.",
-   "hash": "6c173bfb022c90ff53ca98e0ba39e6685f9fdbc7a737366958389802c7fa8725",
-   "questions": [
-    "Which change would you rank first: different day/time, fewer/shorter meetings, or travel bursary?"
-   ],
-   "commanderGuessed": 0
-  },
-  {
-   "n": 17,
-   "at": "2026-11-22T03:19:45.353Z",
-   "kind": "send-approved",
-   "round": 2,
-   "reply": "yes"
-  },
-  {
-   "n": 18,
-   "at": "2026-11-22T03:19:45.354Z",
-   "kind": "flashpoint",
-   "round": 2,
-   "action": "publish",
-   "why": "Publish survey 2.",
-   "couldChange": "Enables sending.",
-   "message": "confirm",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
-   "receipts": [],
-   "price": 0.5,
-   "spent": 4.1
-  },
-  {
-   "n": 19,
-   "at": "2026-11-22T03:19:50.888Z",
-   "kind": "flashpoint",
-   "round": 2,
-   "action": "send",
-   "why": "Send survey 2.",
-   "couldChange": "Whether I get ranking data.",
-   "message": "confirm",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 was emailed to every panel member who can receive it.",
-   "receipts": [],
-   "price": 0.5,
-   "spent": 4.6
-  },
-  {
-   "n": 20,
-   "at": "2026-11-22T03:19:52.145Z",
-   "kind": "wait",
-   "why": "Allow time to answer.",
-   "minutes": 10
-  },
-  {
-   "n": 21,
-   "at": "2026-11-22T03:19:57.896Z",
-   "kind": "flashpoint",
-   "round": 2,
-   "action": "results",
-   "why": "Read round 2.",
-   "couldChange": "Final recommendation.",
-   "message": "Show results for survey 2, with response count.",
-   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 2: results**\n\n**Responses:** 3 respondents answered. Survey 2 is still a draft and has not been published or sent, so confirm the source of these responses before using the results.\n\n**Q1 (ranking, 1 = most helpful): count of respondents giving each rank**\n\n| Change | Ranked 1st | Ranked 2nd | Ranked 3rd |\n|---|---|---|---|\n| Move the meeting to a different day/time | 1 (Respondent 3) | 2 (Respondents 1, 2) | 0 |\n| Fewer or shorter, more focused meetings | 1 (Respondent 2) | 0 | 2 (Respondents 1, 3) |\n| Club money for a travel bursary to cover fares | 1 (Respondent 1) | 1 (Respondent 3) | 1 (Respondent 2) |\n\n**Q2 (single choice): If the club made only your top-ranked change, would you come more often?**\n\n| Answer | Count | Respondents |\n|---|---|---|\n| Yes, definitely | 1 | Respondent 2 |\n| Probably | 2 | Respondents 1, 3 |\n| No | 0 | None |\n\n**Open answers:** None. Survey 2 has no free-text question.",
-   "receipts": [],
-   "price": 0.5,
-   "spent": 5.1
-  },
-  {
-   "n": 22,
-   "at": "2026-11-22T03:20:00.809Z",
-   "kind": "opened",
-   "round": 2,
-   "hash": "6c173bfb022c90ff53ca98e0ba39e6685f9fdbc7a737366958389802c7fa8725",
-   "intact": true,
-   "rows": [
-    {
-     "question": "Which change would you rank first: different day/time, fewer/shorter meetings, or travel bursary?",
-     "people_said": "3 responses: each change ranked first once. Day/time: ranks 1,2,2; bursary: 1,2,3; fewer/shorter: 1,3,3. Q2: 1 yes definitely, 2 probably, 0 no.",
-     "agent": "Split again, with different day/time slightly ahead because it's the most broadly relevant; people will likely rank their own earlier choice first.",
+     "question": "Which ONE change would most make you come to more weekly meetings?",
+     "people_said": "3 responses, split 1-1-1: better/closer venue 1, shorter meetings 1, more interesting content/activities 1; others 0.",
+     "agent": "Different start time or day (scheduling is the commonest barrier); no strong consensus with 3 people.",
      "personas": null,
      "commander": null
     }
    ]
   },
   {
-   "n": 23,
-   "at": "2026-11-22T03:20:03.430Z",
-   "kind": "debrief",
-   "round": 2,
-   "whoWasWrong": "Nobody badly: my guess of a split with day/time slightly ahead matched. The ranking did give day/time the best overall position.",
-   "surprise": "Everyone still ranked their own earlier pick first, and nobody said No. Each change would help someone.",
-   "stillUnknown": "Whether the pattern holds beyond 3 people, and how many members are lost to each barrier.",
-   "nextMove": "finish",
-   "reason": "The panel is only 3 people. Another round can't give a firmer answer, and the remaining question needs a wider audience than this panel."
+   "n": 12,
+   "at": "2026-11-22T06:35:09.452Z",
+   "kind": "commander",
+   "order": "Come to me if the answers split evenly and you cannot call it. / Tell me what you learned before you start a second round.",
+   "why": "Standing orders require reporting a split and my learnings before round 2.",
+   "message": "Round 1 (3 of 3 answered) split three ways: closer venue 1, shorter meetings 1, more varied content 1. Nobody picked day or time, which I had guessed. Free text: one finds sessions samey, one has bus-fare cost, one finds a weekly commitment hard and lets it slide. Common thread: the weekly commitment and effort of attending. I can't call a single winner. Plan: one short follow-up (3 questions max) asking which of those three they'd pick if only one could happen, and whether a lighter option (e.g. drop-in/flexible attendance) would help. Or I can stop here and report the split. Any objection?",
+   "reply": "Nobody is at the keyboard for this practice run. Use your own judgement and carry on."
   },
   {
-   "n": 24,
-   "at": "2026-11-22T03:20:09.961Z",
+   "n": 13,
+   "at": "2026-11-22T06:35:11.911Z",
+   "kind": "debrief",
+   "round": 1,
+   "whoWasWrong": "I was wrong: I guessed day/time; nobody chose either. Commander and personas gave no guess.",
+   "surprise": "A three-way tie, and the free text points to attendance friction (cost, commitment, variety) rather than scheduling.",
+   "stillUnknown": "Which of venue, length or variety matters most when forced to rank, and whether flexible attendance would help.",
+   "nextMove": "another_round",
+   "reason": "One short follow-up forcing a ranking among the three named changes, plus the flexible-attendance idea, could break the tie."
+  },
+  {
+   "n": 14,
+   "at": "2026-11-22T06:35:18.762Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "design",
+   "why": "Draft follow-up to break the tie.",
+   "couldChange": "Which single change I recommend.",
+   "message": "Using [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>, draft (do not publish or send yet) a new short follow-up survey. Opening line: This is the short follow-up to our earlier survey; it's worth a minute because answers were split three ways and yours will break the tie. Questions: 1) If only ONE of these could happen, which would you most want? (single choice: a closer/easier-to-reach venue; shorter meetings; more variety in what we do; a flexible drop-in option with no weekly commitment). 2) Which of those would you least care about? (same four options, single choice). 3) Anything else that would make it easy to come? (free text, optional). No skip logic. Show the full survey.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 2.\n\nPanel: 3 members.\n\n| Label | Type | Question text | Answer options |\n|---|---|---|---|\n| Intro | Statement | This is the short follow-up to our earlier survey; it's worth a minute because answers were split three ways and yours will break the tie. | None |\n| Q1 | Single choice | If only ONE of these could happen, which would you most want? | A closer/easier-to-reach venue; Shorter meetings; More variety in what we do; A flexible drop-in option with no weekly commitment |\n| Q2 | Single choice | Which of those would you least care about? | A closer/easier-to-reach venue; Shorter meetings; More variety in what we do; A flexible drop-in option with no weekly commitment |\n| Q3 | Free text (optional) | Anything else that would make it easy to come? | Open text entry; not required |\n\nValidation: 0 blockers.\nIt is not published. Reply confirm to publish it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 3,
+   "emailed": false
+  },
+  {
+   "n": 15,
+   "at": "2026-11-22T06:35:21.321Z",
+   "kind": "sealed",
+   "round": 2,
+   "why": "Main round 2 question.",
+   "hash": "3a56555fca2a65078b5ac9c1ae1eaea02ff5581bd89854638fc784e32a1d8433",
+   "questions": [
+    "If only ONE of these could happen, which would you most want?"
+   ],
+   "commanderGuessed": 0
+  },
+  {
+   "n": 16,
+   "at": "2026-11-22T06:35:21.322Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "publish",
+   "why": "Publish survey 2.",
+   "couldChange": "Whether it can be sent.",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 3.5,
+   "emailed": false
+  },
+  {
+   "n": 17,
+   "at": "2026-11-22T06:35:22.734Z",
+   "kind": "send-approved",
+   "round": 2,
+   "reply": "yes"
+  },
+  {
+   "n": 18,
+   "at": "2026-11-22T06:35:28.453Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "send",
+   "why": "Send follow-up (2nd and last email).",
+   "couldChange": "Whether I get tie-breaking answers.",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 was emailed to every panel member who can receive it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 4,
+   "emailed": true
+  },
+  {
+   "n": 19,
+   "at": "2026-11-22T06:35:29.400Z",
+   "kind": "wait",
+   "why": "Allow time to answer.",
+   "minutes": 10
+  },
+  {
+   "n": 20,
+   "at": "2026-11-22T06:35:33.247Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "results",
+   "why": "Read follow-up.",
+   "couldChange": "The recommendation.",
+   "message": "Show results for survey 2: counts per question and all free-text answers.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 2 results (3 respondents, 3 answered)**\n\n**Q1: If only ONE of these could happen, which would you most want?**\n\n| Answer option | Count |\n|---|---|\n| A closer/easier-to-reach venue | 1 |\n| Shorter meetings | 0 |\n| More variety in what we do | 1 |\n| A flexible drop-in option with no weekly commitment | 1 |\n| **Total answered** | **3** |\n\n**Q2: Which of those would you least care about?**\n\n| Answer option | Count |\n|---|---|\n| A closer/easier-to-reach venue | 1 |\n| Shorter meetings | 1 |\n| More variety in what we do | 1 |\n| A flexible drop-in option with no weekly commitment | 0 |\n| **Total answered** | **3** |\n\n**Q3: Anything else that would make it easy to come? (optional)**\n\n3 answered.\n\n- Respondent 1: \"A regular schedule and an agenda sent ahead would help me plan around work and set-up duties.\"\n- Respondent 2: \"A venue on a bus route I already use, or something free, and times that don't clash with my evening shifts.\"\n- Respondent 3: \"Nothing specific that I can think of. I'm fine with how things are.\"",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 4.5,
+   "emailed": false
+  },
+  {
+   "n": 21,
+   "at": "2026-11-22T06:35:34.499Z",
+   "kind": "opened",
+   "round": 2,
+   "hash": "3a56555fca2a65078b5ac9c1ae1eaea02ff5581bd89854638fc784e32a1d8433",
+   "intact": true,
+   "rows": [
+    {
+     "question": "If only ONE of these could happen, which would you most want?",
+     "people_said": "3 responses, split 1-1-1: closer venue 1, more variety 1, flexible drop-in 1, shorter meetings 0.",
+     "agent": "Another split, likely with flexible drop-in or venue edging ahead; 3 people can't give a clear winner.",
+     "personas": null,
+     "commander": null
+    }
+   ]
+  },
+  {
+   "n": 22,
+   "at": "2026-11-22T06:35:37.127Z",
+   "kind": "debrief",
+   "round": 2,
+   "whoWasWrong": "I was partly right (another split) but wrong in round 1 on day/time. Commander and personas gave no guesses.",
+   "surprise": "Shorter meetings dropped to 0 as first choice, and respondents shifted their choice between rounds; no single change wins.",
+   "stillUnknown": "Whether the pattern holds in the wider membership; this panel is only 3 people, and no further emails are allowed.",
+   "nextMove": "finish",
+   "reason": "Everyone has had their 2 emails, so no further survey is possible. The split can't be broken with this panel."
+  },
+  {
+   "n": 23,
+   "at": "2026-11-22T06:35:43.248Z",
    "kind": "finish",
-   "recommendation": "Try a different meeting day or time first. It was the best-placed change overall (ranked 1st, 2nd and 2nd), although only 1 of 3 people ranked it first. The result is close to a three-way tie. Shorter, tighter meetings and a travel bursary each had one first-place vote, and no one said their top change wouldn't help. If you can do a second change cheaply, look at cost of travel, which none of our options covered.",
-   "evidence": "Round 1 (3 of 3 answered): different day/time 1, shorter meetings 1, Other (travel bursary for cost) 1, and 0 for every other option. Round 2 (3 of 3 answered), ranking: day/time was 1st once and 2nd twice, bursary was 1st, 2nd and 3rd, and shorter/focused was 1st once and 3rd twice. Asked whether their top change would make them come more often: 1 said yes definitely, 2 said probably, 0 said no.",
+   "recommendation": "The survey did not find one winning change. With 3 people, answers split evenly in both rounds. If you must pick one, make attending easier: a closer or easier-to-reach venue, or a flexible drop-in option. These match what people wrote about bus fares, evening shifts and finding a weekly commitment hard. Shorter meetings looks like the weakest idea, and nobody asked for a different day or time.",
+   "evidence": "Round 1 (3 of 3 answered): closer venue 1, shorter meetings 1, more interesting content 1, day/time 0. Attendance in the last 4 meetings: 0 for one person, 2 for one, 3 for one. Round 2 (3 of 3 answered): most wanted was closer venue 1, more variety 1, flexible drop-in 1, shorter meetings 0. Least cared about: venue 1, shorter meetings 1, variety 1, drop-in 0. Free text: bus fares and shifts; an agenda sent ahead and a regular schedule; one person was happy as things are.",
    "scoreboard": [
     {
      "round": 1,
-     "question": "Which ONE change would make you most likely to come back more often?",
-     "people_said": "Day/time 1, shorter 1, other (travel bursary) 1",
-     "agent": "partly",
-     "personas": "partly",
+     "question": "Which ONE change would most make you come to more weekly meetings?",
+     "people_said": "Split 1-1-1: venue, shorter meetings, content. Day and time got 0.",
+     "agent": "wrong",
+     "personas": "no guess",
      "commander": "no guess"
     },
     {
      "round": 2,
-     "question": "Which change would you rank first: day/time, fewer/shorter meetings, or travel bursary?",
-     "people_said": "Each ranked first once; day/time had the best average rank",
-     "agent": "right",
+     "question": "If only ONE of these could happen, which would you most want?",
+     "people_said": "Split 1-1-1: venue, variety, drop-in. Shorter meetings got 0.",
+     "agent": "partly",
      "personas": "no guess",
      "commander": "no guess"
     }
    ],
-   "learned_between_rounds": "Round 1 split three ways, and one person raised travel cost, which I hadn't offered as an option. Round 2 asked everyone to rank those three changes to break the tie. It still didn't give a clear winner, but it did show day/time as the best-placed change overall.",
-   "limits": "There were only 3 people, so this shows a direction and not a measurement. Round 2 ranking ties are close, and each person ranked their own round-1 choice first. The commander gave no guesses and did not reply to my questions. These were practice-run Flashpoint stand-ins. The round 2 results also carried an odd note that the survey was \"still a draft\", which I couldn't verify. Persona answers were synthetic and are not counted as evidence.",
+   "learned_between_rounds": "Round 1 split three ways and the free text pointed to attendance friction, not scheduling. So round 2 forced a single choice among venue, length, variety and a new flexible drop-in option. It split again, and shorter meetings dropped out. The commander was not at the keyboard to reply, so I went ahead on my own judgement.",
+   "limits": "There were only 3 respondents, so this is a direction and not a measurement. Individual answers shifted between rounds. No persona rehearsal was run. The commander gave no guesses. Both emails are now used for everyone, so no further survey is possible. The tool replies were labelled as practice, with answers invented by an AI stand-in.",
    "unbacked": [],
-   "spent": 5.1,
-   "handedBack": 2.9000000000000004
+   "spent": 4.5,
+   "handedBack": 3.5
   }
  ]
 }

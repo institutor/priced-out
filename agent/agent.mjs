@@ -7,6 +7,7 @@
 //   node agent/agent.mjs "<mission>" --fake     the same with fixed canned replies (used by the tests)
 //
 //   --cap 8            most the run may spend on Flashpoint, in USDC (default 8)
+//   --emails 2         most emails anyone on the list may get, reminders included (default 2)
 //   --recipients file  who to survey, one "Name, email" per line (default agent/recipients.txt)
 //   --orders file      your standing orders, one "- order" per line (default agent/orders.md)
 //   --resume folder    carry on a real run that was stopped, from its folder under agent/runs/
@@ -19,7 +20,7 @@ import readline from "node:readline";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import Anthropic from "@anthropic-ai/sdk";
-import { runAgent, makeRedactor, DEFAULT_ORDERS } from "./loop.mjs";
+import { runAgent, makeRedactor, DEFAULT_ORDERS, EMAIL_LIMIT } from "./loop.mjs";
 import { fakeFlashpoint } from "./fake-flashpoint.mjs";
 import { practiceWriter, PRACTICE_TAG } from "./practice-writer.mjs";
 import { summarize } from "./summary.mjs";
@@ -27,7 +28,7 @@ import { logEntry, logHeader, logFooter, shortLine } from "./log.mjs";
 
 const root = new URL("../", import.meta.url);
 const argv = process.argv.slice(2);
-const valueFlags = ["--cap", "--recipients", "--orders", "--resume"];
+const valueFlags = ["--cap", "--emails", "--recipients", "--orders", "--resume"];
 const flag = (name) => {
   const at = argv.indexOf(name);
   return at === -1 ? undefined : argv[at + 1];
@@ -58,13 +59,15 @@ if (resumeDir) {
 }
 const objective = resumed ? resumed.head.objective : argv.find((arg, i) => !arg.startsWith("--") && !valueFlags.includes(argv[i - 1]));
 const cap = Number(flag("--cap") ?? resumed?.head.cap ?? 8);
+// A resumed run keeps the limit it started with: it is a promise to the people on the list.
+const emailLimit = Number(resumed ? resumed.head.emailLimit ?? EMAIL_LIMIT : flag("--emails") ?? EMAIL_LIMIT);
 // A resumed run reads the list it started with, unless told otherwise.
 const recipientsFile = flag("--recipients") ?? resumed?.state.list?.file ?? new URL("agent/recipients.txt", root);
 const ordersFile = flag("--orders") ?? new URL("agent/orders.md", root);
 const atDesk = Boolean(process.stdin.isTTY);
 
-if (!objective || !(cap > 0)) {
-  console.log('usage: node agent/agent.mjs "<mission>" [--practice | --fake] [--cap 8] [--recipients file] [--orders file]\n       node agent/agent.mjs --resume agent/runs/<folder>');
+if (!objective || !(cap > 0) || !Number.isInteger(emailLimit) || emailLimit < 1) {
+  console.log('usage: node agent/agent.mjs "<mission>" [--practice | --fake] [--cap 8] [--emails 2] [--recipients file] [--orders file]\n       node agent/agent.mjs --resume agent/runs/<folder>');
   process.exit(1);
 }
 if (!fake && !atDesk) {
@@ -223,7 +226,9 @@ function show(request) {
   }
   if (request.kind === "approve_send") {
     rule(`Approve the round ${request.round} send?`);
-    console.log(`  The agent wants to email this survey to ${request.people} ${request.people === 1 ? "person" : "people"}. It cannot be undone.\n`);
+    console.log(`  The agent wants to email this survey to ${request.people} ${request.people === 1 ? "person" : "people"}. It cannot be undone.`);
+    if (request.emailLimit) console.log(`  This would be email ${request.email} of the ${request.emailLimit} each person may get in this mission.${request.email === request.emailLimit ? " After it, nothing more can be sent to them." : ""}`);
+    console.log("");
     console.log(indent(request.survey || "(Flashpoint has not shown a draft.)"));
     if (request.changes?.length > 0) console.log(`\n  Changes Flashpoint reported after that:\n\n${request.changes.map((change) => indent(change)).join("\n\n")}`);
   }
@@ -263,7 +268,7 @@ async function wait(minutes) {
 
 const steps = resumed ? resumed.head.steps : [];
 const runFolder = `agent/runs/${runDir.pathname.replace(/\/$/, "").split("/").pop()}`;
-const head = { objective: redact(objective), model, mode, cap, orders, people: recipients.length, stamp, practiceCommander: !atDesk };
+const head = { objective: redact(objective), model, mode, cap, emailLimit, orders, people: recipients.length, stamp, practiceCommander: !atDesk };
 
 // Ctrl+C. It is handled between steps, never in the middle of saving one, so the
 // saved state always matches the log.
@@ -299,7 +304,7 @@ const save = (snapshot) => {
 };
 
 console.log(`Mission: ${objective}`);
-console.log(`${recipients.length} people on the list. Cap $${cap.toFixed(2)}. ${{ real: "REAL RUN: this emails the people on the list and spends credit.", practice: "PRACTICE RUN: an AI stand-in plays Flashpoint and invents the answers. Nothing is sent or paid.", fake: "PRACTICE RUN: canned fake Flashpoint. Nothing is sent or paid." }[mode]}`);
+console.log(`${recipients.length} people on the list. Cap $${cap.toFixed(2)}. Nobody gets more than ${emailLimit} email${emailLimit === 1 ? "" : "s"}. ${{ real: "REAL RUN: this emails the people on the list and spends credit.", practice: "PRACTICE RUN: an AI stand-in plays Flashpoint and invents the answers. Nothing is sent or paid.", fake: "PRACTICE RUN: canned fake Flashpoint. Nothing is sent or paid." }[mode]}`);
 console.log(`Standing orders:\n${orders.map((order) => `  - ${order}`).join("\n")}\n`);
 
 let flashpoint;
@@ -325,7 +330,7 @@ if (mode === "fake") {
   }
 }
 
-const { answer, spent } = await runAgent({ objective, recipients, cap, orders, llm, flashpoint, commander, wait, record, save, resume: resumed ? { ...resumed.state, steps: resumed.head.steps.length } : null });
+const { answer, spent } = await runAgent({ objective, recipients, cap, orders, emailLimit, llm, flashpoint, commander, wait, record, save, resume: resumed ? { ...resumed.state, steps: resumed.head.steps.length } : null });
 
 let wallet = null;
 if (balanceOf) {

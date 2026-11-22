@@ -92,6 +92,8 @@ function describe(step) {
       return { who: "Flashpoint", what: "The slide deck failed.", extra: [el("p", { text: step.error })] };
     case "blocked":
       return { who: "The budget cap", what: "The agent tried a paid step and the cap refused it.", extra: [] };
+    case "email-limit":
+      return { who: "The email limit", what: `The agent tried ${step.tried}, and the code refused. Everyone on the list had already had every email they may get.`, extra: [] };
     case "sealed": {
       const count = step.questions.length;
       return {
@@ -189,7 +191,7 @@ async function start() {
     el("p", { class: "mission", text: run.objective }),
     el("span", { class: "label", text: "Standing orders" }),
     el("ul", {}, run.orders.map((order) => el("li", { text: order }))),
-    el("p", { text: `${run.people} people to ask. Budget cap ${money(run.cap)}. Model: ${run.model}.${run.practiceCommander ? " Nobody was at the keyboard, so the commander's replies are canned and the commander makes no guesses." : ""}` }),
+    el("p", { text: `${run.people} people to ask. Budget cap ${money(run.cap)}.${run.emailLimit ? ` Nobody gets more than ${run.emailLimit} email${run.emailLimit === 1 ? "" : "s"}.` : ""} Model: ${run.model}.${run.practiceCommander ? " Nobody was at the keyboard, so the commander's replies are canned and the commander makes no guesses." : ""}` }),
   );
   brief.hidden = false;
 

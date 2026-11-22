@@ -59,7 +59,7 @@ export function summarize(run) {
   const lines = [`# Mission summary ${run.stamp}`, ""];
   if (PRACTICE[run.mode]) lines.push(PRACTICE[run.mode], "");
   lines.push(`**The mission:** ${run.objective}`, "");
-  lines.push(`**Given to the agent:** ${run.people} people to ask, a ${money(run.cap)} budget cap, and ${run.orders.length} standing orders. Model: ${run.model}.`, "");
+  lines.push(`**Given to the agent:** ${run.people} people to ask, a ${money(run.cap)} budget cap, and ${run.orders.length} standing orders.${run.emailLimit ? ` Nobody could be emailed more than ${times(run.emailLimit)}, reminders included.` : ""} Model: ${run.model}.`, "");
 
   lines.push("## What the agent decided", "");
   if (list.length === 0) lines.push("The agent wrote no survey.", "");
@@ -89,6 +89,8 @@ export function summarize(run) {
     lines.push(`  The commander said: ${talk.reply === null ? "(nobody was at the desk)" : talk.reply === "" ? "(no reply)" : cell(talk.reply)}`);
   }
   if (talks.length > 0) lines.push("");
+  const stopped = steps.filter((s) => s.kind === "email-limit").length;
+  if (stopped > 0) lines.push(`The email limit refused the agent ${times(stopped)}: it tried to email people who had already had every email they may get.`, "");
   if (run.practiceCommander) lines.push("Nobody was at the keyboard for this run, so the commander's replies and approvals were canned.", "");
 
   lines.push("## The answer", "");

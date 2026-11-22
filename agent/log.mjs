@@ -17,13 +17,13 @@ const PRACTICE_NOTE = {
   practice: " (practice run: an AI stand-in played Flashpoint and invented every answer. No real survey, no real people.)",
 };
 
-export function logHeader({ objective, people, cap, model, orders, mode = "real", practiceCommander, stamp }) {
+export function logHeader({ objective, people, cap, emailLimit, model, orders, mode = "real", practiceCommander, stamp }) {
   const lines = [
     `# Mission log ${stamp}${PRACTICE_NOTE[mode] ?? ""}`,
     "",
     `**Mission from the commander:** ${objective}`,
     "",
-    `**People on the list:** ${people}. **Budget cap:** ${money(cap)}. **Model:** ${model}.`,
+    `**People on the list:** ${people}. **Budget cap:** ${money(cap)}.${emailLimit ? ` **Most emails to any one person:** ${emailLimit}, reminders included.` : ""} **Model:** ${model}.`,
     "",
     "**Standing orders:**",
     "",
@@ -57,6 +57,8 @@ export function logEntry(step) {
       return `${n} the deck failed (${step.charged ? "charged" : "not charged"})\n\n${step.error}\n`;
     case "blocked":
       return `${n} stopped by the budget\n\nThe agent tried a paid step (${step.tool}) and the cap refused it.\n`;
+    case "email-limit":
+      return `${n} stopped by the email limit\n\nThe agent tried ${step.tried}, and the code refused: everyone on the list had already had every email they may get in this mission. Nothing was charged.\n`;
     case "sealed":
       return `${n} the round ${step.round} envelope is sealed\n\n*Why these questions:* ${step.why}\n\n${step.envelope.predictions.length} question${step.envelope.predictions.length === 1 ? "" : "s"} sealed. The commander sealed a guess on ${step.envelope.predictions.filter((p) => p.commander !== null).length}; the agent cannot see it.\n\nSHA-256 of \`envelope-round-${step.round}.json\`: \`${step.hash}\`\n\nThe hash lets this run check, when the envelope is opened, that no guess was changed after the answers came in. It is a check on the run's own files, not proof to an outsider.\n`;
     case "opened": {
@@ -138,6 +140,7 @@ export function shortLine(step) {
     case "deck": return `${tag} Slide deck made (${paid(step)})`;
     case "deck-failed": return `${tag} Slide deck failed: ${step.error}`;
     case "blocked": return `${tag} The budget cap refused a paid step`;
+    case "email-limit": return `${tag} The email limit refused ${step.tried}`;
     case "sealed": return `${tag} Envelope sealed for round ${step.round}: ${step.hash.slice(0, 16)}…`;
     case "opened": return `${tag} Envelope opened for round ${step.round}\n${step.rows.map((row) => `       ${row.question}\n         people:    ${row.people_said}\n         agent:     ${row.agent}\n         personas:  ${row.personas ?? "no guess"}\n         commander: ${row.commander ?? "no guess"}`).join("\n")}`;
     case "debrief": return `${tag} Debrief: ${step.nextMove === "another_round" ? "another round" : "finish"}, because ${step.reason}\n       wrong:     ${step.whoWasWrong}\n       surprise:  ${step.surprise}\n       unknown:   ${step.stillUnknown}`;

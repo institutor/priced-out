@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { runAgent, makeRedactor, envelopeHash, unbackedNumbers, asksToSend, PRICES, TOOLS } from "../agent/loop.mjs";
+import { runAgent, makeRedactor, envelopeHash, unbackedNumbers, asksToSend, PRICES, TOOLS, systemPrompt } from "../agent/loop.mjs";
 import { fakeFlashpoint } from "../agent/fake-flashpoint.mjs";
 
 const recipients = [
@@ -508,4 +508,60 @@ test("a first name, a surname and another letter case are all removed, and every
   assert.equal(redact("Jane and JANE OKAFOR answered. Okafor wrote more."), "[person 1] and [person 1] answered. [person 1] wrote more.");
   assert.equal(redact("One of 3 testers answered. Tester One did."), "One of 3 testers answered. [person 2] did.");
   assert.equal(redact("Janet answered"), "Janet answered", "only whole words");
+});
+
+// One full round: drafted, sealed, published, sent, read, opened.
+const oneRound = (first = {}) => [ask("Write a survey", "design", first), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Show the results", "results"), open()];
+
+test("nobody gets a third email: after a survey and a follow-up, another send is refused and costs nothing", async () => {
+  const { commander, asked } = desk();
+  const { llm, seen } = scripted([...oneRound(), debrief("another_round"), ...oneRound({ new_survey: true }), ask("Send a reminder email to everyone who has not answered", "send"), debrief(), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 20, llm, flashpoint: fakeFlashpoint(), commander, wait: async () => {} });
+  assert.equal(kinds(out, "flashpoint").filter((s) => s.emailed).length, 2);
+  assert.equal(kinds(out, "email-limit").length, 1);
+  assert.equal(approvals(asked), 2, "the commander is not asked about a send the limit refuses");
+  assert.match(seen[14], /already had 2 emails[\s\S]*Nothing was charged/);
+  assert.equal(out.spent, 4, "eight paid steps, and the refused send is not one of them");
+});
+
+test("a reminder counts as an email, so after one there is no follow-up round", async () => {
+  const { commander } = desk();
+  const { llm, seen } = scripted([...oneRound(), ask("Send a reminder email to everyone who has not answered", "send"), debrief("another_round"), debrief(), ask("Write a follow-up", "design", { new_survey: true }), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 20, llm, flashpoint: fakeFlashpoint(), commander, wait: async () => {} });
+  assert.match(seen[8], /Another round is not possible/);
+  assert.match(seen[10], /Not started[\s\S]*Nothing was charged/);
+  assert.equal(kinds(out, "debrief")[0].nextMove, "finish");
+  assert.equal(out.spent, 2.5, "the survey that could never be sent was not paid for");
+});
+
+test("with a limit of one email there is one survey and nothing after it", async () => {
+  const { commander, asked } = desk();
+  const { llm, seen } = scripted([...oneRound(), ask("Send a reminder email to everyone who has not answered", "send"), debrief(), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 20, emailLimit: 1, llm, flashpoint: fakeFlashpoint(), commander, wait: async () => {} });
+  assert.equal(kinds(out, "flashpoint").filter((s) => s.emailed).length, 1);
+  assert.equal(approvals(asked), 1);
+  assert.match(seen[7], /already had their one email/);
+});
+
+test("the approval screen is told which email this is", async () => {
+  const { commander, asked } = desk();
+  await run([...oneRound(), debrief("another_round"), ...oneRound({ new_survey: true }), debrief(), finish], { commander, cap: 20 });
+  assert.deepEqual(asked.filter((a) => a.kind === "approve_send").map((a) => [a.email, a.emailLimit]), [[1, 2], [2, 2]]);
+});
+
+test("the agent is told the email limit and to keep a follow-up short", () => {
+  const two = systemPrompt({ people: 3, cap: 8 });
+  assert.match(two, /more than 2 emails in this whole mission, and a reminder counts as one/);
+  assert.match(two, /one short follow-up may come/);
+  assert.match(two, /three questions at most/);
+  const one = systemPrompt({ people: 3, cap: 8, emailLimit: 1 });
+  assert.match(one, /more than one email/);
+  assert.doesNotMatch(one, /follow-up may come/);
+});
+
+test("a resumed mission remembers how many emails went out", async () => {
+  const saved = [];
+  const { commander } = desk();
+  await runAgent({ objective: "o", recipients, cap: 20, llm: scripted([...oneRound(), debrief("another_round"), ...oneRound({ new_survey: true }), debrief(), finish]).llm, flashpoint: fakeFlashpoint(), commander, wait: async () => {}, save: (s) => saved.push(JSON.parse(JSON.stringify(s))) });
+  assert.equal(saved.at(-1).emails, 2);
 });
