@@ -36,5 +36,31 @@
   "remembered": 0,
   "spent": 5,
   "stamp": "2026-11-22T09-03-06"
+ },
+ {
+  "name": "second-try",
+  "file": "agent-run-second-try.json",
+  "objective": "Figure out the best event to put on for our club next spring.",
+  "mode": "practice",
+  "handsOff": true,
+  "standInCommander": false,
+  "people": 8,
+  "rounds": 2,
+  "remembered": 8,
+  "spent": 5,
+  "stamp": "2026-11-22T09-39-55"
+ },
+ {
+  "name": "low-response",
+  "file": "agent-run-low-response.json",
+  "objective": "Our club's newsletter gets opened by almost nobody. Find out what members would actually read, and how often.",
+  "mode": "practice",
+  "handsOff": true,
+  "standInCommander": false,
+  "people": 8,
+  "rounds": 2,
+  "remembered": 8,
+  "spent": 5,
+  "stamp": "2026-11-22T09-41-40"
  }
 ]

@@ -392,14 +392,6 @@ function drawGlance(body, run) {
     round.now ? el("p", { class: "m-look-now" }, el("strong", { text: "Its answer now: " }), short(round.now, 140)) : round.why ? el("p", { class: "m-foot", text: short(round.why, 120) }) : null,
     round.part > 0 ? el("p", {}, el("a", { class: "m-jump", href: `#part-${round.part}`, text: `See round ${round.round}` })) : null,
   ), `look ${round.round}`));
-  if (look.hunch) {
-    cards.unshift(card(el("div", { class: "m-look hunch" },
-      el("p", { class: "m-when", text: "Before it asked anyone" }),
-      el("p", { class: "m-look-q", text: "Its hunch" }),
-      el("p", { text: short(look.hunch, 150) }),
-      el("p", {}, el("a", { class: "m-jump", href: "#part-1", text: "See its plan" })),
-    ), "look hunch"));
-  }
   if (look.answer) {
     cards.push(card(el("div", { class: "m-look answer" },
       el("p", { class: "m-when", text: "The answer" }),
@@ -409,6 +401,7 @@ function drawGlance(body, run) {
   }
   put(body,
     el("p", { text: `${look.rounds.some((round) => round.move === "another round" && round.verdict && round.verdict !== "right") ? "What it guessed wrong is what it asks about next. " : ""}Here is the whole run on one screen: the first guess of each round, what people said, and what the agent chose to do about it.` }),
+    look.hunch ? el("p", { class: "m-look-hunch" }, marked(el("strong", { text: "Its hunch, before it asked anyone:" }), "look hunch"), ` ${short(look.hunch, 170)}`) : null,
     el("div", { class: "m-trail" }, cards.flatMap((item, index) => (index === 0 ? [item] : [arrowTo(`trail ${index}`), item]))),
   );
 }

@@ -726,8 +726,9 @@ code {
   line-height: 1.45;
 }
 
-.m-trail .m-look.hunch {
-  flex: 0.7 1 0;
+.m-look-hunch {
+  max-width: 54rem;
+  margin: 1.25rem 0 0;
 }
 
 .m-look-answer {
@@ -1041,4 +1042,9 @@ html.present .m-beat .sub {
   .m-vignette {
     width: min(100%, 14rem);
   }
+}
+
+/* In present mode the one-look screen is said aloud, so its opening lines go. */
+html.present #glance .section-body > p:first-child {
+  display: none;
 }

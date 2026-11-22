@@ -160,19 +160,22 @@ lessons before it plans, and its log says which ones it was given. Practice runs
 their own notebook, which is not in the repository, so an invented answer can never
 teach a real run anything.
 
-You can follow the notebook across the three practice runs in [examples/](examples/):
+You can follow the notebook across the five practice runs in [examples/](examples/),
+in the order they were run:
 
-| Run | What it started with | What it wrote down at the end |
+| Run | What it started with | What happened |
 |---|---|---|
-| 1. [A commander approves each send](examples/practice-run-with-a-commander/summary.md) (an AI stand-in played the commander) | Nothing. | "Rank questions gave a clearer signal than single choice, which split on 8 people." |
-| 2. [Another objective, hands-off](examples/practice-run-members/summary.md) | The 3 lessons from run 1. | "Ask openly about uncomfortable incidents." |
-| 3. [The example above, hands-off](examples/practice-run/summary.md) | All 6 lessons. Its plan says: "Acting on notes: use ranking, price framing, open barriers question." | "Don't assume social events are favoured." |
+| 1. [A commander approves each send](examples/practice-run-with-a-commander/summary.md) (an AI stand-in played the commander) | Nothing. | Wrote: "Rank questions gave a clearer signal than single choice, which split on 8 people." |
+| 2. [Another objective, hands-off](examples/practice-run-members/summary.md) | The 3 lessons from run 1. | Wrote: "Ask openly about uncomfortable incidents." |
+| 3. [The example above, hands-off](examples/practice-run/summary.md) | 6 lessons. Its plan says: "Acting on notes: use ranking, price framing, open barriers question." | Guessed a social event would win. It came last. Wrote: "Don't assume social events are favoured." |
+| 4. [The same objective again](examples/practice-run-second-try/summary.md) | 8 lessons, that one among them. | Its hunch this time: "Social event is not necessarily top; practical/skill workshop may win." That guess was marked right. |
+| 5. [A third objective, with 3 of 8 people silent](examples/practice-run-low-response/summary.md) (`--quiet 3`) | 8 lessons. | Only 5 of 8 answered. It did not spend its second email on a reminder. It sent a forced trade-off follow-up, as an earlier note advised, and all 8 answered that. |
 
-What this shows, and what it does not: the notes are read, and the plan in run 3 names
-the ones it is using. Runs 1 and 2 were asked once by the code to think again before
-they stopped after one round, and run 3 chose its follow-up without that. Three runs
-cannot show that the notes caused it. Run 3 also still guessed wrong, and its follow-up
-used a single-choice question that split, which its own first note warns against.
+What this shows, and what it does not: the notes are read, later plans name the ones
+they use, and run 4 guessed better than run 3 on the same objective. It is five practice
+runs with invented answers, so it cannot show that the notes caused that. Runs 1, 2 and
+4 were each asked once by the code to think again before stopping after one round; runs
+3 and 5 chose their follow-up without that.
 
 ## The agent's tools
 
@@ -203,8 +206,8 @@ about, or when to stop. Those are the agent's decisions.
 while it still names something unknown and has the budget for a short second round, the
 code asks it once to think again. It asks at most once in a run, the agent may still
 stop, and the log, the summary and the page all show that it happened. It did not happen in the
-example run above. It did happen in the other two practice runs: the agent chose to
-stop, was asked once, and then chose a short follow-up.
+example run above. It did happen in three of the other practice runs: the agent chose
+to stop, was asked once, and then chose a short follow-up.
 
 **Slips.** Every paid step carries a slip: the price, and the decision of the agent's
 that the step could change. If it cannot name one, it is told to skip the step.
@@ -297,16 +300,22 @@ The whole run is in [examples/practice-run/](examples/practice-run/): the
 [log](examples/practice-run/log.md), with every message, reply, slip, envelope and
 debrief. The same run is on the page at <https://institutor.github.io/priced-out/agent/>.
 
-Two more practice runs are kept beside it, and the page can show each of them:
+Four more practice runs are kept beside it, and the page can show each of them:
 
 - [The same objective with a commander approving each send](examples/practice-run-with-a-commander/summary.md).
-  An AI stand-in played the commander.
-  Here the standing orders did their work: the agent reported before its second round,
-  and went to the commander when the answers split evenly.
+  An AI stand-in played the commander. Here the standing orders did their work: the
+  agent reported before its second round, and went to the commander when the answers
+  split evenly.
 - [Another objective](examples/practice-run-members/summary.md): "Members come to one
   meeting and then stop. Find out why, and what one change would bring them back."
   Nothing in the agent says what to ask, so it wrote a different survey.
-
+- [The same objective again](examples/practice-run-second-try/summary.md), after the
+  example above had added its lessons to the notebook. This run also records the
+  agent's answer after each round, so you can see it move.
+- [A low response](examples/practice-run-low-response/summary.md): "Our club's
+  newsletter gets opened by almost nobody. Find out what members would actually read,
+  and how often." Three of the eight people did not answer the first survey, and the
+  agent had to choose between a reminder and a follow-up.
 
 ### What a run leaves behind
 
