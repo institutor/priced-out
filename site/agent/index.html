@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Sealed Envelope</title>
+  <meta name="description" content="An AI agent runs survey research through Flashpoint. Before each survey goes out, the agent, AI personas and the commander each seal a guess. Watch one mission, step by step.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Londrina+Solid:wght@400;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="replay.css">
+</head>
+<body>
+  <header class="top">
+    <a href="../">Back to Priced Out</a>
+    <a href="https://github.com/institutor/priced-out/tree/main/agent">The code</a>
+  </header>
+
+  <main>
+    <section class="opening">
+      <h1>The Sealed Envelope</h1>
+      <p class="lede">You give an AI agent a question about real people. It runs the survey research through Flashpoint by itself. Before each survey goes out, the agent bets on what people will say, and so do you. The bets go in an envelope.</p>
+      <p>When the answers come back, the envelope is opened. Whatever was guessed wrong is the thing nobody understood yet, so that is what the agent asks about next.</p>
+      <svg class="envelope hero-envelope" viewBox="0 0 240 150" role="img" aria-label="A sealed envelope with three guesses inside: the agent's, the AI personas' and the commander's.">
+        <rect class="env-body" x="6" y="30" width="228" height="114" rx="6"/>
+        <path class="env-line" d="M6 36 L120 104 L234 36"/>
+        <circle class="env-seal" cx="120" cy="100" r="13"/>
+        <text class="env-note" x="120" y="24" text-anchor="middle">3 guesses inside</text>
+      </svg>
+    </section>
+
+    <section>
+      <h2>How a mission goes</h2>
+      <ol class="how">
+        <li><b>You give the mission</b> and a few standing orders, such as “check with me before any email goes out”.</li>
+        <li><b>The agent decides what to ask</b> and has Flashpoint build the survey. It can rehearse it on AI personas first.</li>
+        <li><b>Everyone seals a guess.</b> The agent's, the personas' and yours. The agent cannot see yours.</li>
+        <li><b>You approve the send.</b> No email goes out without your yes. The code enforces that, not the agent.</li>
+        <li><b>The envelope is opened</b> against the real answers, and the agent says who was wrong, itself first.</li>
+        <li><b>The agent decides the next move:</b> a second round on what surprised everyone, or the answer.</li>
+      </ol>
+      <p>Every paid step prints a receipt first: what it costs, and the decision it could change. The agent works inside a budget cap that the code holds.</p>
+    </section>
+
+    <section id="mission">
+      <h2>Watch a mission</h2>
+      <p id="status" class="status">Loading the mission…</p>
+      <div id="practice" class="practice" hidden></div>
+      <div id="brief" class="brief" hidden></div>
+
+      <div id="controls" class="controls" hidden>
+        <div class="buttons">
+          <button type="button" id="replay">Replay step by step</button>
+          <button type="button" id="next" hidden>Next step</button>
+          <button type="button" id="play" hidden>Play</button>
+          <button type="button" id="all" hidden>Show everything</button>
+        </div>
+        <div class="meter" aria-live="polite">
+          <span id="where"></span>
+          <span class="bar"><span id="fill"></span></span>
+          <span id="spent"></span>
+        </div>
+      </div>
+
+      <ol id="log" class="log"></ol>
+    </section>
+
+    <section id="answer" hidden>
+      <h2>The answer</h2>
+      <div id="answer-body"></div>
+    </section>
+
+    <section>
+      <h2>Run it yourself</h2>
+      <p>A practice run is free. An AI stand-in plays Flashpoint and invents the answers, so no email is sent and no credit is spent.</p>
+      <pre class="command">node agent/agent.mjs "Should our club move its weekly meeting to Sunday?" --practice</pre>
+      <p>A real run emails the people on your list and pays Flashpoint for each step. How to set it up is in <a href="https://github.com/institutor/priced-out/blob/main/agent/README.md">the agent's README</a>.</p>
+    </section>
+  </main>
+
+  <script type="module" src="replay.js"></script>
+</body>
+</html>

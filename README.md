@@ -1,5 +1,7 @@
 # Priced Out
 
+> **Here for the MCP Challenge?** The agent is the Sealed Envelope: [what it does](#mcp-challenge-an-agent-that-does-the-research-with-you), [a mission you can replay step by step](https://institutor.github.io/priced-out/agent/), and [how to run it](agent/README.md).
+
 During my time in high school, I found myself often faced with times where I couldn't
 exactly afford to pay for certain club dues, and I wish I could have done something about
 it. For instance, my school's Science Olympiad competitions often cost hundreds of dollars
@@ -60,22 +62,75 @@ treasurer loads the export in the browser and every number becomes their members
 
 ## MCP Challenge: an agent that does the research with you
 
-`agent/` holds a second tool, built for the MCP Challenge. You are the commander: you give
-it a mission and a few standing orders. It decides what survey to make, has Flashpoint
-build it, may rehearse it on AI personas, emails it once you approve, reads the answers,
-and runs a second round on what it learned. It comes to you only when an order says so.
+`agent/` holds a second tool, built for the MCP Challenge. It is called the Sealed
+Envelope. You are the commander: you give it a mission and a few standing orders. It
+decides what survey to make, has Flashpoint build it, may rehearse it on AI personas,
+emails it once you approve, reads the answers, and runs a second round on what it
+learned. It comes to you only when an order says so.
 
 Before each survey goes out, the agent, the AI personas and you each seal a guess of what
 people will say. When the real answers are in, the envelope is opened, and whatever was
 guessed wrong is what the next round asks about.
 
+**Watch a mission, step by step:** <https://institutor.github.io/priced-out/agent/>
+
+### What the agent decides, and what it cannot
+
+| The agent decides | The code holds, whatever the agent says |
+|---|---|
+| What to ask, and how to word it | No email goes out until the commander has seen the survey and typed yes |
+| Whether to rehearse on AI personas first | A budget cap. A paid step that would pass it is refused |
+| What it expects people to answer | The commander's guess stays hidden from the agent until the envelope is opened |
+| Who was wrong, and what that means | A guess cannot be sealed or changed after the survey is sent |
+| Whether to run another round, and on what | Names and addresses never reach the model or the logs |
+| When to stop, and the final recommendation | Every paid step is logged with its price and the decision it could change |
+
+### How to run it
+
 ```bash
+npm install
 node agent/agent.mjs "Find the ticket price for our spring formal that keeps the most members coming." --practice
 ```
 
 `--practice` is a practice run: an AI stand-in plays Flashpoint and invents the answers,
-so there are no emails and no Flashpoint credit. How it works, how to run it for real,
-and the run logs are in [agent/README.md](agent/README.md).
+so there are no emails and no Flashpoint credit. It needs only `ANTHROPIC_API_KEY` in
+`.env`. A real run drops the flag. `node agent/check.mjs` checks, for free, that a real
+run is ready. The rest is in [agent/README.md](agent/README.md).
+
+### The objective given, and what the agent decided
+
+**No real run has been made yet.** What follows is a practice run, kept as an example
+of what a run produces. An AI stand-in played Flashpoint and invented every answer, and
+nobody was at the keyboard, so the commander's replies were canned. Nothing in it is a
+finding.
+
+The objective given:
+
+> We want more members at our weekly meetings. What is the one change that would bring
+> the most people back?
+
+What the agent decided, in that practice run:
+
+- **Survey 1.** It asked the commander what changes were on the table, then had
+  Flashpoint write a short survey: which one change would bring you back, and why.
+- **Rehearsal.** A standing order said to rehearse first, so it ran the survey on AI
+  personas and put their answers in the envelope as the personas' guess.
+- **The envelope.** It guessed that a different day or time would win.
+- **What came back.** A three-way split, and one person wrote in something nobody had
+  offered: help with the cost of travel. Neither the agent nor the personas had guessed it.
+- **Going to the commander.** The split set off the order "Come to me if the answers
+  split evenly", so the agent stopped and reported before going on.
+- **Survey 2.** It asked only about what round one got wrong: rank the three changes
+  that surfaced, travel cost included.
+- **The recommendation.** Try a different day or time first, and look at travel cost. It
+  said plainly that three people give a direction, not a measurement.
+- **The bill.** Nine messages to Flashpoint and one rehearsal: $5.10 of an $8.00 cap, at
+  the prices a real run would have paid.
+
+The full example is in [agent/examples/practice-run/](agent/examples/practice-run/):
+[the one-page summary](agent/examples/practice-run/summary.md) and
+[the log](agent/examples/practice-run/log.md), with every message, reply, receipt,
+envelope and debrief.
 
 ## Try it yourself, in a few minutes
 
@@ -108,7 +163,7 @@ A **Contents** tab in the corner of the screen jumps between the parts of the pa
 
 To check the working instead of the page:
 
-- `npm test` runs the 208 tests on the rules behind every number ([Run it](#run-it)).
+- `npm test` runs the tests on the rules behind every number and on the agent ([Run it](#run-it)).
 - `node scripts/evaluate.mjs` runs the page's rules on 2,000 made-up clubs whose true
   answer is known ([Checked against a known answer](#checked-against-a-known-answer)).
 - [`briefs/`](briefs) and [`replies/`](replies) hold everything sent to and received from
@@ -401,7 +456,7 @@ build need no key.
 - A tie is never reported as a winner. Where two fixes share the top score, both are
   named and the page does not pick one.
 
-The rules live in `site/js/lib/` and are covered by the tests in `test/` (208 tests).
+The rules live in `site/js/lib/` and are covered by the tests in `test/`.
 
 ## Privacy
 

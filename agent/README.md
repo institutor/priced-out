@@ -161,6 +161,7 @@ agent's that the step could change. If it cannot name one, it is told to skip th
 | `log.mjs` | Turns the steps into the mission log. |
 | `summary.mjs` | Turns the steps into a one-page summary of what the agent decided. |
 | `check.mjs` | The free check before a real run. |
+| `publish-run.mjs` | Puts one mission on the replay page, `../site/agent/`. |
 | `fake-flashpoint.mjs` | The stand-in Flashpoint: the same draft, confirm, send, results steps as the real one. |
 | `practice-writer.mjs` | For `--practice`: a small AI model writes the stand-in's survey text and invents the answers. |
 | `orders.md` | The standing orders. |
@@ -169,20 +170,37 @@ agent's that the step could change. If it cannot name one, it is told to skip th
 
 ## The mission and what the agent decided
 
+**No real run has been made yet.** The example here is a practice run: an AI stand-in
+played Flashpoint and invented every answer. Nothing in it is a finding.
+
 The mission given:
 
-> Find the ticket price for our spring formal that keeps the most members coming.
+> We want more members at our weekly meetings. What is the one change that would bring
+> the most people back?
+
+What the agent decided is in [examples/practice-run/summary.md](examples/practice-run/summary.md),
+and every step is in [examples/practice-run/log.md](examples/practice-run/log.md). In
+short: it rehearsed the survey on AI personas, guessed that day or time would win, got a
+three-way split with a write-in nobody had guessed (the cost of travel), went to the
+commander because an order covers split answers, and ran a second round that asked
+people to rank the three changes. You can replay the same mission step by step at
+<https://institutor.github.io/priced-out/agent/>.
+
+### What a run leaves behind
 
 Every run writes three things into its folder under `agent/runs/`: `log.md` (every
 message, reply and receipt), `summary.md` (one page on what the agent decided), and
-`steps.json` (the same steps as data). To remake a summary:
+`steps.json` (the same steps as data). A folder that starts with `practice-` or `fake-`
+is a practice run. It holds no real answers and is not in the repository.
 
 ```bash
-node agent/summary.mjs agent/runs/<folder>
+node agent/summary.mjs agent/runs/<folder>        # remake the summary
+node agent/publish-run.mjs agent/runs/<folder>    # put the mission on the replay page
 ```
 
-Run logs are in `agent/runs/`. A folder that starts with `practice-` or `fake-` is a
-practice run. It holds no real answers and is not in the repository.
+The replay page is `site/agent/`. It reads `site/data/agent-run.json`, which
+`publish-run.mjs` writes. A run that still holds an email address is refused, and a
+practice run is labelled as one above everything else on the page.
 
 ## Limits
 
