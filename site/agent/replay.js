@@ -287,6 +287,52 @@ const TELL = {
   },
 };
 
+// What is said for each part when the screens play by themselves: a
+// sentence or two, from the run's own steps.
+const SAY = {
+  plan: () => "Before it spends anything, the agent writes down what it needs to find out, what it expects, and what would change its mind.",
+  write: (part) => (part.round === 1
+    ? "It chooses the questions itself, and Flashpoint builds the survey through the MCP. Every paid step prints a slip first: what it costs, and the decision it could change."
+    : `It writes a short follow-up on what round ${part.round - 1} left open.`),
+  seal: () => "Before anyone answers, it writes down what it expects people to say, and seals it in the envelope.",
+  send(part, run) {
+    const has = (kind) => part.steps.some((step) => step.kind === kind);
+    const limit = run.emailLimit ? ` Nobody on the list gets more than ${inWords(run.emailLimit)} ${run.emailLimit === 1 ? "email" : "emails"}.` : "";
+    if (has("send-preapproved")) return `Nobody is at the keyboard, so the code checks the survey against fixed rules before it lets it go.${limit}`;
+    if (has("send-approved")) return `No email goes out until the commander has read the survey and said yes. The code holds that, not the agent.${limit}`;
+    return "The send was stopped. Nothing went out and nothing was charged.";
+  },
+  open: () => "The answers come back. Only then is the envelope opened, and each guess is laid beside what people really said.",
+  decide(part) {
+    const debrief = lastOf(part.steps, "debrief");
+    const nudged = part.steps.some((step) => step.kind === "challenge");
+    if (!debrief) return "The agent weighs what came back.";
+    if (debrief.nextMove === "another_round") return `It says who was wrong, itself first. ${nudged ? "It first chose to stop, and the code asked it once to think again. Then it chose" : "Then it chooses"} another round, on what is still open.`;
+    return "It says who was wrong, itself first, and chooses to stop here.";
+  },
+  answer(part, run) {
+    const finish = part.steps.find((step) => step.kind === "finish");
+    return `It stops and gives its answer, having spent ${money(finish?.spent ?? part.spent)} of its ${money(run.cap)} budget${run.mode === "real" ? "" : " at real prices"}.`;
+  },
+};
+
+// The same, for the parts of the page that are not parts of the run.
+function sayForPage(run) {
+  const count = autonomy(run.steps);
+  const rounds = roundsIn(run.steps);
+  const say = {
+    top: "Give this agent one objective. It does the survey research by itself, through the Flashpoint MCP. Before each survey goes out it seals a guess of the answers. What it guessed wrong is what it asks about next.",
+    objective: `This is all it was given: one sentence, a list of ${run.people} people and a budget. It took ${count.alone} steps on its own, over ${rounds === 1 ? "one round" : `${inWords(rounds)} rounds`}, and ${count.person === 0 ? "never stopped for a person" : `went to the commander ${count.person === 1 ? "once" : `${count.person} times`}`}.${run.mode === "real" ? "" : " This is a practice run: the answers are invented."}`,
+    given: run.memory?.length > 0 ? "It also had the commander's standing orders, and its own notes from earlier runs. It reads those notes before it plans." : "It also had the commander's standing orders. Its notebook was still empty: this was its first run.",
+    glance: "Here is the whole run on one screen: what it guessed, what people said, and what it chose to do next. Then, the same run, part by part.",
+    answer: "Its recommendation, the evidence, the limits, and a scoreboard of who guessed better, marked by the agent itself. Last, the lessons it writes down for its next run.",
+    how: "One round: write a survey, seal a guess, send it out, open the envelope, decide. Then another round, or the answer.",
+    rules: "The agent decides the research. The code holds the limits, whatever the agent says: the budget, the emails, the sealed guesses, and who is asked before a send.",
+    run: "A practice run is free, and needs only a model key. The code, the logs of every run shown here, and how to run it are in the repository.",
+  };
+  for (const [id, text] of Object.entries(say)) document.getElementById(id)?.setAttribute("data-say", text);
+}
+
 function partCard(part, run, story, index) {
   const tell = TELL[part.part](part, run, story);
   // Wherever the agent went to the commander, it is told in that part.
@@ -310,6 +356,7 @@ function partCard(part, run, story, index) {
     rawSteps(part.steps),
   );
   item.dataset.slide = `${when}: ${tell.title.charAt(0).toLowerCase()}${tell.title.slice(1)}`;
+  item.dataset.say = SAY[part.part](part, run);
   item.dataset.spent = String(part.spent);
   return item;
 }
@@ -635,11 +682,14 @@ async function start() {
 
   // Present mode: from the button on the title page, the P key, or an
   // address that asks for it.
+  sayForPage(run);
   const stage = present.mount(document.getElementById("present-bar"), {
     before: watch.showAll,
+    say: (slide) => slide.dataset.say ?? "",
     note: (slide) => (slide.dataset.spent ? `${money(slide.dataset.spent)} of ${money(run.cap)} spent` : ""),
   });
   document.getElementById("present-open").addEventListener("click", () => stage.open(0));
+  document.getElementById("present-play").addEventListener("click", () => stage.open(0, true));
 
   // A link to a part of the page that the replay has put away brings the
   // whole page back first, so the link has somewhere to go.
@@ -649,7 +699,8 @@ async function start() {
     const to = link.getAttribute("href").slice(1);
     if (["answer", "how", "rules", "run"].includes(to) || to.startsWith("part-")) watch.showAll();
   });
-  if (new URLSearchParams(window.location.search).has("present")) stage.open(present.screenIn(window.location.hash, stage.count()));
+  const asked = new URLSearchParams(window.location.search);
+  if (asked.has("present") || asked.has("play")) stage.open(present.screenIn(window.location.hash, stage.count()), asked.has("play"));
 
   // The hand lettering can arrive after the first drawing. When it does the
   // words move, and the lines drawn under them are drawn again.

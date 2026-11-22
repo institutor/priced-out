@@ -868,6 +868,15 @@ code {
   border-top: 2px solid var(--ink);
 }
 
+/* The words for a screen, when the screens play by themselves. */
+.m-bar-say {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0.7rem var(--gutter) 0.2rem;
+  font: 600 clamp(1.1rem, 1.9vw, 1.45rem)/1.35 var(--font-body);
+  text-wrap: balance;
+}
+
 .m-bar-in {
   max-width: 70rem;
   margin-inline: auto;
@@ -913,6 +922,10 @@ code {
   .m-bar-keys {
     display: none;
   }
+}
+
+html.playing .m-bar-keys {
+  display: none;
 }
 
 html.present {

@@ -31,6 +31,7 @@ been made yet.
 
 - **Watch it, part by part:** <https://institutor.github.io/priced-out/agent/>
   (press **P** on that page for present mode)
+- **Or let it play by itself, with captions, in about three minutes:** <https://institutor.github.io/priced-out/agent/?play>
 - **What the agent decided, on one page:** [examples/practice-run/summary.md](examples/practice-run/summary.md)
 - **Every message, reply and decision:** [examples/practice-run/log.md](examples/practice-run/log.md)
 

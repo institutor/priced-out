@@ -7,6 +7,13 @@ import { inkButton, redrawAll } from "../js/ui/ink.js";
 const typing = (target) => ["INPUT", "TEXTAREA", "SELECT"].includes(target?.tagName) || target?.isContentEditable;
 const pressing = (target) => ["BUTTON", "A", "SUMMARY"].includes(target?.tagName);
 
+// How long a line of words stays up when the screens play by themselves:
+// time to read it, and never less than a few seconds.
+export function readingTime(text) {
+  const words = String(text ?? "").trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(5000, 1800 + words * 420);
+}
+
 // Which screen an address asks for: "#s3" is the third. Otherwise the first.
 export function screenIn(hash, count) {
   const found = /^#s(\d+)$/.exec(hash ?? "");
@@ -16,13 +23,19 @@ export function screenIn(hash, count) {
 
 // `bar` is the empty strip the controls go in. `before` runs as the mode is
 // entered, so the page can put everything in view first. `note(slide)` gives
-// the few words the strip shows on the right for a screen.
-export function mount(bar, { before = () => {}, note = () => "" } = {}) {
+// the few words the strip shows on the right for a screen. `say(slide)` gives
+// the sentence or two shown for a screen when the screens play by themselves.
+export function mount(bar, { before = () => {}, note = () => "", say = () => "" } = {}) {
   const root = document.documentElement;
   let slides = [];
   let at = 0;
   let timer = 0;
+  let playing = false;
+  let turn = 0;
+  let halfway = 0;
 
+  const said = el("p", { class: "m-bar-say", hidden: true });
+  const play = inkButton(el("button", { class: "button m-small", type: "button", onclick: () => setPlaying(!playing) }, el("span", { text: "Play" })), "present play");
   const where = el("span", { class: "m-bar-where" });
   const title = el("span", { class: "m-bar-title" });
   const aside = el("span", { class: "m-bar-note" });
@@ -30,11 +43,12 @@ export function mount(bar, { before = () => {}, note = () => "" } = {}) {
   const next = inkButton(el("button", { class: "button m-small", type: "button", "aria-label": "Next screen", onclick: () => show(at + 1) }, el("span", { text: "Next" })), "present next");
   const leave = el("button", { class: "m-link", type: "button", text: "Leave", onclick: () => close() });
   bar.append(
+    said,
     el("div", { class: "m-bar-in" },
       el("p", { class: "m-bar-text", "aria-live": "polite" }, where, title),
       aside,
-      el("p", { class: "m-bar-keys", text: "← → move · F full screen · Esc leaves" }),
-      el("div", { class: "m-bar-buttons" }, back, next, leave),
+      el("p", { class: "m-bar-keys", text: "← → move · A plays by itself · F full screen · Esc leaves" }),
+      el("div", { class: "m-bar-buttons" }, play, back, next, leave),
     ),
   );
 
@@ -43,10 +57,13 @@ export function mount(bar, { before = () => {}, note = () => "" } = {}) {
   const address = (hash, present) => {
     const url = new URL(window.location.href);
     if (present) url.searchParams.set("present", "");
-    else url.searchParams.delete("present");
+    else {
+      url.searchParams.delete("present");
+      url.searchParams.delete("play");
+    }
     url.hash = hash;
     try {
-      window.history.replaceState(null, "", url.href.replace("present=", "present"));
+      window.history.replaceState(null, "", url.href.replace("present=", "present").replace("play=", "play"));
     } catch {
       // The address stays as it was. The page works the same.
     }
@@ -74,8 +91,36 @@ export function mount(bar, { before = () => {}, note = () => "" } = {}) {
     slide.classList.add("drawing");
     timer = window.setTimeout(() => slide.classList.remove("drawing"), 2600);
     address(`s${at + 1}`, true);
+    said.textContent = say(slide);
     // The strip covers the bottom of the screen, so the screen leaves it room.
     root.style.setProperty("--m-bar-h", `${bar.offsetHeight}px`);
+    schedule();
+  }
+
+  // Playing by itself: each screen stays for as long as its words take to
+  // read, a tall screen is read down half way through, and then the next
+  // screen comes. It stops on the last one.
+  function schedule() {
+    window.clearTimeout(turn);
+    window.clearTimeout(halfway);
+    if (!playing) return;
+    const stay = readingTime(said.textContent);
+    halfway = window.setTimeout(() => {
+      if (room() > 24) window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+    }, stay * 0.55);
+    turn = window.setTimeout(() => {
+      if (at >= slides.length - 1) setPlaying(false);
+      else show(at + 1);
+    }, stay);
+  }
+
+  function setPlaying(on) {
+    playing = on;
+    root.classList.toggle("playing", on);
+    said.hidden = !on;
+    play.querySelector("span").textContent = on ? "Pause" : "Play";
+    root.style.setProperty("--m-bar-h", `${bar.offsetHeight}px`);
+    schedule();
   }
 
   // A screen taller than the window is read down before the next one comes.
@@ -96,18 +141,21 @@ export function mount(bar, { before = () => {}, note = () => "" } = {}) {
     return slides.indexOf(slide);
   }
 
-  function open(index = 0) {
+  function open(index = 0, andPlay = false) {
     before();
+    playing = andPlay;
     // The button that opened this keeps no hold on the space bar.
     document.activeElement?.blur?.();
     slides = [...document.querySelectorAll("[data-slide]")];
     root.classList.add("present");
     bar.hidden = false;
+    setPlaying(andPlay);
     show(index);
   }
 
   function close() {
     const slide = slides[at];
+    setPlaying(false);
     root.classList.remove("present");
     bar.hidden = true;
     slides.forEach((other) => other.classList.remove("on", "drawing"));
@@ -131,6 +179,7 @@ export function mount(bar, { before = () => {}, note = () => "" } = {}) {
     else if (key === "PageUp" || (key === " " && event.shiftKey && !pressing(event.target))) backward();
     else if (key === "Home") show(0);
     else if (key === "End") show(slides.length - 1);
+    else if (key === "a" || key === "A") setPlaying(!playing);
     else if (key === "f" || key === "F") {
       if (document.fullscreenElement) document.exitFullscreen?.();
       else root.requestFullscreen?.().catch(() => {});

@@ -126,3 +126,12 @@ test("the run in one look: one card a round, with the guess, the answer and the 
   assert.equal(short("one two three", 50), "one two three");
   assert.equal(short("The social dinner came last, and the workshop came first", 30), "The social dinner came last…");
 });
+
+test("a screen that plays by itself stays long enough to read its words", async () => {
+  const { readingTime } = await import("../site/agent/present.js");
+  assert.equal(readingTime(""), 5000);
+  assert.equal(readingTime("one two three"), 5000);
+  const long = readingTime(Array(40).fill("word").join(" "));
+  assert.equal(long, 1800 + 40 * 420);
+  assert.ok(long > readingTime(Array(20).fill("word").join(" ")));
+});
