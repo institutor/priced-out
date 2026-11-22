@@ -28,6 +28,8 @@ with a recommendation.
 answer, so it is not a finding. It shows what the agent decides and how. No real run has
 been made yet.
 
+<p align="center"><a href="https://institutor.github.io/priced-out/agent/#glance"><img src="../docs/agent-one-look.jpg" alt="The agent's page: the example practice run on one screen. Its hunch, then for each round what it guessed, what people said and what it chose, then its answer." width="720"></a><br><em>The example practice run on one screen, from the agent's page. The answers in it are invented.</em></p>
+
 
 - **Watch it, part by part:** <https://institutor.github.io/priced-out/agent/>
   (press **P** on that page for present mode)
