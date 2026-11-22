@@ -19,6 +19,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { runAgent, makeRedactor, DEFAULT_ORDERS } from "./loop.mjs";
 import { fakeFlashpoint } from "./fake-flashpoint.mjs";
 import { practiceWriter, PRACTICE_TAG } from "./practice-writer.mjs";
+import { summarize } from "./summary.mjs";
 import { logEntry, logHeader, logFooter, shortLine } from "./log.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -212,12 +213,14 @@ function show(request) {
 }
 
 // A practice run with nobody at the keyboard still needs a commander, so it gets canned replies.
-const canned = { ask: "Understood. Your call, carry on.", approve_send: "yes", guess: "I think most will pick the cheapest option." };
+// It approves sends, so the practice can go on, and it makes no guess: an invented guess would
+// put an invented player on the scoreboard.
+const canned = { ask: "Nobody is at the keyboard for this practice run. Use your own judgement and carry on.", approve_send: "yes", guess: "" };
 
 async function commander(request) {
   show(request);
   if (!atDesk) {
-    console.log(`\n  (practice commander, canned reply) ${canned[request.kind]}`);
+    console.log(`\n  (practice commander, canned reply) ${canned[request.kind] || "(no guess)"}`);
     return canned[request.kind];
   }
   if (request.kind === "approve_send") return typed("\n  yes, or no and why > ");
@@ -295,6 +298,8 @@ if (balanceOf) {
   console.log(`\n${wallet}`);
 }
 fs.appendFileSync(logFile, logFooter({ steps, cap, spent, wallet }));
+// One page on what the agent decided, made from the saved steps.
+fs.writeFileSync(new URL("summary.md", runDir), summarize({ ...head, steps }));
 
 if (!answer) {
   console.log(`\nThe agent stopped without an answer after spending $${spent.toFixed(2)}. See ${logFile.pathname}`);
@@ -302,4 +307,4 @@ if (!answer) {
 }
 rule("The agent's answer");
 const board = answer.scoreboard.map((row) => `  Round ${row.round}: ${row.question}\n    people said: ${row.people_said}\n    agent ${row.agent}, AI personas ${row.personas}, commander ${row.commander}`).join("\n");
-console.log(`\nRecommendation: ${answer.recommendation}\n\nEvidence: ${answer.evidence}\n\nScoreboard:\n${board || "  (no envelope was opened)"}\n\nBetween rounds: ${answer.learned_between_rounds}\n\nLimits: ${answer.limits}\n\nSpent $${spent.toFixed(2)} of $${cap.toFixed(2)}. Full log: ${logFile.pathname}`);
+console.log(`\nRecommendation: ${answer.recommendation}\n\nEvidence: ${answer.evidence}\n\nScoreboard:\n${board || "  (no envelope was opened)"}\n\nBetween rounds: ${answer.learned_between_rounds}\n\nLimits: ${answer.limits}\n\nSpent $${spent.toFixed(2)} of $${cap.toFixed(2)}. Full log: ${logFile.pathname}\nOne-page summary: ${new URL("summary.md", runDir).pathname}`);

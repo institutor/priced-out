@@ -29,8 +29,8 @@ export function logHeader({ objective, people, cap, model, orders, mode = "real"
     "",
     ...orders.map((order) => `- ${order}`),
     "",
-    practiceCommander ? "Nobody was at the keyboard, so the commander's replies below are canned practice replies.\n" : "",
-    "Every research decision below this line was made by the agent. The commander speaks only where the log says so.",
+    practiceCommander ? "Nobody was at the keyboard, so the commander's replies below are canned practice replies. The canned commander approves sends and makes no guesses.\n" : "",
+    "The agent chose every step below. The commander speaks only where the log says so. The loop itself steps in at two points, both marked: no email goes out without the commander's yes, and if the agent stops after one round with a question still open, it is asked once to think again.",
     "",
     "---",
     "",
@@ -58,7 +58,7 @@ export function logEntry(step) {
     case "blocked":
       return `${n} stopped by the budget\n\nThe agent tried a paid step (${step.tool}) and the cap refused it.\n`;
     case "sealed":
-      return `${n} the round ${step.round} envelope is sealed\n\n*Why these questions:* ${step.why}\n\n${step.envelope.predictions.length} question${step.envelope.predictions.length === 1 ? "" : "s"} sealed. The commander sealed a guess on ${step.envelope.predictions.filter((p) => p.commander !== null).length}; the agent cannot see it.\n\nSHA-256 of \`envelope-round-${step.round}.json\`: \`${step.hash}\`\n`;
+      return `${n} the round ${step.round} envelope is sealed\n\n*Why these questions:* ${step.why}\n\n${step.envelope.predictions.length} question${step.envelope.predictions.length === 1 ? "" : "s"} sealed. The commander sealed a guess on ${step.envelope.predictions.filter((p) => p.commander !== null).length}; the agent cannot see it.\n\nSHA-256 of \`envelope-round-${step.round}.json\`: \`${step.hash}\`\n\nThe hash lets this run check, when the envelope is opened, that no guess was changed after the answers came in. It is a check on the run's own files, not proof to an outsider.\n`;
     case "opened": {
       const rows = step.rows.map((row) => `| ${cell(row.question)} | ${cell(row.people_said)} | ${cell(row.agent)} | ${cell(row.personas ?? "no guess")} | ${cell(row.commander ?? "no guess")} |`);
       return `${n} the round ${step.round} envelope is opened\n\nThe envelope's hash ${step.intact ? "matches the one recorded when it was sealed" : "DOES NOT MATCH the one recorded when it was sealed"}.\n\n| Question | What people said | The agent guessed | AI personas guessed (synthetic) | The commander guessed |\n|---|---|---|---|---|\n${rows.join("\n")}\n`;
@@ -82,7 +82,8 @@ export function logEntry(step) {
         ? "No envelope was opened, so there is no scoreboard."
         : `| Round | Question | What people said | Agent | AI personas | Commander |\n|---|---|---|---|---|---|\n${step.scoreboard.map((row) => `| ${row.round} | ${cell(row.question)} | ${cell(row.people_said)} | ${row.agent} | ${row.personas} | ${row.commander} |`).join("\n")}`;
       const warning = step.unbacked.length > 0 ? `\n**Check these numbers.** They are in the answer but in nothing Flashpoint or the commander said: ${step.unbacked.join(", ")}.\n` : "";
-      return `## Answer\n\n**Recommendation.** ${step.recommendation}\n\n**Evidence.** ${step.evidence}\n${warning}\n**Scoreboard.**\n\n${board}\n\n**What changed between rounds.** ${step.learned_between_rounds}\n\n**Limits.** ${step.limits}\n`;
+      const marked = step.scoreboard.length === 0 ? "" : "\n\nThe agent marked right and wrong itself, its own guesses included. With this few people, the scoreboard shows the method, not who guesses better.";
+      return `## Answer\n\n**Recommendation.** ${step.recommendation}\n\n**Evidence.** ${step.evidence}\n${warning}\n**Scoreboard.**\n\n${board}${marked}\n\n**What changed between rounds.** ${step.learned_between_rounds}\n\n**Limits.** ${step.limits}\n`;
     }
     default:
       return "";
@@ -105,6 +106,7 @@ export function logFooter({ steps, cap, spent, wallet }) {
   const rows = tally(steps).map((row) => `| ${row.label} | ${row.count} | ${money(row.cost)} |`);
   const asked = steps.filter((s) => s.kind === "commander").length;
   const approvals = steps.filter((s) => s.kind === "send-approved" || s.kind === "send-refused").length;
+  const challenges = steps.filter((s) => s.kind === "challenge").length;
   return [
     "---",
     "",
@@ -116,7 +118,7 @@ export function logFooter({ steps, cap, spent, wallet }) {
     `| **Spent** | | **${money(spent)}** |`,
     `| Handed back, of the ${money(cap)} cap | | ${money(Math.max(0, cap - spent))} |`,
     "",
-    `The agent went to the commander ${asked} time${asked === 1 ? "" : "s"} and asked for ${approvals} send approval${approvals === 1 ? "" : "s"}. Every other step was its own decision.`,
+    `The agent went to the commander ${asked} time${asked === 1 ? "" : "s"} and asked for ${approvals} send approval${approvals === 1 ? "" : "s"}. ${challenges > 0 ? "The loop asked it once to think again before stopping. " : ""}Every other step was the agent's own choice.`,
     wallet ? `\n${wallet}` : "",
     "",
   ].join("\n");
