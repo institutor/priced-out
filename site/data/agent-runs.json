@@ -75,5 +75,19 @@
   "remembered": 8,
   "spent": 5,
   "stamp": "2026-11-22T10-07-43"
+ },
+ {
+  "name": "real-test",
+  "file": "agent-run-real-test.json",
+  "objective": "Figure out the best event to put on for our club next spring.",
+  "mode": "real",
+  "handsOff": false,
+  "standInCommander": false,
+  "people": 8,
+  "rounds": 2,
+  "remembered": 0,
+  "spent": 4.5,
+  "stamp": "2026-11-22T18-41-56",
+  "ownAddresses": true
  }
 ]

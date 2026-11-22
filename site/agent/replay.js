@@ -212,9 +212,12 @@ const TELL = {
     const checked = part.steps.find((step) => step.kind === "send-preapproved");
     const held = part.steps.filter((step) => step.kind === "send-held");
     const refused = part.steps.find((step) => step.kind === "send-refused");
-    const emailed = part.steps.some((step) => step.kind === "flashpoint" && step.emailed);
+    // A reply the code counted as a send when nothing had been emailed: a correction
+    // made by hand when the run was published.
+    const miscounted = part.steps.some((step) => step.kind === "flashpoint" && step.miscounted);
+    const emailed = part.steps.some((step) => step.kind === "flashpoint" && step.emailed && !step.miscounted);
     const wait = part.steps.find((step) => step.kind === "wait");
-    const before = story.slice(0, story.indexOf(part)).flatMap((other) => other.steps).filter((step) => step.kind === "flashpoint" && step.emailed).length;
+    const before = story.slice(0, story.indexOf(part)).flatMap((other) => other.steps).filter((step) => step.kind === "flashpoint" && step.emailed && !step.miscounted).length;
     const body = [];
     if (held.length > 0) body.push(el("p", { text: `The code held the send ${held.length === 1 ? "once" : `${held.length} times`} until the survey passed its checks.` }));
     if (approved) body.push(el("p", {}, stamp("Approved", `approved ${part.round}`), ` ${commanderName(run)} read the survey and typed “${approved.reply}”. No email goes out without that.`));
@@ -229,6 +232,7 @@ const TELL = {
         ? `Flashpoint emailed the survey to all ${run.people} people on the list.${count}`
         : `In a real run Flashpoint would now email the survey to all ${run.people} people on the list. In this practice run nothing was sent: the stand-in invented their answers.${count}` }));
     }
+    if (miscounted) body.push(el("p", {}, stamp("Not sent", `miscounted ${part.round}`), ` Nobody was emailed this time. Flashpoint replied that the survey was live and ready to send, and the code misread that as the send itself. It counted it as email ${before + 1} of ${run.emailLimit}, and the email limit then refused the real send. This is a fault in the code's reading of replies, found by this run. It failed on the careful side: nobody got an email they should not have.`));
     if (wait) body.push(el("p", { text: `Then the agent chose to wait up to ${wait.minutes} minutes for answers.${run.mode === "real" ? "" : " A practice run does not really wait: the invented answers come straight back."}` }));
     return { doodle: "plane", title: emailed ? "The survey goes out" : "The send is stopped", body, side: [emailed ? vignette("send", run.emailLimit ? [`Email ${before + 1} of ${run.emailLimit}.`, "Off it goes."] : ["Off it goes."], 40 + part.round) : null, paidSlip(part, run, `send ${part.round}`)] };
   },
@@ -665,6 +669,8 @@ async function start() {
   const banner = document.getElementById("banner");
   if (run.mode !== "real") {
     banner.append(strip("banner", "A practice run. ", "An AI stand-in played Flashpoint and invented every answer. No survey was sent, no real person answered and no credit was spent. Nothing here is a finding. A real run was also tested on 22 November 2026: Flashpoint emailed the agent's survey to eight test addresses, all the author's own.", "Invented answers. Nothing here is a finding."));
+  } else if (run.ownAddresses) {
+    banner.append(strip("banner pilot", "A real test run. ", `Flashpoint emailed the survey to ${run.people} test addresses, all the author's own, and the paid steps were charged. It tests that the real pipeline works. One person gave every answer, so nothing here is a finding.`, "Real emails, one person's test addresses. Not a finding."));
   } else {
     banner.append(strip("banner pilot", "A real run. ", `${run.people} people were emailed through Flashpoint and paid steps were charged. With so few people, read the answer as a direction, not a measurement.`, `${run.people} real people asked. A direction, not a measurement.`));
   }

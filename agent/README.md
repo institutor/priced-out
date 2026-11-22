@@ -28,6 +28,7 @@ with a recommendation.
 answer, so it is not a finding. It shows what the agent decides and how. A real run was
 also tested on 22 November 2026: Flashpoint emailed the agent's survey to eight test
 addresses, all the author's own. That tests the real pipeline and is not a finding either.
+[Its summary is here](examples/real-run-test/summary.md).
 
 <p align="center"><a href="https://institutor.github.io/priced-out/agent/#glance"><img src="../docs/agent-one-look.jpg" alt="The agent's page: the example practice run on one screen. Its hunch, then for each round what it guessed, what people said and what it chose, then its answer." width="720"></a><br><em>The example practice run on one screen, from the agent's page. The answers in it are invented.</em></p>
 
@@ -303,10 +304,16 @@ These are rules in the code. They hold whatever the model says.
 **The example is a practice run**: an AI stand-in played Flashpoint and invented every
 answer. It is labelled wherever it speaks. Nothing in it is a finding.
 
-**A real run was also tested, on 22 November 2026, and it worked.** From the same
-objective the agent planned, wrote and published a survey through the Flashpoint MCP,
-asked for approval, and Flashpoint emailed it to eight test addresses, all the author's
-own. It tests that the real pipeline works. It is not a finding.
+**A real run was also tested, on 22 November 2026.** From the same objective the agent
+planned, wrote and published a survey through the Flashpoint MCP, asked for approval,
+and Flashpoint emailed it to eight test addresses, all the author's own. Six were
+answered. The agent read the results, opened its sealed envelope, found its guess
+partly wrong, and wrote a follow-up. It cost $4.50 of the $9.00 budget. It tests that
+the real pipeline works. One person gave every answer, so it is not a finding.
+[Its summary](examples/real-run-test/summary.md), [its full log](examples/real-run-test/log.md),
+and [the run on the agent's page](https://institutor.github.io/priced-out/agent/?run=real-test).
+The log was added after the 2:00 p.m. deadline on 22 November; the run itself started
+before it.
 
 The objective given:
 
@@ -413,6 +420,11 @@ labelled as one above everything else on the page.
 - The only real run so far went to eight test addresses, all the author's own. Its
   answer is not a measurement, and its scoreboard shows the method working, not a
   finding. The agent is told to say so.
+- That real run found a fault that is not fixed yet. Flashpoint replied that the
+  follow-up survey was live and ready to send, and the code misread that as the send
+  itself. It counted a second email that never went out, and the email limit then
+  refused the real follow-up. It failed on the careful side: nobody got an email they
+  should not have. The run's log has a note on it.
 - The commander's guess is only a fair bet when other people answer the survey. If you are
   answering it yourself from test addresses, press Enter to skip your guess.
 - Flashpoint's guide says to allow about a day for replies. A short wait only works when

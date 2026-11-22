@@ -56,10 +56,21 @@ run is ready. The rest is in [agent/README.md](agent/README.md).
 **What follows is a practice run**, kept as an example of what a run produces. An AI
 stand-in played Flashpoint and invented every answer. Nothing in it is a finding.
 
-**A real run was also tested, on 22 November 2026, and it worked.** From the same
-one-sentence objective the agent planned, wrote and published a survey through the
-Flashpoint MCP, asked for approval, and Flashpoint emailed it to eight test addresses,
-all the author's own. It tests that the real pipeline works. It is not a finding.
+**A real run was also tested, on 22 November 2026.** From the same one-sentence
+objective the agent planned, wrote and published a survey through the Flashpoint MCP,
+asked for approval, and Flashpoint emailed it to eight test addresses, all the author's
+own. Six were answered. The agent read the results, opened its sealed envelope, found
+its guess partly wrong, and wrote a follow-up. It cost $4.50 of the $9.00 budget. It
+tests that the real pipeline works. One person gave every answer, so it is not a
+finding. [Its summary](agent/examples/real-run-test/summary.md),
+[its full log](agent/examples/real-run-test/log.md), and
+[the run on the agent's page](https://institutor.github.io/priced-out/agent/?run=real-test).
+
+The real run also found a fault. The follow-up was never emailed: the code misread
+Flashpoint's "the survey is live, ready to send" reply as the send itself, counted it as
+the second email, and the email limit refused the real send. Nobody got an email they
+should not have. The log and the page both say so. The log was added after the 2:00 p.m.
+deadline on 22 November; the run itself started before it.
 
 The objective given:
 
