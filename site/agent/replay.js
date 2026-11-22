@@ -313,8 +313,8 @@ function partCard(part, run, story, index) {
 function otherRuns(list, showing) {
   if (list.length < 2) return null;
   return [
-    el("h3", { class: "sub", text: "The same agent, other objectives" }),
-    el("p", { text: "Nothing in the agent says what to ask. Give it another objective and it writes another survey." }),
+    el("h3", { class: "sub", text: "Other runs by the same agent" }),
+    el("p", { text: "Nothing in the agent says what to ask. Give it another objective and it writes another survey. Leave it alone, or sit and approve each send: the same code runs." }),
     el("ul", { class: "m-runs" }, list.map((entry, index) => {
       const now = entry.file === showing.file;
       const words = `“${entry.objective}”`;
@@ -551,6 +551,11 @@ async function start() {
     banner.append(strip("banner", "A practice run. ", "An AI stand-in played Flashpoint and invented every answer. No survey was sent, no real person answered and no credit was spent. Nothing here is a finding.", "Invented answers. Nothing here is a finding."));
   } else {
     banner.append(strip("banner pilot", "A real run. ", `${run.people} people were emailed through Flashpoint and paid steps were charged. With so few people, read the answer as a direction, not a measurement.`, `${run.people} real people asked. A direction, not a measurement.`));
+  }
+
+  // Each published practice run has its own written log in the repository.
+  if (showing.name) {
+    for (const link of document.querySelectorAll('a[href*="/examples/practice-run/"]')) link.href = link.href.replace("/practice-run/", `/practice-run-${showing.name}/`);
   }
 
   drawObjective(section("objective"), run, Array.isArray(list) ? list : [], showing);

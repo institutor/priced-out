@@ -107,6 +107,7 @@ export function runFor(list, wanted) {
 export function aboutRun(entry) {
   const parts = [entry.mode === "real" ? "a real run" : "a practice run"];
   if (entry.handsOff) parts.push("hands-off: nobody approved the sends");
+  else parts.push("the commander approved each send");
   if (entry.remembered > 0) parts.push(`started with ${entry.remembered} ${entry.remembered === 1 ? "lesson" : "lessons"} from earlier runs`);
   parts.push(`${entry.rounds} ${entry.rounds === 1 ? "round" : "rounds"}`);
   parts.push(`${money(entry.spent)} spent`);

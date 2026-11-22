@@ -1,0 +1,392 @@
+{
+ "objective": "Members come to one meeting and then stop. Find out why, and what one change would bring them back.",
+ "mode": "practice",
+ "model": "claude-sonnet-5-5",
+ "cap": 9,
+ "emailLimit": 2,
+ "orders": [
+  "I am away. Do not wait for me: every decision is yours.",
+  "You may email the survey without asking me, as long as it passes the send checks."
+ ],
+ "people": 8,
+ "stamp": "2026-11-22T09-24-20",
+ "practiceCommander": false,
+ "standInCommander": false,
+ "handsOff": true,
+ "memory": [
+  "Rank questions gave a clearer signal than single choice, which split on 8 people.",
+  "Offering cost-sharing in the options changed the preference order, so test price framing explicitly.",
+  "My guesses and the commander's both missed; ask about barriers openly instead of assuming them."
+ ],
+ "steps": [
+  {
+   "n": 1,
+   "at": "2026-11-22T09:24:28.283Z",
+   "kind": "plan",
+   "first": true,
+   "needToKnow": [
+    "Why people stop after one meeting (barriers, open-ended)",
+    "Which single change would most bring them back (ranked)",
+    "Whether price/time/format/welcome matters most"
+   ],
+   "hunches": [
+    "Feeling unwelcome or unclear value after first meeting, or timing conflicts",
+    "Guesses have missed before, so ask openly"
+   ],
+   "wouldChange": "If the open reasons point to something other than meeting content/welcome, e.g. scheduling or cost, I'd recommend that instead.",
+   "surveyIdea": "To the 8 people: ~4 questions: open 'why did you not return', rank 5-6 possible changes, open 'what one change'. Opening line mentions one short follow-up may come. Acting on notes: rank over single choice, ask barriers openly, include cost framing.",
+   "budget": "One round ~$2.50, skip rehearsal, maybe a short follow-up with remaining emails. Keep reserve for reading results."
+  },
+  {
+   "n": 2,
+   "at": "2026-11-22T09:24:38.861Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "design",
+   "why": "Draft survey for review",
+   "couldChange": "Determines the survey wording sent",
+   "message": "Make a panel from [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>\n[person 4] <[recipient 4]>\n[person 5] <[recipient 5]>\n[person 6] <[recipient 6]>\n[person 7] <[recipient 7]>\n[person 8] <[recipient 8]>: 8 people who came to one club meeting and did not return. Draft a short survey (do not publish or send yet). Opening line: thanks, this is a quick survey and one short follow-up may come. Questions: 1) Open text: In your own words, what was the main reason you didn't come back after the first meeting? 2) Rank these changes from most to least likely to bring you back: a different day/time; a friendlier welcome and introductions for newcomers; a clearer plan of what the club does; more hands-on activities, less talk; lower or shared cost; a shorter meeting. 3) Open text: If the club could change just one thing, what should it be? No personal info asked. Show me the full wording of every question and option.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 1.\n\nThe panel has 8 members.\n\n| Label | Type | Text | Answer options |\n|---|---|---|---|\n| Intro | Message | Thanks for taking part. This is a quick survey, and one short follow-up may come. | None |\n| Q1 | Open text | In your own words, what was the main reason you didn't come back after the first meeting? | Free text |\n| Q2 | Ranking | Rank these changes from most likely (1) to least likely (6) to bring you back to the club. | a) A different day or time<br>b) A friendlier welcome and introductions for newcomers<br>c) A clearer plan of what the club does<br>d) More hands-on activities, less talk<br>e) Lower or shared cost<br>f) A shorter meeting |\n| Q3 | Open text | If the club could change just one thing, what should it be? | Free text |\n\nValidation: 0 blockers in the survey wording and structure. Note that the panel member fields still contain unfilled placeholders ([person 1]–[person 8] and [recipient 1]–[recipient 8]), so names and contact details must be filled in before the survey can be sent.\nIt is not published. Reply confirm to publish it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 0.5,
+   "emailed": false
+  },
+  {
+   "n": 3,
+   "at": "2026-11-22T09:24:41.597Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "publish",
+   "why": "Publish",
+   "couldChange": "Enables send",
+   "message": "I approve publishing with no quotas and no fraud screening. Publish the survey.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nPublishing survey 1 makes it live. Reply confirm to publish it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 1,
+   "emailed": false
+  },
+  {
+   "n": 4,
+   "at": "2026-11-22T09:24:41.598Z",
+   "kind": "sealed",
+   "round": 1,
+   "why": "Main bets",
+   "hash": "27ffee476830e09127c5dcce00f2f86dabd991a7ab9aadf15a32568650efdda4",
+   "questions": [
+    "Main change most likely to bring you back (rank top)",
+    "Main reason for not returning (open)"
+   ],
+   "commanderGuessed": 0
+  },
+  {
+   "n": 5,
+   "at": "2026-11-22T09:24:43.002Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "publish",
+   "why": "Confirm publish",
+   "couldChange": "Enables send",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 1 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 1.5,
+   "emailed": false
+  },
+  {
+   "n": 6,
+   "at": "2026-11-22T09:24:44.626Z",
+   "kind": "send-preapproved",
+   "round": 1,
+   "email": 1,
+   "emailLimit": 2,
+   "checks": [
+    "Flashpoint showed the whole survey, and nothing changed after that",
+    "It is short: about 10 questions at most, and about 5 for a follow-up",
+    "It does not ask for a name, a contact detail, income, financial aid or anything else personal",
+    "The round's envelope is sealed",
+    "Nobody has had more emails than the limit, and the budget covers it"
+   ]
+  },
+  {
+   "n": 7,
+   "at": "2026-11-22T09:24:55.580Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "send",
+   "why": "Send to the 8",
+   "couldChange": "Gets the real answers",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 1 was emailed to every panel member who can receive it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 2,
+   "emailed": true
+  },
+  {
+   "n": 8,
+   "at": "2026-11-22T09:24:57.242Z",
+   "kind": "wait",
+   "why": "Give people time to answer",
+   "minutes": 30
+  },
+  {
+   "n": 9,
+   "at": "2026-11-22T09:25:06.021Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "results",
+   "why": "Read answers",
+   "couldChange": "Final recommendation",
+   "message": "Show results: how many responded, Q2 ranking (average rank and counts of first place per option), and Q1 and Q3 open answers word for word.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Responses received: 8 of 8 panel members.**\n\n**Q2: Ranking of changes (1 = most likely to bring you back, 6 = least likely)**\n\n| Option | Ranked 1st (count) | Average rank |\n|---|---|---|\n| a) A different day or time | 1 | 3.38 |\n| b) A friendlier welcome and introductions for newcomers | 4 | 2.38 |\n| c) A clearer plan of what the club does | 2 | 2.25 |\n| d) More hands-on activities, less talk | 0 | 6.00 |\n| e) Lower or shared cost | 0 | 3.13 |\n| f) A shorter meeting | 1 | 3.88 |\n\nTotal first-place votes: 8. Sorted by average rank, the options run c, b, e, a, f, d.\n\n**Q1: In your own words, what was the main reason you didn't come back after the first meeting?**\n\n- **Respondent 1:** \"The room felt a bit cliquey, and I didn't feel I could just join in with anyone.\"\n- **Respondent 2:** \"I didn't follow much of the discussion, and I wasn't sure I was supposed to understand it all.\"\n- **Respondent 3:** \"I'm already committed to several other groups, and I didn't see what this one would add.\"\n- **Respondent 4:** \"The meeting time clashed with my work shifts, so I couldn't make it back.\"\n- **Respondent 5:** \"A couple of members dominated the discussion, and it didn't feel like my views were wanted.\"\n- **Respondent 6:** \"I got bored in the meeting and didn't see a reason to go back.\"\n- **Respondent 7:** \"I was told the club is for people who already know the subject, and I wasn't sure I qualified.\"\n- **Respondent 8:** \"I had a bad experience with a member who pressured me to buy merchandise, and I've been avoiding the club since.\"\n\n**Q3: If the club could change just one thing, what should it be?**\n\n- **Respondent 1:** \"Have someone actively invite newcomers to sit with them and introduce them to the group.\"\n- **Respondent 2:** \"Explain the terms and what the club is working towards at the start of each meeting.\"\n- **Respondent 3:** \"Be clearer about what the club offers that other groups don't, or work more closely with them.\"\n- **Respondent 4:** \"Hold meetings at a time that works for people who work evenings or shifts.\"\n- **Respondent 5:** \"Share out the discussion so quieter members get a turn and feel their input counts.\"\n- **Respondent 6:** \"Keep the talks and discussions as the core of the club, and make them more engaging rather than adding hands-on activities.\"\n- **Respondent 7:** \"Make it clear that beginners are welcome, and offer some introductory material for newcomers.\"\n- **Respondent 8:** \"Make sure nobody is pressured to buy anything, and deal properly with members who do.\"",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 2.5,
+   "emailed": false
+  },
+  {
+   "n": 10,
+   "at": "2026-11-22T09:25:08.343Z",
+   "kind": "opened",
+   "round": 1,
+   "hash": "27ffee476830e09127c5dcce00f2f86dabd991a7ab9aadf15a32568650efdda4",
+   "intact": true,
+   "rows": [
+    {
+     "question": "Main change most likely to bring you back (rank top)",
+     "people_said": "Welcome ranked 1st by 4, clearer plan 2 (best avg 2.25), welcome avg 2.38; hands-on last (avg 6.0, 0 firsts)",
+     "agent": "Friendlier welcome / clearer plan ranks top; newcomers felt lost",
+     "personas": null,
+     "commander": null
+    },
+    {
+     "question": "Main reason for not returning (open)",
+     "people_said": "Mixed: cliquey/dominated (2), confusing/beginners unsure (2), schedule clash (1), other groups (1), bored (1), merchandise pressure (1)",
+     "agent": "Felt unwelcome or unsure of value; some mention timing",
+     "personas": null,
+     "commander": null
+    }
+   ]
+  },
+  {
+   "n": 11,
+   "at": "2026-11-22T09:25:11.495Z",
+   "kind": "challenge",
+   "round": 1,
+   "stillUnknown": "Whether welcome or clarity matters more; the merchandise issue's scale.",
+   "reason": "Both top options point to one newcomer-onboarding fix; a follow-up on 8 people would likely still tie, and the answer is actionable."
+  },
+  {
+   "n": 12,
+   "at": "2026-11-22T09:25:14.077Z",
+   "kind": "debrief",
+   "round": 1,
+   "whoWasWrong": "Mostly right on direction; I missed the merchandise-pressure incident and dominating-members theme.",
+   "surprise": "One member reported merchandise pressure; nobody predicted it.",
+   "stillUnknown": "Whether welcome or clarity matters more; whether others experienced pressure to buy.",
+   "nextMove": "another_round",
+   "reason": "Short follow-up: if only one change, welcome buddy vs. a beginner-friendly opening explainer; plus whether anyone felt pressured to buy."
+  },
+  {
+   "n": 13,
+   "at": "2026-11-22T09:25:21.843Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "design",
+   "why": "Draft follow-up",
+   "couldChange": "Which single fix I recommend",
+   "message": "Make a panel from [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>\n[person 4] <[recipient 4]>\n[person 5] <[recipient 5]>\n[person 6] <[recipient 6]>\n[person 7] <[recipient 7]>\n[person 8] <[recipient 8]>: 8 people who came to one club meeting and didn't return; they already answered a first survey. Draft (do not publish or send yet) a short follow-up. Opening line: this is the short follow-up, and it is worth a minute because it decides which single change the club makes first. Q1 Ranking, most to least likely to bring you back: a) A named person who greets newcomers and sits with them; b) A short plain-language beginners' intro at the start of every meeting; c) A rule that everyone gets a turn to speak; d) A meeting time that suits people working shifts; e) A clear statement of what the club offers that other groups don't. Q2 Single choice: Did you feel any pressure to buy something or join something at the meeting? Yes / No / Prefer not to say. Q3 Open text: What would the club have to do in the first ten minutes for you to come back? Show full wording of every question and option.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 2.\n\nThe panel has 8 members.\n\n| Label | Type | Text | Answer options |\n|---|---|---|---|\n| Intro | Statement | This is the short follow-up, and it is worth a minute because it decides which single change the club makes first. | None |\n| Q1 | Ranking | Rank these from most to least likely to bring you back: | a) A named person who greets newcomers and sits with them; b) A short plain-language beginners' intro at the start of every meeting; c) A rule that everyone gets a turn to speak; d) A meeting time that suits people working shifts; e) A clear statement of what the club offers that other groups don't |\n| Q2 | Single choice | Did you feel any pressure to buy something or join something at the meeting? | Yes / No / Prefer not to say |\n| Q3 | Open text | What would the club have to do in the first ten minutes for you to come back? | Free text |\n\nValidation: 0 blockers.\nIt is not published. Reply confirm to publish it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 3,
+   "emailed": false
+  },
+  {
+   "n": 14,
+   "at": "2026-11-22T09:25:24.550Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "publish",
+   "why": "Publish",
+   "couldChange": "Enables send",
+   "message": "I approve publishing with no quotas and no fraud screening. Publish.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nPublishing survey 2 makes it live. Reply confirm to publish it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 3.5,
+   "emailed": false
+  },
+  {
+   "n": 15,
+   "at": "2026-11-22T09:25:24.551Z",
+   "kind": "sealed",
+   "round": 2,
+   "why": "Round 2 bets",
+   "hash": "df2fdf4b15c65901ecf07577faf4d7ddcff657705109ede1cdf81d65e100b3e5",
+   "questions": [
+    "Top-ranked change to bring you back",
+    "Felt pressure to buy/join?"
+   ],
+   "commanderGuessed": 0
+  },
+  {
+   "n": 16,
+   "at": "2026-11-22T09:25:25.916Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "publish",
+   "why": "Confirm publish",
+   "couldChange": "Enables send",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 4,
+   "emailed": false
+  },
+  {
+   "n": 17,
+   "at": "2026-11-22T09:25:27.264Z",
+   "kind": "send-preapproved",
+   "round": 2,
+   "email": 2,
+   "emailLimit": 2,
+   "checks": [
+    "Flashpoint showed the whole survey, and nothing changed after that",
+    "It is short: about 10 questions at most, and about 5 for a follow-up",
+    "It does not ask for a name, a contact detail, income, financial aid or anything else personal",
+    "The round's envelope is sealed",
+    "Nobody has had more emails than the limit, and the budget covers it"
+   ]
+  },
+  {
+   "n": 18,
+   "at": "2026-11-22T09:25:35.950Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "send",
+   "why": "Send follow-up",
+   "couldChange": "Gets answers",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 was emailed to every panel member who can receive it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 4.5,
+   "emailed": true
+  },
+  {
+   "n": 19,
+   "at": "2026-11-22T09:25:37.611Z",
+   "kind": "wait",
+   "why": "Allow time",
+   "minutes": 30
+  },
+  {
+   "n": 20,
+   "at": "2026-11-22T09:25:45.500Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "results",
+   "why": "Read",
+   "couldChange": "Final recommendation",
+   "message": "Show results for survey 2: responses, Q1 average rank and first-place counts, Q2 counts, Q3 word for word.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 2 results (8 of 8 panel members answered)**\n\n**Q1: Ranking** (1 = most likely to bring you back, 5 = least likely)\n\n| Option | Average rank | First-place count |\n|---|---|---|\n| a) A named person who greets newcomers and sits with them | 2.13 | 1 |\n| b) A short plain-language beginners' intro at the start of every meeting | 2.13 | 3 |\n| c) A rule that everyone gets a turn to speak | 3.75 | 1 |\n| d) A meeting time that suits people working shifts | 4.38 | 1 |\n| e) A clear statement of what the club offers that other groups don't | 2.63 | 2 |\n\n**Q2: Did you feel any pressure to buy something or join something at the meeting?**\n\n| Answer | Count |\n|---|---|\n| Yes | 1 |\n| No | 7 |\n| Prefer not to say | 0 |\n\n**Q3: What would the club have to do in the first ten minutes for you to come back?**\n\nRespondent 1: \"If someone who's already in the group came over and asked me to sit with them before things started, I'd probably stay.\"\n\nRespondent 2: \"Explain the terms in plain English at the start. I didn't want to keep asking what things meant, and I assumed I was the only one lost.\"\n\nRespondent 3: \"Tell me in the first ten minutes what this club offers that I can't get from the group I already do. If it doesn't, I won't have time to come back.\"\n\nRespondent 4: \"Hold it at a time I can get to after my shifts. I can't keep missing it, and I'd make it if it fit.\"\n\nRespondent 5: \"Make sure everyone gets a turn before the discussion settles. Otherwise the same two people end up running it and the rest of us stop bothering.\"\n\nRespondent 6: \"Tell me up front that it stays a discussion club and isn't going to turn into hands-on activities. If the talk stays the focus, I'd give it another go.\"\n\nRespondent 7: \"Open with a short beginners' intro that says plainly that the club is for people who are new to the subject too. Then I'd know I belong and would come back.\"\n\nRespondent 8: \"Say at the start that nothing is for sale and nobody will push you to buy or join anything. Without that I'm not going to feel comfortable coming back.\"",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 5,
+   "emailed": false
+  },
+  {
+   "n": 21,
+   "at": "2026-11-22T09:25:47.272Z",
+   "kind": "opened",
+   "round": 2,
+   "hash": "df2fdf4b15c65901ecf07577faf4d7ddcff657705109ede1cdf81d65e100b3e5",
+   "intact": true,
+   "rows": [
+    {
+     "question": "Top-ranked change to bring you back",
+     "people_said": "Greeter and beginners' intro tied avg 2.13; intro 3 firsts, greeter 1; clear offer 2.63 (2 firsts); turn-taking 3.75; shift time 4.38",
+     "agent": "Beginners' intro (b) or greeter (a) tops; shift time lowest overall",
+     "personas": null,
+     "commander": null
+    },
+    {
+     "question": "Felt pressure to buy/join?",
+     "people_said": "Yes 1, No 7",
+     "agent": "Most say No; 1-2 Yes",
+     "personas": null,
+     "commander": null
+    }
+   ]
+  },
+  {
+   "n": 22,
+   "at": "2026-11-22T09:25:49.645Z",
+   "kind": "debrief",
+   "round": 2,
+   "whoWasWrong": "I was broadly right. I didn't predict a tie between greeter and intro.",
+   "surprise": "Reasons were scattered: each person gave a different one.",
+   "stillUnknown": "Whether the fix works in practice; the pressure incident's scale.",
+   "nextMove": "finish",
+   "reason": "Every person has had 2 emails, so no further send is possible."
+  },
+  {
+   "n": 23,
+   "at": "2026-11-22T09:25:58.406Z",
+   "kind": "finish",
+   "recommendation": "Make the first ten minutes newcomer-friendly. Open every meeting with a short plain-language beginners' intro that says newcomers are welcome and explains the terms. Pair that with a named person who greets newcomers and sits with them. Intro and greeter tied on average rank, but the intro got the most first places. Also say plainly that nothing is for sale. Changing the meeting time or adding hands-on activities ranked low.",
+   "evidence": "Both rounds had 8 of 8 respondents. Round 1 ranking (avg rank, lower is better): clearer plan 2.25, welcome 2.38 (4 first places), cost 3.13, time 3.38, shorter meeting 3.88, hands-on 6.0 (0 first places). Round 1 reasons were all different: cliquey or dominated discussion (2), lost or unsure beginners were welcome (2), schedule clash (1), already in other groups (1), bored (1), pressured to buy merchandise (1). Round 2 ranking: beginners' intro 2.13 (3 first places), greeter 2.13 (1), clear offer 2.63 (2), everyone gets a turn 3.75, shift-friendly time 4.38. Round 2 pressure to buy or join: Yes 1, No 7.",
+   "scoreboard": [
+    {
+     "round": 1,
+     "question": "Which change would bring you back (ranking)",
+     "people_said": "Welcome and clearer plan on top; hands-on last",
+     "agent": "right",
+     "personas": "no guess",
+     "commander": "no guess"
+    },
+    {
+     "round": 1,
+     "question": "Main reason for not returning (open)",
+     "people_said": "Scattered; welcome and clarity themes; one merchandise pressure",
+     "agent": "partly",
+     "personas": "no guess",
+     "commander": "no guess"
+    },
+    {
+     "round": 2,
+     "question": "Top-ranked change",
+     "people_said": "Beginners' intro and greeter tied at 2.13; intro had 3 first places",
+     "agent": "right",
+     "personas": "no guess",
+     "commander": "no guess"
+    },
+    {
+     "round": 2,
+     "question": "Felt pressure to buy/join?",
+     "people_said": "Yes 1, No 7",
+     "agent": "right",
+     "personas": "no guess",
+     "commander": "no guess"
+    }
+   ],
+   "learned_between_rounds": "Round 1 showed scattered reasons and two top options, welcome and clarity, that were close together. I used round 2 to separate them, and they tied again on average rank. It also checked how widespread the merchandise pressure was: 1 of 8.",
+   "limits": "Only 8 people, so this is a direction and not a measurement. The tie between intro and greeter was not resolved. The pressure-to-buy report comes from one person. Every Flashpoint reply was labelled as a practice stand-in, so the results may be simulated. I did not run a persona rehearsal.",
+   "lessons": [
+    "Open-ended reasons from a small group scatter. Ranking plus 'what would bring you back' gave the usable signal.",
+    "Two top options tied again when re-ranked. A different design, such as a forced trade-off, may be needed to split them.",
+    "Ask openly about uncomfortable incidents. One surprise (pressure to buy) only came up because of the open question."
+   ],
+   "unbacked": [
+    "6.0"
+   ],
+   "spent": 5,
+   "handedBack": 4
+  }
+ ]
+}

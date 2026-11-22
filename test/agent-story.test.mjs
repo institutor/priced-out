@@ -73,7 +73,7 @@ test("the page only loads a run that is on the list, by a safe file name", async
   assert.equal(runFor([], "two").file, "agent-run.json");
   assert.equal(runFor(undefined, null).file, "agent-run.json");
   assert.equal(aboutRun({ mode: "practice", handsOff: true, remembered: 3, rounds: 2, spent: 5 }), "a practice run, hands-off: nobody approved the sends, started with 3 lessons from earlier runs, 2 rounds, $5.00 spent");
-  assert.equal(aboutRun({ mode: "real", handsOff: false, remembered: 0, rounds: 1, spent: 3.5 }), "a real run, 1 round, $3.50 spent");
+  assert.equal(aboutRun({ mode: "real", handsOff: false, remembered: 0, rounds: 1, spent: 3.5 }), "a real run, the commander approved each send, 1 round, $3.50 spent");
 });
 
 test("every published run on the list tells a whole story", () => {

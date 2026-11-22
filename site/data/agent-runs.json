@@ -4,11 +4,35 @@
   "file": "agent-run.json",
   "objective": "Figure out the best event to put on for our club next spring.",
   "mode": "practice",
+  "handsOff": true,
+  "people": 8,
+  "rounds": 2,
+  "remembered": 6,
+  "spent": 5,
+  "stamp": "2026-11-22T09-26-19"
+ },
+ {
+  "name": "with-a-person",
+  "file": "agent-run-with-a-person.json",
+  "objective": "Figure out the best event to put on for our club next spring.",
+  "mode": "practice",
   "handsOff": false,
   "people": 8,
   "rounds": 2,
   "remembered": 0,
   "spent": 5,
   "stamp": "2026-11-22T09-03-06"
+ },
+ {
+  "name": "members",
+  "file": "agent-run-members.json",
+  "objective": "Members come to one meeting and then stop. Find out why, and what one change would bring them back.",
+  "mode": "practice",
+  "handsOff": true,
+  "people": 8,
+  "rounds": 2,
+  "remembered": 3,
+  "spent": 5,
+  "stamp": "2026-11-22T09-24-20"
  }
 ]

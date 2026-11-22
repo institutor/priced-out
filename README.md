@@ -110,35 +110,35 @@ run is ready. The rest is in [agent/README.md](agent/README.md).
 ### The objective given, and what the agent decided
 
 **No real run has been made yet.** What follows is a practice run, kept as an example
-of what a run produces. An AI stand-in played Flashpoint and invented every answer, and
-another played the commander because nobody was at the keyboard. Nothing in it is a
-finding.
+of what a run produces. An AI stand-in played Flashpoint and invented every answer.
+Nothing in it is a finding.
 
 The objective given:
 
 > Figure out the best event to put on for our club next spring.
 
-What the agent decided, in that practice run:
+It was run hands-off, with nobody at the keyboard. What the agent decided:
 
-- **The plan.** Before spending anything, it wrote down what it needed to know: which
-  kind of event members prefer, and what would make them come.
-- **Survey 1.** Rank five kinds of event, pick a day and time, the most you would pay,
-  and one open question. Its opening line said one short follow-up might come.
-- **The envelope.** It guessed a social evening or a picnic would lead, and that most
-  people would pay up to $10.
-- **What came back.** The picnic ranked first and the social evening last. All 8 chose
-  Saturday daytime. Money worries came up again and again. The agent wrote "I was wrong".
-- **Stop or go on?** It first chose to stop. The code asked it once to think again, and
-  it chose a follow-up.
-- **Survey 2.** Three questions on what round 1 left open: a free picnic, a subsidised
-  day trip, a small event plus an aid fund, or no event, and what would stop you coming.
-- **Stopping.** Round 2 split, with cost the top barrier. Everyone had now had their two
-  emails, so there could be no third survey, and the agent said so.
-- **The recommendation.** A free or very cheap Saturday daytime outdoor event with kids
-  welcome. A picnic is the safe choice, and a subsidised day trip is close behind. It
-  said plainly that 8 people give a direction, not a measurement.
-- **How much it did alone.** 20 steps on its own. It went to a person 4 times: 2
-  approvals to send, and 2 reports its standing orders asked for.
+- **The plan.** Before spending anything, it wrote down what it needed to know, and
+  which of its own notes from earlier runs it was acting on.
+- **Survey 1.** Rank six kinds of event, pick a time, say what you would do if it cost
+  money, and one open question on what keeps you away.
+- **The envelope.** It guessed a social dinner or party would come top.
+- **The send.** Nobody approved it. The code checked the survey against fixed rules.
+- **What came back.** The social dinner came last. A skills workshop and a guest
+  speaker tied for first. The agent wrote "I predicted social dinner on top; it ranked
+  last".
+- **Stop or go on?** It chose a second round by itself, to break the tie.
+- **Survey 2.** Workshop, speaker, or the two combined? The most you would pay? Which
+  topic?
+- **Stopping.** Speaker 3, combined 2, workshop 1, none 2. Everyone had now had their
+  two emails, so there could be no third survey, and the agent said so.
+- **The recommendation.** A weekday evening with a professional guest: a short talk,
+  then a hands-on part, free or cheap. Skip the social dinner. It said plainly that 8
+  people give a direction, not a measurement.
+- **How much it did alone.** 20 steps on its own. It did not stop for a person once.
+- **What it learned.** It began with six lessons from two earlier runs and ended by
+  writing three more.
 - **The bill.** Ten messages to Flashpoint: $5.00 of a $9.00 budget. A real run needs a
   few more messages, about $7 for two rounds.
 

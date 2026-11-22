@@ -29,10 +29,10 @@ export function logHeader({ objective, people, cap, emailLimit, model, orders, m
     "",
     ...orders.map((order) => `- ${order}`),
     "",
-    handsOff ? "The commander handed this mission over and was away. No person approved a send: the code checked each survey before it went out, and the checks are listed where they were made.\n" : "",
+    handsOff ? "The commander handed this objective over and was away. No person approved a send: the code checked each survey before it went out, and the checks are listed where they were made.\n" : "",
     standInCommander ? "Nobody was at the keyboard, so an AI stand-in played the commander as well. Its replies and its sealed guesses below are invented, like everything else in a practice run. It approves every send.\n"
       : practiceCommander ? "Nobody was at the keyboard, so the commander's replies below are canned practice replies. The canned commander approves sends and makes no guesses.\n" : "",
-    memory.length > 0 ? `**What the agent remembered from earlier missions:**\n\n${memory.map((lesson) => `- ${lesson}`).join("\n")}\n` : "",
+    memory.length > 0 ? `**What the agent remembered from earlier runs:**\n\n${memory.map((lesson) => `- ${lesson}`).join("\n")}\n` : "",
     "The agent chose every step below. The commander speaks only where the log says so. The loop itself steps in at two points, both marked: no email goes out without the commander's yes, and if the agent stops after one round with a question still open, it is asked once to think again.",
     "",
     "---",
@@ -67,7 +67,7 @@ export function logEntry(step) {
     case "blocked":
       return `${n} stopped by the budget\n\nThe agent tried a paid step (${step.tool}) and the cap refused it.\n`;
     case "email-limit":
-      return `${n} stopped by the email limit\n\nThe agent tried ${step.tried}, and the code refused: everyone on the list had already had every email they may get in this mission. Nothing was charged.\n`;
+      return `${n} stopped by the email limit\n\nThe agent tried ${step.tried}, and the code refused: everyone on the list had already had every email they may get in this run. Nothing was charged.\n`;
     case "sealed":
       return `${n} the round ${step.round} envelope is sealed\n\n*Why these questions:* ${step.why}\n\n${step.envelope.predictions.length} question${step.envelope.predictions.length === 1 ? "" : "s"} sealed. The commander sealed a guess on ${step.envelope.predictions.filter((p) => p.commander !== null).length}; the agent cannot see it.\n\nSHA-256 of \`envelope-round-${step.round}.json\`: \`${step.hash}\`\n\nThe hash lets this run check, when the envelope is opened, that no guess was changed after the answers came in. It is a check on the run's own files, not proof to an outsider.\n`;
     case "opened": {
@@ -77,7 +77,7 @@ export function logEntry(step) {
     case "debrief":
       return `${n} what the round ${step.round} envelope taught the agent\n\n| Debrief | |\n|---|---|\n| Who was wrong | ${cell(step.whoWasWrong)} |\n| Biggest surprise | ${cell(step.surprise)} |\n| Still unknown | ${cell(step.stillUnknown)} |\n| Next move | ${step.nextMove === "another_round" ? "another round" : "finish"} |\n| Why | ${cell(step.reason)} |\n`;
     case "resumed":
-      return `${n} the mission was resumed after ${step.away}\n\n${step.cutOff.length > 0 ? `It had been stopped during: ${step.cutOff.join(", ")}. The agent was told that step's outcome is not known, and its price was counted as spent to be safe.` : "It had been stopped between steps."}\n`;
+      return `${n} the run was resumed after ${step.away}\n\n${step.cutOff.length > 0 ? `It had been stopped during: ${step.cutOff.join(", ")}. The agent was told that step's outcome is not known, and its price was counted as spent to be safe.` : "It had been stopped between steps."}\n`;
     case "challenge":
       return `${n} the agent was asked to think again before stopping\n\nIt chose to finish after one round with budget left and this still unknown: ${step.stillUnknown}\n\nIts reason: ${step.reason}\n\nThe loop asks this once per mission. The decision stays the agent's.\n`;
     case "send-approved":

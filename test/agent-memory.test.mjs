@@ -42,21 +42,21 @@ test("the summary counts what the agent did alone, and shows its plan, the check
   assert.deepEqual(autonomy(steps), { alone: 5, approvals: 0, ordered: 0, asked: 0, questions: 0, person: 0, codeStops: 1, nudges: 0 });
   const text = summarize({ ...head, handsOff: true, memory: ["An older lesson."], steps });
   assert.match(text, /took \*\*5 steps on its own\*\*\. It did not stop for a person once\. The code stopped it 1 time\./);
-  assert.match(text, /What it remembered from earlier missions:\*\*\n\n- An older lesson\./);
+  assert.match(text, /What it remembered from earlier runs:\*\*\n\n- An older lesson\./);
   assert.match(text, /It needed to find out: which event/);
   assert.match(text, /The code held the send back 1 time/);
   assert.match(text, /The code checked the survey in the commander's place, and it was emailed/);
-  assert.match(text, /What it wrote down for its next mission\.\*\*\n\n- Rank, do not pick\./);
-  assert.match(text, /handed the mission over and was away/);
+  assert.match(text, /What it wrote down for its next run\.\*\*\n\n- Rank, do not pick\./);
+  assert.match(text, /handed the objective over and was away/);
 
   const attended = summarize({ ...head, steps: [...steps.slice(0, 3), { n: 4, kind: "send-approved", round: 1, reply: "yes" }, { n: 5, kind: "commander", message: "m", reply: "ok" }, steps[6]] });
   assert.match(attended, /A person was needed 2 times: 1 send approval, 0 reports a standing order asked for, and 1 question of its own\./);
 });
 
 test("the log says when the mission was handed over and when a stand-in played the commander", () => {
-  assert.match(logHeader({ ...head, handsOff: true }), /handed this mission over and was away/);
+  assert.match(logHeader({ ...head, handsOff: true }), /handed this objective over and was away/);
   assert.match(logHeader({ ...head, mode: "practice", standInCommander: true }), /an AI stand-in played the commander as well[\s\S]*invented/);
-  assert.match(logHeader({ ...head, memory: ["An older lesson."] }), /remembered from earlier missions:\*\*\n\n- An older lesson\./);
+  assert.match(logHeader({ ...head, memory: ["An older lesson."] }), /remembered from earlier runs:\*\*\n\n- An older lesson\./);
   assert.match(logEntry(steps[0]), /the agent's plan[\s\S]*- which event[\s\S]*What would change its answer:\* a workshop winning/);
   assert.match(logEntry(steps[4]), /email 1 of the 2[\s\S]*- It is short/);
   assert.match(logEntry(steps[3]), /held back[\s\S]*income/);

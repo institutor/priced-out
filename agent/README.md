@@ -12,17 +12,20 @@ with a recommendation.
 | | In the example run |
 |---|---|
 | **The objective given** | "Figure out the best event to put on for our club next spring." |
-| **Survey 1, the agent's choice** | Rank five kinds of event, pick a day and time, the most you would pay, and one open question. Sent to all 8 people. |
-| **What it guessed, sealed before sending** | A social evening or a picnic would lead, and most people would pay up to $10. |
-| **What surprised it** | The social evening came last. Money worries came up again and again, and one person proposed skipping the event. |
-| **Survey 2, on that surprise** | Three questions: a free picnic, a club-subsidised day trip, a small event plus an aid fund, or no event? What would stop you coming? |
-| **The recommendation** | A free or very cheap Saturday daytime outdoor event with kids welcome. Picnic is the safe choice; a subsidised day trip is close behind. |
-| **How much it did alone** | 20 steps on its own. It went to a person 4 times: 2 approvals to send, and 2 reports its standing orders asked for. The code stepped in once, to ask it to think again before stopping. |
+| **Who was at the keyboard** | Nobody. It was a hands-off run: the code checked each survey before it was sent. |
+| **What it started with** | Six lessons it wrote itself at the end of two earlier runs. Its plan says which ones it is acting on. |
+| **Survey 1, the agent's choice** | Rank six kinds of event, pick a time, say what you would do if it cost money, and one open question on what keeps you away. Sent to all 8 people. |
+| **What it guessed, sealed before sending** | A social dinner or party would come top. |
+| **What surprised it** | The social dinner came last. A skills workshop and a guest speaker tied for first. Shift work and "cliquey" socials kept people away. |
+| **Survey 2, on that surprise** | Three questions: workshop, speaker, or the two combined? The most you would pay? Which topic? |
+| **The recommendation** | A weekday evening with a professional guest: a short talk, then a hands-on part, free or cheap. Skip the social dinner. |
+| **How much it did alone** | 20 steps on its own. It did not stop for a person once, and the code never had to step in. |
 | **Cost** | $5.00 of a $9.00 budget in practice. A real run needs a few more messages, about $7 for two rounds. |
 
 **That example is a practice run.** An AI stand-in played Flashpoint and invented every
 answer, so it is not a finding. It shows what the agent decides and how. No real run has
 been made yet.
+
 
 - **Watch it, part by part:** <https://institutor.github.io/priced-out/agent/>
   (press **P** on that page for present mode)
@@ -154,6 +157,18 @@ lessons before it plans, and its log says which ones it was given. Practice runs
 their own notebook, which is not in the repository, so an invented answer can never
 teach a real run anything.
 
+You can see it happen across the three practice runs in [examples/](examples/):
+
+| Run | What it started with | What it did differently |
+|---|---|---|
+| 1. [With a person approving](examples/practice-run-with-a-person/summary.md) | Nothing. | Asked a single-choice question that split. Wrote: "Rank questions gave a clearer signal than single choice." |
+| 2. [Another objective, hands-off](examples/practice-run-members/summary.md) | The 3 lessons from run 1. | Used ranking from the start. Wrote: "Ask openly about uncomfortable incidents." |
+| 3. [The example above, hands-off](examples/practice-run/summary.md) | All 6 lessons. | Its plan says: "Acting on notes: use ranking, price framing, open barriers question." All three are in its first survey. |
+
+Run 1 needed the code to ask it to think again before it stopped after one round. Run 3
+chose its follow-up round with no prompting.
+
+
 ## The agent's tools
 
 The agent is Claude Sonnet 5.5 in a loop. Each turn it reads everything so far, picks one
@@ -230,45 +245,44 @@ These are rules in the code. They hold whatever the model says.
 ## The objective given, and what the agent decided
 
 **No real run has been made yet.** The example is a practice run: an AI stand-in played
-Flashpoint and invented every answer, and another AI stand-in played the commander
-because nobody was at the keyboard. Both are labelled wherever they speak. Nothing in it
+Flashpoint and invented every answer. It is labelled wherever it speaks. Nothing in it
 is a finding.
 
 The objective given:
 
 > Figure out the best event to put on for our club next spring.
 
-What the agent decided:
+It was run hands-off, so nobody was at the keyboard. What the agent decided:
 
-- **The plan.** It needed to know which kind of event members prefer, what would make
-  them come (timing, cost, format), and anything only the commander would know. Its
-  hunch was a social outdoor event.
-- **Survey 1.** One survey to all 8 people: rank five kinds of event, pick a day and
-  time, the most you would pay, and an open question. Its opening line said one short
-  follow-up might come.
-- **The envelope.** It guessed a social evening or a picnic would lead and most people
-  would pay up to $10. The commander guessed a skills workshop.
-- **What came back.** The picnic ranked first, a day trip second, and the social evening
-  last. All 8 chose Saturday daytime. On price people split, and money worries came up
-  again and again. One person proposed skipping the event. The agent wrote "I was wrong",
-  and that the commander was too.
-- **Stop or go on?** It first chose to stop. The code asked it once to think again, and
-  it chose a follow-up. A standing order says to report before a second round, so it
-  told the commander what it had learned first.
-- **Survey 2.** Three questions on what round 1 left open: a free picnic, a subsidised
-  day trip, a small event plus an aid fund, or no event, and what would stop you coming.
-- **What came back.** A split: trip 3, picnic 2, small event plus aid 2, no event 1.
-  Cost was the top barrier. The split set off the order "Come to me if the answers split
-  evenly", so it went to the commander with its own call.
+- **The plan.** It needed to know which kind of event members want most, what would
+  bring them or keep them away, and anything they disliked before. Its hunch was that a
+  social or outdoor event would win. It also wrote which of its own notes from earlier
+  runs it was acting on: use ranking, test the price wording, ask about barriers openly.
+- **Survey 1.** One survey to all 8 people: rank six kinds of event, pick a time, say
+  what you would do if the event cost money, and an open question on what keeps you
+  away. Its opening line said one short follow-up might come.
+- **The envelope.** It guessed a social dinner or party would come top.
+- **The send.** Nobody approved it. The code checked the survey against fixed rules
+  first: short, no personal questions, and the same survey the agent had been shown.
+- **What came back.** The social dinner came last, with no first-place votes. A skills
+  workshop and a guest speaker tied for first. Weekday evening was the best time. Open
+  answers named shift work, Saturday jobs and "cliquey" socials. The agent wrote "I
+  predicted social dinner on top; it ranked last".
+- **Stop or go on?** It chose a second round by itself, to break the tie: "a 3-question
+  follow-up forcing a trade-off between workshop, speaker and a hybrid, plus price".
+- **Survey 2.** Workshop, speaker, or a workshop led by a working professional with a
+  short talk first? The most you would pay? Which topic?
+- **What came back.** Speaker 3, combined 2, workshop 1, none 2. Its guess that the
+  combined event would win was wrong, and it said so. Its price guess was right.
 - **Stopping.** Everyone had had their two emails, so there could be no third survey. It
-  said so.
-- **The recommendation.** A free or very cheap Saturday daytime outdoor event with kids
-  welcome. A picnic is the safe choice. A subsidised day trip is a close second if the
-  treasurer confirms the money. It said plainly that 8 people give a direction, not a
-  measurement.
-- **Its lessons for next time.** Rank questions gave a clearer signal than single choice.
-  Offering cost-sharing changed the order, so test price wording on purpose. Ask about
-  barriers openly instead of assuming them.
+  said so, and said the choice between speaker and workshop "is still soft".
+- **The recommendation.** A practical career and money skills evening with a
+  professional guest: a short talk, then a hands-on part. Weekday evening, free or under
+  about $10 to $25. Skip the social dinner. It said plainly that 8 people give a
+  direction, not a measurement.
+- **Its lessons for next time.** Do not assume social events are the favourite. A
+  hybrid option did not break a tie, so force the trade-off in the first round. Keep an
+  open question on barriers.
 - **The bill.** Ten messages to Flashpoint: $5.00 of a $9.00 budget. A real run needs a
   few more messages, because the real Flashpoint asks for a confirm on the way.
 
@@ -276,6 +290,16 @@ The whole run is in [examples/practice-run/](examples/practice-run/): the
 [one-page summary](examples/practice-run/summary.md) and the
 [log](examples/practice-run/log.md), with every message, reply, slip, envelope and
 debrief. The same run is on the page at <https://institutor.github.io/priced-out/agent/>.
+
+Two more practice runs are kept beside it, and the page can show each of them:
+
+- [The same objective with a commander approving each send](examples/practice-run-with-a-person/summary.md).
+  Here the standing orders did their work: the agent reported before its second round,
+  and went to the commander when the answers split evenly.
+- [Another objective](examples/practice-run-members/summary.md): "Members come to one
+  meeting and then stop. Find out why, and what one change would bring them back."
+  Nothing in the agent says what to ask, so it wrote a different survey.
+
 
 ### What a run leaves behind
 

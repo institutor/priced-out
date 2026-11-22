@@ -84,7 +84,7 @@ export function summarize(run) {
   lines.push(`**The objective:** ${run.objective}`, "");
   lines.push(`**Given to the agent:** ${run.people} people to ask, a ${money(run.cap)} budget cap, and ${run.orders.length} standing orders.${run.emailLimit ? ` Nobody could be emailed more than ${times(run.emailLimit)}, reminders included.` : ""} Model: ${run.model}.`, "");
 
-  if (run.memory?.length > 0) lines.push("**What it remembered from earlier missions:**", "", ...run.memory.map((lesson) => `- ${lesson}`), "");
+  if (run.memory?.length > 0) lines.push("**What it remembered from earlier runs:**", "", ...run.memory.map((lesson) => `- ${lesson}`), "");
 
   const own = autonomy(steps);
   lines.push("## How much it did alone", "", `The agent took **${own.alone} steps on its own**. ${own.person === 0 ? "It did not stop for a person once." : `A person was needed ${times(own.person)}: ${own.approvals} send approval${own.approvals === 1 ? "" : "s"}, ${own.ordered} report${own.ordered === 1 ? "" : "s"} a standing order asked for, and ${own.asked} question${own.asked === 1 ? "" : "s"} of its own.`}${own.nudges > 0 ? " The code asked it once to think again before it stopped." : ""}${own.codeStops > 0 ? ` The code stopped it ${times(own.codeStops)}.` : ""}`, "");
@@ -127,7 +127,7 @@ export function summarize(run) {
   if (talks.length > 0) lines.push("");
   const stopped = steps.filter((s) => s.kind === "email-limit").length;
   if (stopped > 0) lines.push(`The email limit refused the agent ${times(stopped)}: it tried to email people who had already had every email they may get.`, "");
-  if (run.handsOff) lines.push("The commander handed the mission over and was away, so nobody answered the agent and no person approved a send.", "");
+  if (run.handsOff) lines.push("The commander handed the objective over and was away, so nobody answered the agent and no person approved a send.", "");
   else if (run.standInCommander) lines.push("Nobody was at the keyboard for this run, so an AI stand-in played the commander. Its replies and guesses are invented.", "");
   else if (run.practiceCommander) lines.push("Nobody was at the keyboard for this run, so the commander's replies and approvals were canned.", "");
 
@@ -146,7 +146,7 @@ export function summarize(run) {
       lines.push(`The agent marked these itself, its own guesses included. With ${run.people} people asked, the scoreboard shows how the method works. It does not show who is the better guesser.`, "");
     }
     lines.push(`**What changed between rounds.** ${finish.learned_between_rounds}`, "", `**Limits.** ${finish.limits}`, "");
-    if (finish.lessons?.length > 0) lines.push("**What it wrote down for its next mission.**", "", ...finish.lessons.map((lesson) => `- ${lesson}`), "");
+    if (finish.lessons?.length > 0) lines.push("**What it wrote down for its next run.**", "", ...finish.lessons.map((lesson) => `- ${lesson}`), "");
   }
 
   lines.push("## The bill", "", "| Paid for | How many | Cost |", "|---|---|---|");

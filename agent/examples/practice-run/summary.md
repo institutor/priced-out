@@ -1,81 +1,86 @@
-# Run summary 2026-11-22T09-03-06
+# Run summary 2026-11-22T09-26-19
 
 **This was a practice run. An AI stand-in played Flashpoint and invented every answer. No survey was sent and no real person answered. Nothing below is a finding.**
 
 **The objective:** Figure out the best event to put on for our club next spring.
 
-**Given to the agent:** 8 people to ask, a $9.00 budget cap, and 3 standing orders. Nobody could be emailed more than 2 times, reminders included. Model: claude-sonnet-5-5.
+**Given to the agent:** 8 people to ask, a $9.00 budget cap, and 2 standing orders. Nobody could be emailed more than 2 times, reminders included. Model: claude-sonnet-5-5.
+
+**What it remembered from earlier runs:**
+
+- Rank questions gave a clearer signal than single choice, which split on 8 people.
+- Offering cost-sharing in the options changed the preference order, so test price framing explicitly.
+- My guesses and the commander's both missed; ask about barriers openly instead of assuming them.
+- Open-ended reasons from a small group scatter. Ranking plus 'what would bring you back' gave the usable signal.
+- Two top options tied again when re-ranked. A different design, such as a forced trade-off, may be needed to split them.
+- Ask openly about uncomfortable incidents. One surprise (pressure to buy) only came up because of the open question.
 
 ## How much it did alone
 
-The agent took **20 steps on its own**. A person was needed 4 times: 2 send approvals, 2 reports a standing order asked for, and 0 questions of its own. The code asked it once to think again before it stopped.
+The agent took **20 steps on its own**. It did not stop for a person once.
 
 ## What the agent decided
 
 **Its plan, before it spent anything.**
 
-- It needed to find out: Which event type members prefer for spring; What would make them attend (timing, cost, format); Any local constraints the commander knows
-- It already suspected: A social outdoor event (picnic/field day) beats formal options, since it is low-effort
-- What would change its answer: Strong preference for a different format, or ranking showing indoor/skill events on top
+- It needed to find out: Which event type members most prefer (ranked); What would bring them to attend / barriers (timing, cost); Any uncomfortable past incidents or dislikes
+- It already suspected: A social/outdoor event ranks top; cost and timing are barriers; Acting on notes: use ranking, price framing, open barriers question
+- What would change its answer: If a different option ranks top, or cost framing flips the order, or barriers make the top option unattendable.
 
 **Round 1.**
 
 - It sent Flashpoint 5 messages, 1 of them to write or change the survey.
-- Before sending, it sealed guesses on: "Which event is ranked most preferred?"; "Most you'd pay?".
-- The commander approved, and the survey was emailed.
-- Who was wrong: I was wrong: social evening ranked last, and price was split not clustered at $10. Commander was wrong too: workshop came third, not first.
-- Biggest surprise: All 8 chose Saturday daytime; money hardship came up repeatedly, and one member proposed skipping the event.
-- Still unknown: Picnic vs day trip when cost and transport matter; support for skipping the event and redirecting funds.
-- It first chose to stop here. The loop asked it once to think again, because a question was still open and there was budget left.
-- Its decision: **run another round**. Short follow-up of 3 questions: ask about a free Saturday picnic vs a subsidised day trip vs skipping the event, and what would block attendance.
+- Before sending, it sealed guesses on: "Which event ranks most wanted?"; "If top event cost money, what would you do?".
+- The code checked the survey in the commander's place, and it was emailed.
+- Who was wrong: Me: I predicted social dinner on top; it ranked last. Commander gave no guess.
+- Biggest surprise: Weekday evening timing and shift work as a barrier; socials seen as cliquey; practical/professional value drives interest.
+- Still unknown: Workshop vs speaker tie-break; whether a hybrid (professional-led workshop) satisfies both; price tolerance for it.
+- Its decision: **run another round**. Use the second email for a 3-question follow-up forcing a trade-off between workshop, speaker and a hybrid, plus price.
 
 **Round 2.**
 
 - It sent Flashpoint 5 messages, 1 of them to write or change the survey.
-- Before sending, it sealed guesses on: "Which would you most prefer: free picnic, subsidised day trip, small event plus aid fund, or no event with budget to aid?"; "What would most likely stop you coming?".
-- The commander approved, and the survey was emailed.
-- Who was wrong: Me: picnic got 2, not 3-4; day trip led. Commander was wrong on picnic as leader and on timing as barrier (cost led; timing was not an option offered). I was right on cost as top barrier.
-- Biggest surprise: Day trip edged ahead of the picnic once cost-sharing was offered; opinion is genuinely split.
-- Still unknown: Actual costs of picnic and trip, and treasurer's budget.
-- Its decision: **finish**. Both emails are used up for everyone; the remaining decision depends on costs and budget the commander holds.
+- Before sending, it sealed guesses on: "Which option would you most likely attend on a weekday evening?"; "Max you'd pay?".
+- The code checked the survey in the commander's place, and it was emailed.
+- Who was wrong: Me: predicted combined would win with ~4; it got 2, speaker got 3. Price guess was right.
+- Biggest surprise: Topics scattered widely (freelancing, jobs, budgeting, cars, outdoor skills); 2 said none.
+- Still unknown: Which single topic; no emails remain.
+- Its decision: **finish**. Everyone has had 2 emails; no further survey is permitted.
 
 ## When it came to the commander
 
-- Step 13, under the order "Tell me what you learned before you start a second round.": Round 1 (8 of 8 answered): outdoor picnic/field day ranked first (avg 2.0), day trip second (2.25), workshop third (2.75), volunteer 4th, social evening last (4.75). All 8 want Saturday daytime. Cost split: free 3, ≤$10 2, ≤$25 2, >$25 1. Several say money is tight, one has childcare needs, and one …
-  The commander said: That lines up with what I'd expect. A free picnic is the easiest sell since money is tight for a lot of us, and the childcare point is real: we've lost people before because a Saturday event had no kid-friendly option. The idea of skipping the event to help a struggling member is worth taking seriously, but we don't have much slack in the budget, so I'd be careful about treating it as either/or.
-- Step 22, under the order "Come to me if the answers split evenly and you cannot call it.": Round 2 split: day trip with club-subsidised cost 3, free picnic 2, small event plus aid fund 2, skip event 1. Cost is the top barrier (4), childcare 1, nothing 3. Round 1 had picnic first, day trip second, all Saturday. My call: a Saturday outdoor event, free or nearly free, kids welcome, with the …
-  The commander said: Cost is our real limit, so the picnic is the safer choice, but I'd want the aid fund kept small and the club only covering trip costs if the treasurer confirms we have the money. I'll leave the final pick between picnic and day trip to the committee, so send me a rough cost for each and I'll bring it to the next meeting.
+It did not, apart from send approvals.
 
-Nobody was at the keyboard for this run, so an AI stand-in played the commander. Its replies and guesses are invented.
+The commander handed the objective over and was away, so nobody answered the agent and no person approved a send.
 
 ## The answer
 
-**Recommendation.** Hold a Saturday daytime outdoor event with kids welcome, and keep it free or very cheap. A free picnic or field day is the safe choice, because cost is the main barrier. A club-subsidised day trip is a close alternative that members like, if the treasurer confirms the money. Keep any aid fund small. The committee should choose between picnic and trip once rough costs are known.
+**Recommendation.** Put on a practical, career/money-skills evening with a professional guest: a short talk followed by a hands-on part. Hold it on a weekday evening and keep it free or under about $10–25. Skip a social dinner (ranked last). Topics were scattered, so pick job-search/freelance/money skills, which came up most.
 
-**Evidence.** Round 1 (8 of 8 answered): average rank was picnic 2.00, day trip 2.25, workshop 2.75, volunteer project 3.25, social evening 4.75. All 8 chose Saturday daytime. Maximum price: free 3, up to $10 2, up to $25 2, over $25 1. Round 2 (8 of 8): subsidised day trip 3, free picnic 2, small event plus aid fund 2, skip the event 1. Biggest barrier: cost 4, nothing 3, childcare 1. Open answers asked for no Sundays, childcare or a kids' corner, free outdoor options, and volunteer days. Every number is from the Flashpoint tool, which labelled itself a practice stand-in with invented answers.
+**Evidence.** Round 1 (8 of 8): workshop and speaker tied on average rank (2.38 each); social dinner was last (5.75, 0 firsts). Weekday evening was best for 4, Saturday daytime for 3. Cost: free-only 3, under $25 3, any cost 2, under $10 0. Several open answers cited shifts and Saturday work, cliquey socials, and wanting work-relevant sessions. Round 2 (8 of 8): guest speaker 3, combined 2, workshop 1, none 2. Max price: free 3, $10 1, $25 3, $40 1. Topics: job/freelance/hiring (3 of 8), budgeting, cars, outdoor skills, a competition night, small-group mixing.
 
 **Who guessed better.**
 
 | Round | Question | What people said | Agent | AI personas | Commander |
 |---|---|---|---|---|---|
-| 1 | Which event ranks most preferred? | Picnic 2.0 avg rank, day trip 2.25, workshop 2.75, social evening last | partly | no guess | wrong |
-| 1 | Most you'd pay? | Free 3, ≤$10 2, ≤$25 2, >$25 1 | partly | no guess | partly |
-| 2 | Preferred format: picnic, subsidised trip, small event plus aid, no event | Trip 3, picnic 2, small plus aid 2, no event 1 | partly | no guess | wrong |
-| 2 | What would most stop you coming? | Cost 4, nothing 3, childcare 1 | right | no guess | wrong |
+| 1 | Which event ranks most wanted? | Workshop and speaker tied (2.38); social dinner last | wrong | no guess | no guess |
+| 1 | If top event cost money, what would you do? | Free 3, <$10 0, <$25 3, any 2 | partly | no guess | no guess |
+| 2 | Which option would you most likely attend on a weekday evening? | Speaker 3, combined 2, workshop 1, none 2 | wrong | no guess | no guess |
+| 2 | Max you'd pay? | Free 3, $10 1, $25 3, $40 1 | right | no guess | no guess |
 
-The agent: 1 right, 3 partly, 0 wrong. The AI personas made no guess. The commander: 0 right, 1 partly, 3 wrong.
+The agent: 1 right, 1 partly, 2 wrong. The AI personas made no guess. The commander made no guess.
 
 The agent marked these itself, its own guesses included. With 8 people asked, the scoreboard shows how the method works. It does not show who is the better guesser.
 
-**What changed between rounds.** Round 1 showed money and childcare worries and one suggestion to skip the event. Round 2 asked about picnic vs subsidised trip vs aid-fund options and the main barriers. It found the choice is split and cost is the top barrier.
+**What changed between rounds.** Round 1 left a workshop vs speaker tie and showed a weekday-evening need. Round 2 tested a combined option; it did not win clearly (speaker led 3 vs 2), so the choice is still soft.
 
-**Limits.** Only 8 people, so this is a direction, not a measurement. Round 2 was split 3/2/2/1. I have no cost figures for the options. Nobody could be emailed again. The tool's replies were labelled as practice and AI-generated.
+**Limits.** Only 8 people; direction, not measurement. The tie was not cleanly broken, 2 of 8 chose none, and topics scattered. Flashpoint replies were labelled as practice stand-ins. No personas were run. Commander gave no guesses.
 
-**What it wrote down for its next mission.**
+**What it wrote down for its next run.**
 
-- Rank questions gave a clearer signal than single choice, which split on 8 people.
-- Offering cost-sharing in the options changed the preference order, so test price framing explicitly.
-- My guesses and the commander's both missed; ask about barriers openly instead of assuming them.
+- My guess of a social event on top was wrong; don't assume social events are favoured, and include practical/career options.
+- Adding a hybrid option after a tie did not decide it; with 8 people, use a forced trade-off or ranking in the first round.
+- Open answers revealed barriers (shift work, cliquey socials) that closed questions missed; keep an open barrier question.
 
 ## The bill
 
