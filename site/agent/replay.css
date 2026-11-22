@@ -3,49 +3,10 @@
    and drawing rules come from ../css/style.css. Only what this page adds is
    here, and every class of its own starts with "m-". */
 
-/* The two parts of the project, at the very top ----------------------------- */
-
-.m-pages {
-  max-width: 70rem;
-  margin-inline: auto;
-  padding: 0.9rem var(--gutter) 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem 1.6rem;
-  font: 400 1.25rem/1.2 var(--font-display);
-  letter-spacing: 0.02em;
-}
-
-.m-pages a {
-  text-decoration: none;
-  color: var(--ink-soft);
-  padding: 0.2rem 0;
-}
-
-.m-pages a span {
-  font: 400 0.9rem var(--font-body);
-  letter-spacing: 0;
-}
-
-.m-pages a:hover {
-  color: var(--ink);
-}
-
-.m-pages a[aria-current] {
-  color: var(--ink);
-  box-shadow: inset 0 -0.5em 0 var(--hilite);
-}
-
-@media (prefers-color-scheme: dark) {
-  .m-pages a[aria-current] {
-    box-shadow: inset 0 -2px 0 var(--series);
-  }
-}
-
 /* The title page -------------------------------------------------------------- */
 
 .m-cover .title {
-  width: min(100%, 44rem, 92svh);
+  width: min(100%, 36rem, 76svh);
 }
 
 .scene-art .seal-fill {
@@ -788,7 +749,7 @@ html.present {
   }
 }
 
-html.present .m-pages,
+html.present .pages,
 html.present .contents,
 html.present .colophon,
 html.present .tear,
@@ -825,7 +786,6 @@ html.present .m-beat .sub {
 }
 
 @media print {
-  .m-pages,
   .m-controls,
   .m-bar {
     display: none;
