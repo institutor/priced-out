@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { runAgent, makeRedactor, envelopeHash, unbackedNumbers, PRICES, TOOLS } from "../agent/loop.mjs";
+import { runAgent, makeRedactor, envelopeHash, unbackedNumbers, asksToSend, PRICES, TOOLS } from "../agent/loop.mjs";
 import { fakeFlashpoint } from "../agent/fake-flashpoint.mjs";
 
 const recipients = [
@@ -245,4 +245,17 @@ test("the practice writer plays Flashpoint without ever seeing an address", asyn
   assert.match(kinds(out, "flashpoint")[0].reply, /Drafted survey 1\.\n\nwritten 2\nIt is not published/);
   assert.equal(kinds(out, "opened").length, 1);
   assert.equal(prompts.length, 6, "cast, draft, persona answers, persona results, people's answers, results");
+});
+
+test("a message that tells Flashpoint to email people is gated, whatever it is labelled", async () => {
+  for (const text of ["Publish it and send it to the panel", "Now email the survey to everyone", "Please distribute", "Sending now: go ahead"]) assert.ok(asksToSend(text), text);
+  for (const text of ["Make a panel from these names and emails", "Write the survey. Do not publish or send yet.", "Draft it, but don't email it", "How many emails bounced?", "Show the results before sending anything"]) assert.ok(!asksToSend(text), text);
+
+  let reached = 0;
+  const flashpoint = async () => { reached += 1; return { text: "ok" }; };
+  const { llm, seen } = scripted([ask("Make a panel from {{RECIPIENTS}}, write a survey, publish it and send it", "design"), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint, commander: desk().commander, wait: async () => {} });
+  assert.equal(reached, 0, "Flashpoint never got the message");
+  assert.equal(out.spent, 0);
+  assert.match(seen[1], /would email people, and the round's envelope is not sealed/);
 });

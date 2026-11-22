@@ -226,7 +226,7 @@ The sealed envelope
 Before each survey is sent, call seal_predictions with what you expect people to answer on its main questions. If you rehearsed on personas, put their answers in as the personas' guess. The commander seals a guess too, and you cannot see it. After the real results are in, call open_envelope, then debrief: who was wrong (yourself first), what surprised everyone, what is still unknown, and your next move. A wrong guess or a surprise is the most useful thing a round can give you. It marks what nobody understood yet, and that is what the next round should ask about. Often the surprise is that the thing you asked about is not what decides the matter; then the next round asks about the thing that does.
 
 The people
-There are ${people} people on the list. They have agreed to be surveyed. You never see their addresses: write {{RECIPIENTS}} in a message to Flashpoint and the list is put in for you. Survey only these people. Emailing them cannot be undone, so read the survey Flashpoint wrote before you ask to send it.
+There are ${people} people on the list. They have agreed to be surveyed. You never see their addresses: write {{RECIPIENTS}} in a message to Flashpoint and the list is put in for you. Survey only these people. Emailing them cannot be undone, so have Flashpoint draft first (tell it "do not publish or send yet"), and read the survey it wrote before you ask to send it.
 
 Budget and receipts
 You have $${cap.toFixed(2)}. Every tool result tells you what is left. Each paid step needs a receipt: the decision of yours that it could change. If you cannot name one, the step is not worth its price, so skip it. Keep enough budget to read the results of anything you send. The budget is there to be used on steps that could change the answer: finishing with an open question you could have afforded to ask is a worse result than spending the money. Stop when no step you can afford could change your answer, and say that is why you stopped; what is left then goes back to the commander.
@@ -268,6 +268,12 @@ export function unbackedNumbers(text, sources) {
 
 const saysYes = (text) => /^\W*(y|yes|yep|yeah|ok|okay|approve|approved|go|go ahead|send|send it|do it)\b/i.test(String(text ?? ""));
 const isConfirm = (text) => /^\W*confirm\W*$/i.test(text);
+// True when a message tells Flashpoint to email people now. "Names and emails" and
+// "do not send yet" do not count.
+export function asksToSend(message) {
+  const text = String(message).replace(/\b(do not|don't|not|never|without|before|until)\s+(yet\s+)?(publish(ing)?\s+(or|and)\s+)?(send|e-?mail|distribut|invit)\w*/gi, "");
+  return /\b(send|sending|distribute|distributing|invite)\b/i.test(text) || /\be-?mail\s+(it|this|them|everyone|the survey|the panel|to|out)\b/i.test(text);
+}
 
 // Runs the mission to the end. Returns { answer, spent, steps }.
 //   llm({ system, tools, messages })   -> { content, stop_reason }
@@ -316,7 +322,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
   // The one order the code enforces itself: no email without a sealed envelope and the commander's yes.
   async function sendGate(input) {
     if (approved) return null;
-    if (!envelope) return "Not sent: seal your predictions for this round first, with seal_predictions. Nothing was charged.";
+    if (!envelope) return "Not sent: this message would email people, and the round's envelope is not sealed yet. Seal your predictions first, with seal_predictions. If you did not mean to email anyone, reword the message and say 'do not send yet'. Nothing was charged.";
     if (!commander) {
       note({ kind: "send-refused", round, reason: "Nobody was at the desk to approve the send." });
       return "Not sent: nobody is at the desk to approve the send, so no email can go out. Nothing was charged. Call finish with what you have.";
@@ -347,7 +353,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
     // A bare "confirm" does whatever Flashpoint last offered. Unless that was plainly
     // publishing and nothing else, treat it as a send, whatever the model called it.
     const onlyPublishes = /publish/i.test(lastReply) && !/\b(send|sent|sending|e-?mail|invit|distribut)/i.test(lastReply);
-    const sending = !newSurvey && (input.action === "send" || (isConfirm(input.message) && !onlyPublishes));
+    const sending = input.action === "send" || asksToSend(input.message) || (isConfirm(input.message) && !onlyPublishes);
     if (sending) {
       const refusal = await sendGate(input);
       if (refusal) return { text: `${refusal}\n\n${left()}`, failed: true };
