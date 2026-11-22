@@ -100,8 +100,9 @@ node agent/agent.mjs "Figure out the best event to put on for our club next spri
 | Option | What it does | Default |
 |---|---|---|
 | `--practice` | Practice run. An AI stand-in plays Flashpoint and invents the answers. | off |
-| `--fake` | Practice run with fixed canned replies. This is what the tests use. | off |
+| `--fake` | Like `--practice`, but Flashpoint's replies are fixed canned text. The agent is still Claude, so it needs the key. | off |
 | `--hands-off` | Nobody approves each send. The code checks every survey before it goes out. You agree to this once, at the start. | off |
+| `--quiet 3` | Practice only: 3 of the invented people do not answer the first survey until they are reminded, so you can watch the agent meet a low response. | 0 |
 | `--cap 9` | The most the run may spend on Flashpoint, in USDC | 9 |
 | `--emails 2` | The most emails anyone on the list may get, reminders included | 2 |
 | `--recipients file` | Who to survey, one `Name, email` per line | `agent/recipients.txt` |
@@ -157,17 +158,19 @@ lessons before it plans, and its log says which ones it was given. Practice runs
 their own notebook, which is not in the repository, so an invented answer can never
 teach a real run anything.
 
-You can see it happen across the three practice runs in [examples/](examples/):
+You can follow the notebook across the three practice runs in [examples/](examples/):
 
-| Run | What it started with | What it did differently |
+| Run | What it started with | What it wrote down at the end |
 |---|---|---|
-| 1. [With a person approving](examples/practice-run-with-a-person/summary.md) | Nothing. | Asked a single-choice question that split. Wrote: "Rank questions gave a clearer signal than single choice." |
-| 2. [Another objective, hands-off](examples/practice-run-members/summary.md) | The 3 lessons from run 1. | Asked why people left in an open question, then used ranking for its follow-up. Wrote: "Ask openly about uncomfortable incidents." |
-| 3. [The example above, hands-off](examples/practice-run/summary.md) | All 6 lessons. | Its plan says: "Acting on notes: use ranking, price framing, open barriers question." All three are in its first survey. |
+| 1. [A commander approves each send](examples/practice-run-with-a-commander/summary.md) (an AI stand-in played the commander) | Nothing. | "Rank questions gave a clearer signal than single choice, which split on 8 people." |
+| 2. [Another objective, hands-off](examples/practice-run-members/summary.md) | The 3 lessons from run 1. | "Ask openly about uncomfortable incidents." |
+| 3. [The example above, hands-off](examples/practice-run/summary.md) | All 6 lessons. Its plan says: "Acting on notes: use ranking, price framing, open barriers question." | "Don't assume social events are favoured." |
 
-Run 1 needed the code to ask it to think again before it stopped after one round. Run 3
-chose its follow-up round with no prompting.
-
+What this shows, and what it does not: the notes are read, and the plan in run 3 names
+the ones it is using. Runs 1 and 2 were asked once by the code to think again before
+they stopped after one round, and run 3 chose its follow-up without that. Three runs
+cannot show that the notes caused it. Run 3 also still guessed wrong, and its follow-up
+used a single-choice question that split, which its own first note warns against.
 
 ## The agent's tools
 
@@ -189,16 +192,17 @@ tool, and writes down why.
 
 The agent's instructions say what Flashpoint can do, what a step costs, and a few
 limits: keep a survey short, keep a follow-up to about three questions, and spend a
-second round only on what the first one got wrong. They do not say what to ask, how to
-word it, whether to rehearse, whether to run a second round, or when to stop. Those are
-the agent's decisions.
+second round only on what the first one got wrong. They also say that one round rarely
+settles it, and that the first survey should open by saying a short follow-up may come.
+They do not say what to ask, what to guess, whether to rehearse, what the follow-up is
+about, or when to stop. Those are the agent's decisions.
 
 **One nudge, and it is counted.** If the agent chooses to stop after a single round
 while it still names something unknown and has the budget for a short second round, the
 code asks it once to think again. It asks at most once in a run, the agent may still
-stop, and the log, the summary and the page all show that it happened. In the first
-example run it did happen: the agent chose to stop, was asked once, and then chose a
-three-question follow-up.
+stop, and the log, the summary and the page all show that it happened. It did not happen in the
+example run above. It did happen in the other two practice runs: the agent chose to
+stop, was asked once, and then chose a short follow-up.
 
 **Slips.** Every paid step carries a slip: the price, and the decision of the agent's
 that the step could change. If it cannot name one, it is told to skip the step.
@@ -240,7 +244,7 @@ These are rules in the code. They hold whatever the model says.
   addresses.
 
 [^hash]: The envelope's SHA-256 fingerprint is written to the log when it is sealed and
-    checked when it is opened, so a guess changed afterwards would show.
+    checked when it is opened. It is a record inside one run, not proof to an outsider.
 
 ## The objective given, and what the agent decided
 
@@ -293,7 +297,8 @@ debrief. The same run is on the page at <https://institutor.github.io/priced-out
 
 Two more practice runs are kept beside it, and the page can show each of them:
 
-- [The same objective with a commander approving each send](examples/practice-run-with-a-person/summary.md).
+- [The same objective with a commander approving each send](examples/practice-run-with-a-commander/summary.md).
+  An AI stand-in played the commander.
   Here the standing orders did their work: the agent reported before its second round,
   and went to the commander when the answers split evenly.
 - [Another objective](examples/practice-run-members/summary.md): "Members come to one

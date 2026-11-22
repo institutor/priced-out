@@ -74,7 +74,9 @@ export function partsOf(steps) {
 // often the code stopped it. The same count as the run's one-page summary.
 export function autonomy(steps) {
   const ALONE = ["plan", "flashpoint", "rehearsal", "deck", "sealed", "opened", "debrief", "wait", "finish"];
-  const approvals = steps.filter((step) => step.kind === "send-approved" || step.kind === "send-refused").length;
+  // A send the commander answered, yes or no. A send refused because nobody
+  // was there to ask is not a time a person was needed.
+  const approvals = steps.filter((step) => step.kind === "send-approved" || (step.kind === "send-refused" && !/^Nobody was at the desk/.test(step.reason ?? ""))).length;
   const told = steps.filter((step) => step.kind === "commander" && step.reply !== null);
   // A report one of the standing orders asked for is not a question the
   // agent chose to ask, so the two are counted apart.
@@ -107,7 +109,7 @@ export function runFor(list, wanted) {
 export function aboutRun(entry) {
   const parts = [entry.mode === "real" ? "a real run" : "a practice run"];
   if (entry.handsOff) parts.push("hands-off: nobody approved the sends");
-  else parts.push("the commander approved each send");
+  else parts.push(entry.standInCommander ? "an AI stand-in for the commander approved each send" : "the commander approved each send");
   if (entry.remembered > 0) parts.push(`started with ${entry.remembered} ${entry.remembered === 1 ? "lesson" : "lessons"} from earlier runs`);
   parts.push(`${entry.rounds} ${entry.rounds === 1 ? "round" : "rounds"}`);
   parts.push(`${money(entry.spent)} spent`);
@@ -148,8 +150,10 @@ export function glance(steps) {
       verdict: marked?.agent ?? null,
       move: debrief ? (debrief.nextMove === "another_round" ? "another round" : "to stop") : null,
       why: debrief?.reason ?? null,
+      now: debrief?.answerSoFar ?? null,
       part: parts.findIndex((part) => part.part === "write" && part.round === opened.round) + 1,
     });
   }
-  return { rounds, answer: finish?.recommendation ?? null };
+  const plan = steps.find((step) => step.kind === "plan");
+  return { hunch: plan?.hunches?.[0] ?? null, rounds, answer: finish?.recommendation ?? null };
 }

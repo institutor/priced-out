@@ -60,8 +60,12 @@ export function mount(bar, { before = () => {}, note = () => "" } = {}) {
     where.textContent = `${at + 1} of ${slides.length}`;
     title.textContent = slide.dataset.slide;
     aside.textContent = note(slide);
+    // A button that is switched off cannot keep the keyboard's place.
+    const held = document.activeElement;
     back.disabled = at === 0;
     next.disabled = at === slides.length - 1;
+    if (held === back && back.disabled) next.focus();
+    if (held === next && next.disabled) back.focus();
     window.scrollTo(0, 0);
     // A screen that was hidden had no size, so its drawings are made now,
     // and drawn in as if by hand.

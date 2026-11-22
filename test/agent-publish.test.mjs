@@ -52,7 +52,7 @@ test("several runs can be published, and the page's first run stays first", asyn
 
   const run = { objective: "o", mode: "practice", handsOff: true, people: 8, memory: ["a", "b"], stamp: "s", steps: [{ kind: "flashpoint", round: 1, spent: 0.5 }, { kind: "flashpoint", round: 2, spent: 3 }, { kind: "finish", spent: 3 }] };
   const entry = listed(run, "two");
-  assert.deepEqual(entry, { name: "two", file: "agent-run-two.json", objective: "o", mode: "practice", handsOff: true, people: 8, rounds: 2, remembered: 2, spent: 3, stamp: "s" });
+  assert.deepEqual(entry, { name: "two", file: "agent-run-two.json", objective: "o", mode: "practice", handsOff: true, standInCommander: false, people: 8, rounds: 2, remembered: 2, spent: 3, stamp: "s" });
 
   const main = listed({ ...run, handsOff: false }, undefined);
   let list = withRun([], entry);

@@ -49,6 +49,7 @@ export function listed(run, name) {
     objective: run.objective,
     mode: run.mode,
     handsOff: run.handsOff === true,
+    standInCommander: run.standInCommander === true,
     people: run.people,
     rounds: new Set(run.steps.filter((step) => step.round !== undefined).map((step) => step.round)).size,
     remembered: (run.memory ?? []).length,

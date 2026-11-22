@@ -29,7 +29,7 @@ export function score(scoreboard) {
 // How much of the mission the agent did without a person.
 export function autonomy(steps) {
   const ALONE = ["plan", "flashpoint", "rehearsal", "deck", "sealed", "opened", "debrief", "wait", "finish"];
-  const approvals = steps.filter((s) => s.kind === "send-approved" || s.kind === "send-refused").length;
+  const approvals = steps.filter((s) => s.kind === "send-approved" || (s.kind === "send-refused" && !/^Nobody was at the desk/.test(s.reason ?? ""))).length;
   const told = steps.filter((s) => s.kind === "commander" && s.reply !== null);
   // A report one of the standing orders asked for is not a question the
   // agent chose to ask, so the two are counted apart.
@@ -120,7 +120,7 @@ export function summarize(run) {
   }
 
   lines.push("## When it came to the commander", "");
-  if (talks.length === 0) lines.push("It did not, apart from send approvals.", "");
+  if (talks.length === 0) lines.push(run.handsOff ? "It did not." : "It did not, apart from send approvals.", "");
   for (const talk of talks) {
     lines.push(`- Step ${talk.n}${talk.order ? `, under the order "${cell(talk.order)}"` : ""}: ${cell(talk.message).slice(0, 300)}${cell(talk.message).length > 300 ? "…" : ""}`);
     lines.push(`  The commander said: ${talk.reply === null ? "(nobody was at the desk)" : talk.reply === "" ? "(no reply)" : cell(talk.reply)}`);

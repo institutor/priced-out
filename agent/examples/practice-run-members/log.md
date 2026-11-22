@@ -18,7 +18,7 @@ The commander handed this objective over and was away. No person approved a send
 - Offering cost-sharing in the options changed the preference order, so test price framing explicitly.
 - My guesses and the commander's both missed; ask about barriers openly instead of assuming them.
 
-The agent chose every step below. The commander speaks only where the log says so. The loop itself steps in at two points, both marked: no email goes out without the commander's yes, and if the agent stops after one round with a question still open, it is asked once to think again.
+The agent chose every step below. The commander speaks only where the log says so. The loop itself steps in at two points, both marked: no email goes out without passing the code's send checks, and if the agent stops after one round with a question still open, it is asked once to think again.
 
 ---
 ### Step 1: the agent's plan

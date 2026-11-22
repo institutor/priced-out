@@ -49,7 +49,7 @@ The agent took **20 steps on its own**. It did not stop for a person once.
 
 ## When it came to the commander
 
-It did not, apart from send approvals.
+It did not.
 
 The commander handed the objective over and was away, so nobody answered the agent and no person approved a send.
 

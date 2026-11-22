@@ -378,7 +378,7 @@ code {
 }
 
 .m-envelope .m-env-slip {
-  fill: #fcfcfe;
+  fill: var(--paper);
   stroke: none;
 }
 
@@ -446,11 +446,11 @@ code {
 
 @media (prefers-color-scheme: dark) {
   .m-stamp {
-    color: #ff8fa3;
+    color: var(--mark-2);
   }
 
   .m-stamp-line {
-    stroke: #ff8fa3;
+    stroke: var(--mark-2);
   }
 }
 
@@ -524,7 +524,7 @@ code {
 
 @media (prefers-color-scheme: dark) {
   .m-verdict.wrong path {
-    stroke: #ff8fa3;
+    stroke: var(--mark-2);
   }
 }
 
@@ -718,6 +718,16 @@ code {
   display: inline-block;
   margin-left: 0.4em;
   font-weight: 900;
+}
+
+.m-look-now {
+  margin: 0.2rem 0 0.8rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.m-trail .m-look.hunch {
+  flex: 0.7 1 0;
 }
 
 .m-look-answer {
@@ -960,6 +970,16 @@ html.present .m-beat .sub {
   .m-controls,
   .m-bar {
     display: none;
+  }
+
+  /* The calculator's print rules keep only its receipt. This page prints whole. */
+  .cover.m-cover,
+  main#app > section {
+    display: block;
+  }
+
+  .m-beat[hidden] {
+    display: block;
   }
 }
 

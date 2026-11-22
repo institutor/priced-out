@@ -21,7 +21,7 @@ The commander handed this objective over and was away. No person approved a send
 - Two top options tied again when re-ranked. A different design, such as a forced trade-off, may be needed to split them.
 - Ask openly about uncomfortable incidents. One surprise (pressure to buy) only came up because of the open question.
 
-The agent chose every step below. The commander speaks only where the log says so. The loop itself steps in at two points, both marked: no email goes out without the commander's yes, and if the agent stops after one round with a question still open, it is asked once to think again.
+The agent chose every step below. The commander speaks only where the log says so. The loop itself steps in at two points, both marked: no email goes out without passing the code's send checks, and if the agent stops after one round with a question still open, it is asked once to think again.
 
 ---
 ### Step 1: the agent's plan

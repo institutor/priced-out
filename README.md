@@ -104,7 +104,7 @@ node agent/agent.mjs "Figure out the best event to put on for our club next spri
 
 `--practice` is a practice run: an AI stand-in plays Flashpoint and invents the answers,
 so there are no emails and no Flashpoint credit. It needs only `ANTHROPIC_API_KEY` in
-`.env`. A real run drops the flag. `node agent/check.mjs` checks, for free, that a real
+`.env`. With no list of people it uses 8 stand-ins. A real run drops the flag. `node agent/check.mjs` checks, for free, that a real
 run is ready. The rest is in [agent/README.md](agent/README.md).
 
 ### The objective given, and what the agent decided

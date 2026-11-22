@@ -112,16 +112,18 @@ function describe(step) {
     case "debrief":
       return { who: `The agent, round ${step.round}`, what: `It said what the envelope taught it, and chose to ${step.nextMove === "another_round" ? "run another round" : "finish"}.`, extra: [] };
     case "send-approved":
-      return { who: "The commander", what: `Approved sending the round ${step.round} survey.`, extra: [quote(step.reply, "commander")] };
+      return { who: theCommander, what: `Approved sending the round ${step.round} survey.`, extra: [quote(step.reply, "commander")] };
     case "send-preapproved":
       return { who: "The code", what: `Checked the round ${step.round} survey and let it go. Nobody was at the keyboard.`, extra: [points(step.checks ?? [], 520)] };
     case "send-held":
       return { who: "The code", what: `Held the round ${step.round} survey. Nothing was sent or charged.`, extra: [points(step.problems ?? [], 540)] };
     case "send-refused":
-      return { who: "The commander", what: `Refused sending the round ${step.round} survey. Nothing was sent or charged.`, extra: [quote(step.reason, "commander")] };
+      return /^Nobody was at the desk/.test(step.reason ?? "")
+        ? { who: "The code", what: `Nobody was at the keyboard to approve the round ${step.round} survey, so it was not sent. Nothing was charged.`, extra: [] }
+        : { who: theCommander, what: `Refused sending the round ${step.round} survey. Nothing was sent or charged.`, extra: [quote(step.reason, "commander")] };
     case "commander":
       return {
-        who: "The agent went to the commander", what: step.order ? `Standing order: “${step.order}”` : "It had a question.",
+        who: `The agent went to ${theCommander.replace(/^The/, "the")}`, what: step.order ? `Standing order: “${step.order}”` : "It had a question.",
         extra: [quote(step.message), quote(step.reply === null ? "(nobody was at the keyboard)" : step.reply === "" ? "(no reply)" : step.reply, "commander")],
       };
     case "wait":
@@ -148,6 +150,8 @@ function rawSteps(steps) {
 // The parts of the story ------------------------------------------------------
 
 const commanderName = (run) => (run.standInCommander ? "The commander (an AI stand-in)" : "The commander");
+// Who the commander was in the run being shown, for the raw steps.
+let theCommander = "The commander";
 
 const TELL = {
   plan(part) {
@@ -183,7 +187,7 @@ const TELL = {
         draft?.why ? el("p", { class: "m-why", text: `Its reason: ${draft.why}.`.replace(/\.\.$/, ".") }) : null,
         draft ? fold("Read the survey Flashpoint drafted", draft.reply) : null,
       ],
-      side: [vignette("write", first ? ["I'll ask them this."] : ["A short follow-up,", "on what surprised us."], 30 + part.round), paidSlip(part, run, `write ${part.round}`)],
+      side: [vignette("write", first ? ["I'll ask them this."] : ["A short follow-up,", "on what is still open."], 30 + part.round), paidSlip(part, run, `write ${part.round}`)],
     };
   },
 
@@ -220,7 +224,10 @@ const TELL = {
     else if (refused) body.push(el("p", {}, stamp("Refused", `refused ${part.round}`), " The commander read the survey and refused the send. Nothing was sent or charged."), quote(refused.reason, "commander"));
     if (!emailed && !refused && held.length > 0) body.push(el("p", { text: "It did not pass, so nothing was sent." }));
     if (emailed) {
-      body.push(el("p", { text: `Flashpoint emailed the survey to all ${run.people} people on the list.${run.emailLimit ? ` That was email ${before + 1} of the ${run.emailLimit} each of them may get.` : ""}` }));
+      const count = run.emailLimit ? ` That ${run.mode === "real" ? "was" : "counts as"} email ${before + 1} of the ${run.emailLimit} each of them may get.` : "";
+      body.push(el("p", { text: run.mode === "real"
+        ? `Flashpoint emailed the survey to all ${run.people} people on the list.${count}`
+        : `In a real run Flashpoint would now email the survey to all ${run.people} people on the list. In this practice run nothing was sent: the stand-in invented their answers.${count}` }));
     }
     if (wait) body.push(el("p", { text: `Then the agent chose to wait up to ${wait.minutes} minutes for answers.${run.mode === "real" ? "" : " A practice run does not really wait: the invented answers come straight back."}` }));
     return { doodle: "plane", title: emailed ? "The survey goes out" : "The send is stopped", body, side: [emailed ? vignette("send", run.emailLimit ? [`Email ${before + 1} of ${run.emailLimit}.`, "Off it goes."] : ["Off it goes."], 40 + part.round) : null, paidSlip(part, run, `send ${part.round}`)] };
@@ -248,7 +255,6 @@ const TELL = {
   decide(part, run) {
     const debrief = lastOf(part.steps, "debrief");
     const challenge = part.steps.find((step) => step.kind === "challenge");
-    const told = part.steps.filter((step) => step.kind === "commander");
     const again = debrief?.nextMove === "another_round";
     const body = [];
     if (challenge) body.push(el("p", { text: "The agent first chose to stop here. The code asked it, once, to think again about what was still unknown. The choice stayed the agent's." }));
@@ -257,15 +263,12 @@ const TELL = {
         ["Who was wrong", debrief.whoWasWrong],
         ["Biggest surprise", debrief.surprise],
         ["Still unknown", debrief.stillUnknown],
+        ["Its answer at this point", debrief.answerSoFar],
       ]));
       body.push(el("p", { class: "m-move" }, "Its next move: ", circled(el("strong", { text: again ? "another round" : "finish" }), `move ${part.round}`)));
       body.push(el("p", { class: "m-why", text: debrief.reason }));
     }
-    for (const step of told) {
-      body.push(el("p", { class: "m-foot", text: step.order ? `A standing order applied here: “${step.order}” So the agent told the commander what it had learned.` : "The agent went to the commander with a question." }));
-      if (step.reply) body.push(quote(step.reply, "commander"));
-    }
-    return { doodle: "glass", title: again ? "It learns, and chooses another round" : "It learns, and chooses to stop", body, side: [debrief ? vignette("decide", again ? ["One more round,", "on what we got wrong."] : ["That is enough", "to answer."], 50 + part.round) : null, paidSlip(part, run, `decide ${part.round}`)] };
+    return { doodle: "glass", title: again ? "It learns, and chooses another round" : "It learns, and chooses to stop", body, side: [debrief ? vignette("decide", again ? ["One more round,", "on what is still open."] : ["That is enough", "to answer."], 50 + part.round) : null, paidSlip(part, run, `decide ${part.round}`)] };
   },
 
   answer(part, run) {
@@ -286,6 +289,11 @@ const TELL = {
 
 function partCard(part, run, story, index) {
   const tell = TELL[part.part](part, run, story);
+  // Wherever the agent went to the commander, it is told in that part.
+  for (const step of part.steps.filter((other) => other.kind === "commander")) {
+    tell.body.push(el("p", { class: "m-foot", text: step.order ? `A standing order applied here: “${step.order}” So the agent went to the commander.` : "The agent went to the commander with a question." }));
+    tell.body.push(step.reply ? quote(step.reply, "commander") : el("p", { class: "m-foot", text: "Nobody was at the keyboard to answer." }));
+  }
   // A plan changed part way through is told where it was changed.
   const changed = part.part === "plan" ? null : lastOf(part.steps, "plan");
   if (changed) tell.body.push(el("p", { class: "m-foot", text: `Here the agent changed its plan.${changed.wouldChange ? ` What would change its answer now: ${changed.wouldChange}` : ""}` }));
@@ -381,18 +389,26 @@ function drawGlance(body, run) {
       ["People said", short(round.said, 100)],
     ]),
     round.move ? el("p", { class: "m-look-move" }, "So it chose ", circled(el("strong", { text: round.move }), `look ${round.round}`)) : null,
-    round.why ? el("p", { class: "m-foot", text: short(round.why, 120) }) : null,
+    round.now ? el("p", { class: "m-look-now" }, el("strong", { text: "Its answer now: " }), short(round.now, 140)) : round.why ? el("p", { class: "m-foot", text: short(round.why, 120) }) : null,
     round.part > 0 ? el("p", {}, el("a", { class: "m-jump", href: `#part-${round.part}`, text: `See round ${round.round}` })) : null,
   ), `look ${round.round}`));
+  if (look.hunch) {
+    cards.unshift(card(el("div", { class: "m-look hunch" },
+      el("p", { class: "m-when", text: "Before it asked anyone" }),
+      el("p", { class: "m-look-q", text: "Its hunch" }),
+      el("p", { text: short(look.hunch, 150) }),
+      el("p", {}, el("a", { class: "m-jump", href: "#part-1", text: "See its plan" })),
+    ), "look hunch"));
+  }
   if (look.answer) {
     cards.push(card(el("div", { class: "m-look answer" },
       el("p", { class: "m-when", text: "The answer" }),
-      el("p", { class: "m-look-answer", text: short(look.answer.split(/(?<=[.!?])\s+/).slice(0, 2).join(" "), 260) }),
+      el("p", { class: "m-look-answer", text: short((look.answer.match(/[^.!?]+[.!?]+(\s|$)/g) ?? [look.answer]).slice(0, 2).join("").trim(), 260) }),
       el("p", {}, el("a", { class: "m-jump", href: "#answer", text: "Read the whole answer" })),
     ), "look answer"));
   }
   put(body,
-    el("p", { text: "What it guessed wrong is what it asks about next. Here is the whole run on one screen: the first guess of each round, what people said, and what the agent chose to do about it." }),
+    el("p", { text: `${look.rounds.some((round) => round.move === "another round" && round.verdict && round.verdict !== "right") ? "What it guessed wrong is what it asks about next. " : ""}Here is the whole run on one screen: the first guess of each round, what people said, and what the agent chose to do about it.` }),
     el("div", { class: "m-trail" }, cards.flatMap((item, index) => (index === 0 ? [item] : [arrowTo(`trail ${index}`), item]))),
   );
 }
@@ -406,6 +422,7 @@ function drawAnswer(body, run) {
   const spent = finish.spent ?? 0;
   const bar = meter("answer spend");
   const anyPersonas = finish.scoreboard.some((row) => row.personas && row.personas !== "no guess");
+  const anyCommander = finish.scoreboard.some((row) => row.commander && row.commander !== "no guess");
   put(body, 
     run.mode !== "real" ? el("p", { class: "m-warn" }, marked(el("strong", { text: "A practice answer." }), "practice answer"), " It comes from invented answers, so it is not a finding. It shows how the agent reasons.") : null,
     el("p", { class: "m-recommendation", text: finish.recommendation }),
@@ -413,8 +430,8 @@ function drawAnswer(body, run) {
     finish.unbacked?.length > 0 ? el("p", { class: "m-warn", text: `Check these numbers. They are in the answer but in nothing Flashpoint or the commander said: ${finish.unbacked.join(", ")}.` }) : null,
     finish.scoreboard.length > 0 ? [
       el("h3", { class: "sub", text: "Who guessed better" }),
-      table(["Round", "Question", "What people said", "The agent", anyPersonas ? "AI personas" : null, commanderName(run)].filter(Boolean),
-        finish.scoreboard.map((row, index) => [String(row.round), row.question, el("td", { class: "m-people", text: row.people_said }), verdict(row.agent, 700 + index), anyPersonas ? verdict(row.personas, 720 + index) : null, verdict(row.commander, 740 + index)].filter((cell) => cell !== null))),
+      table(["Round", "Question", "What people said", "The agent", anyPersonas ? "AI personas" : null, anyCommander ? commanderName(run) : null].filter(Boolean),
+        finish.scoreboard.map((row, index) => [String(row.round), row.question, el("td", { class: "m-people", text: row.people_said }), verdict(row.agent, 700 + index), anyPersonas ? verdict(row.personas, 720 + index) : null, anyCommander ? verdict(row.commander, 740 + index) : null].filter((cell) => cell !== null))),
       el("p", { class: "m-foot", text: `The agent marked these itself, its own guesses included. With ${run.people} people asked, the scoreboard shows how the method works. It does not show who is the better guesser.` }),
     ] : null,
     finish.lessons?.length > 0 ? [
@@ -455,6 +472,7 @@ function drawRules(body, run) {
     "Who was wrong, and what that means",
     "Whether to run another round, and on what",
     "When to stop, and the final recommendation",
+    "What to write down for its next run",
   ];
   const code = [
     "No email goes out until the commander has typed yes, or, hands-off, until the survey passes fixed checks",
@@ -533,6 +551,8 @@ function drawWatch(body, run) {
     playButton.hidden = !replaying;
     allButton.hidden = !replaying;
     playButton.querySelector("span").textContent = timer ? "Pause" : "Play";
+    // While it plays by itself, a screen reader is not told of every part.
+    controls.querySelector(".m-progress").setAttribute("aria-live", timer ? "off" : "polite");
     // A button that has just gone cannot keep the keyboard's place.
     if (!replaying && [nextButton, playButton, allButton].includes(document.activeElement)) again.focus();
   }
@@ -587,6 +607,10 @@ async function start() {
   } catch {
     document.getElementById("status").textContent = "No run has been published to this page yet. Run one, then: node agent/publish-run.mjs agent/runs/<folder>";
     for (const id of ["given", "glance", "watch", "answer"]) document.getElementById(id).hidden = true;
+    // With no run there is nothing to watch or present.
+    document.getElementById("present-open").closest("p").hidden = true;
+    document.querySelector(".cover-go a").setAttribute("href", "#how");
+    document.querySelector(".cover-go a span").textContent = "How one round goes";
     drawHow(section("how"), {});
     drawRules(section("rules"), {});
     dress();
@@ -605,6 +629,7 @@ async function start() {
     for (const link of document.querySelectorAll('a[href*="/examples/practice-run/"]')) link.href = link.href.replace("/practice-run/", `/practice-run-${showing.name}/`);
   }
 
+  theCommander = commanderName(run);
   drawObjective(section("objective"), run, Array.isArray(list) ? list : [], showing);
   drawGiven(section("given"), run);
   drawGlance(section("glance"), run);
@@ -628,7 +653,8 @@ async function start() {
   document.addEventListener("click", (event) => {
     const link = event.target.closest?.('a[href^="#"]');
     if (!link || stage.on() || !watch.replaying()) return;
-    if (["answer", "how", "rules", "run"].includes(link.getAttribute("href").slice(1))) watch.showAll();
+    const to = link.getAttribute("href").slice(1);
+    if (["answer", "how", "rules", "run"].includes(to) || to.startsWith("part-")) watch.showAll();
   });
   if (new URLSearchParams(window.location.search).has("present")) stage.open(present.screenIn(window.location.hash, stage.count()));
 

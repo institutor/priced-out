@@ -1,7 +1,7 @@
 // A free check before a real run: are the keys, the list, the model and Flashpoint
 // all ready? It sends no email and spends no Flashpoint credit.
 //
-//   node agent/check.mjs [--cap 8] [--recipients file] [--orders file]
+//   node agent/check.mjs [--cap 9] [--recipients file] [--orders file]
 //
 // It never prints a key or an address.
 

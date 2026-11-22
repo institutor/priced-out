@@ -121,7 +121,8 @@ test("the run in one look: one card a round, with the guess, the answer and the 
     assert.equal(partsOf(run.steps)[round.part - 1].round, round.round);
   }
   assert.ok(look.answer.length > 20);
-  assert.deepEqual(glance([{ kind: "plan" }]), { rounds: [], answer: null });
+  assert.deepEqual(glance([{ kind: "plan" }]), { hunch: null, rounds: [], answer: null });
+  assert.equal(glance([{ kind: "plan", hunches: ["a social"] }]).hunch, "a social");
   assert.equal(short("one two three", 50), "one two three");
   assert.equal(short("The social dinner came last, and the workshop came first", 30), "The social dinner came last…");
 });
