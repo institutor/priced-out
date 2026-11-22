@@ -31,7 +31,7 @@ guessed wrong is what the next round asks about.
 | What it expects people to answer | Nobody gets more than two emails in a run, reminders included |
 | Who was wrong, and what that means | Your guess stays hidden from the agent until the envelope is opened |
 | Whether to run another round, and on what | A guess cannot be sealed or changed after the survey is sent |
-| When to stop, and the final recommendation | Addresses never reach the model or the logs, and names on the list are taken out |
+| When to stop (inside the email limit), and the final recommendation | Addresses never reach the model or the logs, and names on the list are taken out |
 | What to remember for its next run | Every paid step is logged with its price and the decision it could change |
 
 **People's time.** A follow-up round is one more email to people who are doing you a

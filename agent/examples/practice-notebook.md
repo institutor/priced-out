@@ -42,3 +42,11 @@ Objective: Our club's newsletter gets opened by almost nobody. Find out what mem
 - Open questions surfaced the real driver (trust and transparency) that my closed options missed; keep one open barrier question in every first round.
 - I guessed practical content (dates) would win, but decisions and news won. Don't assume practical content beats governance content.
 - A forced single choice with a few distinct formats split a frequency tie in round 2. Use that design instead of re-ranking.
+
+## 2026-11-22T10-07-43
+
+Objective: Figure out the best event to put on for our club next spring.
+
+- Ranking plus an open question worked: the open answers showed the real drivers (cost, inclusion, résumé value) that the closed options missed.
+- My guesses lean toward social formats, but this group wanted practical or governance content. Don't assume a social event wins.
+- Open questions on topic scatter with 8 people. Offer a short closed list of topics if I need a single winner.

@@ -1,0 +1,397 @@
+{
+ "objective": "Figure out the best event to put on for our club next spring.",
+ "mode": "practice",
+ "model": "claude-sonnet-5-5",
+ "cap": 12,
+ "emailLimit": 3,
+ "orders": [
+  "I am away. Do not wait for me: every decision is yours.",
+  "You may email the survey without asking me, as long as it passes the send checks."
+ ],
+ "people": 8,
+ "stamp": "2026-11-22T10-07-43",
+ "practiceCommander": false,
+ "standInCommander": false,
+ "handsOff": true,
+ "memory": [
+  "Adding a hybrid option after a tie did not decide it; with 8 people, use a forced trade-off or ranking in the first round.",
+  "Open answers revealed barriers (shift work, cliquey socials) that closed questions missed; keep an open barrier question.",
+  "Ranking worked better than single choice for the main question, but single-choice format questions tied again with 8 people; use ranking everywhere.",
+  "My cost guess was wrong; people on tight budgets want free options, so test price explicitly.",
+  "Open barrier questions again brought up things closed questions missed (feeling unconsulted, transport, recordings).",
+  "Open questions surfaced the real driver (trust and transparency) that my closed options missed; keep one open barrier question in every first round.",
+  "I guessed practical content (dates) would win, but decisions and news won. Don't assume practical content beats governance content.",
+  "A forced single choice with a few distinct formats split a frequency tie in round 2. Use that design instead of re-ranking."
+ ],
+ "steps": [
+  {
+   "n": 1,
+   "at": "2026-11-22T10:07:48.937Z",
+   "kind": "plan",
+   "first": true,
+   "needToKnow": [
+    "Which event format members would most want next spring (ranked)",
+    "Barriers to attending (time, cost, transport, cliques)",
+    "Price tolerance / whether free is needed"
+   ],
+   "hunches": [
+    "A casual social or outing wins, but governance/decision-type content may surprise me",
+    "Cost matters; free options preferred"
+   ],
+   "wouldChange": "If ranking favors a non-social format like a workshop or members' meeting, or barriers like shift work rule out weekday events.",
+   "surveyIdea": "8 members, ~5 questions: rank 4-5 event formats, forced single choice on weekday evening vs weekend, price ceiling, open barrier question. Opening line mentions one short follow-up may come. Acting on notes: use ranking, test price, keep open barrier question.",
+   "budget": "~$2.50 round 1, round 2 follow-up (<=3 questions) ~$2.50; skip persona rehearsal to save money; max 2 emails per person."
+  },
+  {
+   "n": 2,
+   "at": "2026-11-22T10:08:03.914Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "design",
+   "why": "Draft the first-round survey so I can review it before sending.",
+   "couldChange": "Determines the survey wording that will be sent, and so the event recommendation.",
+   "message": "Create a panel from [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>\n[person 4] <[recipient 4]>\n[person 5] <[recipient 5]>\n[person 6] <[recipient 6]>\n[person 7] <[recipient 7]>\n[person 8] <[recipient 8]> (8 club members). Draft a short survey, do not publish or send yet. Opening line: \"Help us choose our spring event. This is a short survey; one short follow-up may come later.\" Questions:\n1. Rank these spring events from most to least preferred: (a) outdoor social/picnic, (b) skills workshop, (c) day trip/outing, (d) open members' meeting where we decide club plans, (e) competition/tournament or game day.\n2. Which timing would you most likely attend? Single choice: weekday evening / Saturday daytime / Sunday daytime / weekend evening.\n3. What is the most you would pay to attend? Single choice: Free only / up to $10 / up to $25 / more than $25.\n4. Open: What would make it hard for you to attend a spring event, or what would make you really want to come?\nShow the full wording of every question and option.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 1.\n\nPanel: 8 club members.\n\n| Label | Type | Text | Answer options |\n|---|---|---|---|\n| Intro | Statement | Help us choose our spring event. This is a short survey; one short follow-up may come later. | None |\n| Q1 | Ranking | Rank these spring events from most to least preferred: | (a) Outdoor social/picnic; (b) Skills workshop; (c) Day trip/outing; (d) Open members' meeting where we decide club plans; (e) Competition/tournament or game day |\n| Q2 | Single choice | Which timing would you most likely attend? | Weekday evening; Saturday daytime; Sunday daytime; Weekend evening |\n| Q3 | Single choice | What is the most you would pay to attend? | Free only; Up to $10; Up to $25; More than $25 |\n| Q4 | Open text | What would make it hard for you to attend a spring event, or what would make you really want to come? | Free text |\n\nValidation: 0 blockers.\nIt is not published. Reply confirm to publish it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 0.5,
+   "emailed": false
+  },
+  {
+   "n": 3,
+   "at": "2026-11-22T10:08:07.237Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "publish",
+   "why": "Publish so it can be sent.",
+   "couldChange": "Enables sending the survey that decides the event recommendation.",
+   "message": "I approve publishing with no quotas and no fraud screening (small invited list). Publish. confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nPublishing survey 1 makes it live. Reply confirm to publish it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 1,
+   "emailed": false
+  },
+  {
+   "n": 4,
+   "at": "2026-11-22T10:08:07.239Z",
+   "kind": "sealed",
+   "round": 1,
+   "why": "Main format and price drive the recommendation.",
+   "hash": "0ab6d5714e0a0906130227106649612b78b3d7386ce77e0696fdb279998d5242",
+   "questions": [
+    "Which spring event format ranks first?",
+    "Most you would pay?"
+   ],
+   "commanderGuessed": 0
+  },
+  {
+   "n": 5,
+   "at": "2026-11-22T10:08:08.917Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "publish",
+   "why": "Second confirm to publish.",
+   "couldChange": "Enables sending the survey.",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 1 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 1.5,
+   "emailed": false
+  },
+  {
+   "n": 6,
+   "at": "2026-11-22T10:08:11.241Z",
+   "kind": "send-preapproved",
+   "round": 1,
+   "email": 1,
+   "emailLimit": 3,
+   "checks": [
+    "Flashpoint showed the whole survey, and nothing changed after that",
+    "It is short: about 10 questions at most, and about 5 for a follow-up",
+    "It does not ask for a name, a contact detail, income, financial aid or anything else personal",
+    "The round's envelope is sealed",
+    "Nobody has had more emails than the limit, and the budget covers it"
+   ]
+  },
+  {
+   "n": 7,
+   "at": "2026-11-22T10:08:20.958Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "send",
+   "why": "Email the reviewed survey to the 8 members.",
+   "couldChange": "Gets real answers that decide the event recommendation.",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 1 was emailed to every panel member who can receive it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 2,
+   "emailed": true
+  },
+  {
+   "n": 8,
+   "at": "2026-11-22T10:08:22.554Z",
+   "kind": "wait",
+   "why": "Allow time for answers so one check suffices.",
+   "minutes": 30
+  },
+  {
+   "n": 9,
+   "at": "2026-11-22T10:08:31.552Z",
+   "kind": "flashpoint",
+   "round": 1,
+   "action": "results",
+   "why": "Read the real answers.",
+   "couldChange": "Determines the recommended event and whether a follow-up is needed.",
+   "message": "Show results for survey 1: response count, Q1 ranking (average rank and first-place counts per option), Q2 and Q3 counts, and all Q4 open answers word for word.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 1 results** (8 respondents, all answered every question)\n\n**Q1: Ranking** (1 = most preferred, 5 = least preferred; lower average = more preferred)\n\n| Option | Average rank | First-place count |\n|---|---|---|\n| (a) Outdoor social/picnic | 3.13 | 2 |\n| (b) Skills workshop | 1.63 | 4 |\n| (c) Day trip/outing | 3.50 | 0 |\n| (d) Open members' meeting where we decide club plans | 3.63 | 2 |\n| (e) Competition/tournament or game day | 3.13 | 0 |\n\n**Q2: Timing most likely to attend** (single choice, n = 8)\n\n| Option | Count |\n|---|---|\n| Weekday evening | 3 |\n| Saturday daytime | 3 |\n| Sunday daytime | 1 |\n| Weekend evening | 1 |\n\n**Q3: Most willing to pay** (single choice, n = 8)\n\n| Option | Count |\n|---|---|\n| Free only | 2 |\n| Up to $10 | 5 |\n| Up to $25 | 1 |\n| More than $25 | 0 |\n\n**Q4: Open responses (verbatim)**\n\n**Respondent 1:** Money is the main thing. If it costs more than bus fare I can't come, but I'd really want to help plan something, so I'd rather be asked to organize it than just show up.\n\n**Respondent 2:** The same few people end up deciding everything, so I'd come to something that asks everyone to weigh in, even if it's less fun. Make it easy for newer members to join the planning.\n\n**Respondent 3:** My work schedule is the biggest problem, and I can't always spend money on things. Free events on a weeknight would be the easiest for me to make.\n\n**Respondent 4:** Game days feel closed off if you're new. If there's a beginners' bracket, I'd come and bring people who haven't played before.\n\n**Respondent 5:** The club has gotten too casual. A paid, serious skills workshop would bring back members who want to get better at something, even if a few people drop off.\n\n**Respondent 6:** I'd come if it's a real skill I can list on my résumé. Social stuff doesn't interest me, and I'm not spending money on anything without a clear payoff.\n\n**Respondent 7:** Weekends are when I see my family, so a weeknight evening would work. Small groups are better for me than big events, and I don't like assuming everyone's free on Saturdays.\n\n**Respondent 8:** Free events get treated as optional, so people don't show up. A small fee makes people commit, and I'd be more likely to come if I'd paid something.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 2.5,
+   "emailed": false
+  },
+  {
+   "n": 10,
+   "at": "2026-11-22T10:08:33.619Z",
+   "kind": "opened",
+   "round": 1,
+   "hash": "0ab6d5714e0a0906130227106649612b78b3d7386ce77e0696fdb279998d5242",
+   "intact": true,
+   "rows": [
+    {
+     "question": "Which spring event format ranks first?",
+     "people_said": "Skills workshop: avg rank 1.63, 4 first places; picnic 2, members' meeting 2 first places; avg ranks 3.13-3.63 for others",
+     "agent": "Outdoor social/picnic, with members' meeting surprising mid-high",
+     "personas": null,
+     "commander": null
+    },
+    {
+     "question": "Most you would pay?",
+     "people_said": "Up to $10: 5; Free only: 2; Up to $25: 1; >$25: 0",
+     "agent": "Up to $10 modal; few above $25",
+     "personas": null,
+     "commander": null
+    }
+   ]
+  },
+  {
+   "n": 11,
+   "at": "2026-11-22T10:08:37.576Z",
+   "kind": "challenge",
+   "round": 1,
+   "stillUnknown": "Whether a low-cost weeknight workshop with a member-shaped agenda works, and which skill topic.",
+   "reason": "The workshop lead is clear and price and timing are settled enough; a follow-up on topic would need club-specific options I don't have, so more spend is unlikely to change the recommendation."
+  },
+  {
+   "n": 12,
+   "at": "2026-11-22T10:08:40.777Z",
+   "kind": "debrief",
+   "round": 1,
+   "whoWasWrong": "I was wrong on format: guessed picnic, workshop won. Price guess was right.",
+   "surprise": "Participation/inclusion theme (planning involvement, beginner-friendly) that no closed option captured.",
+   "stillUnknown": "Which skill topic, and whether members would co-plan; also fee level vs commitment tension.",
+   "answerSoFar": "A weeknight, low-fee (≤$10) beginner-friendly skills workshop, with members involved in planning.",
+   "nextMove": "another_round",
+   "reason": "Ask a short follow-up: forced choice of workshop topic/format and fee (free vs $5 vs $10), plus open ask what skill they'd want."
+  },
+  {
+   "n": 13,
+   "at": "2026-11-22T10:08:49.275Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "design",
+   "why": "Draft the follow-up on topic, fee mechanism and involvement.",
+   "couldChange": "Decides the workshop's topic, fee design and planning approach in the recommendation.",
+   "message": "Create a panel from [person 1] <[recipient 1]>\n[person 2] <[recipient 2]>\n[person 3] <[recipient 3]>\n[person 4] <[recipient 4]>\n[person 5] <[recipient 5]>\n[person 6] <[recipient 6]>\n[person 7] <[recipient 7]>\n[person 8] <[recipient 8]> (8 club members who just answered our spring event survey). Draft a short follow-up survey, do not publish or send yet. Opening line: \"Short follow-up: the last survey pointed to a skills workshop, and your answers on the details will shape it, so it's worth one minute.\" Questions:\n1. Open: What one skill would you most want to learn or improve at a club workshop?\n2. Single choice, which fee setup would you prefer for the workshop? Free / $5 deposit refunded when you attend / flat $5 / flat $10.\n3. Single choice: How would you like to be involved in planning it? Just attend / vote on topic and date / help organize on the day / help plan from the start.\nShow full wording of every question and option.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nDrafted survey 2.\n\nThe panel has 8 members.\n\n| Label | Type | Text | Answer options |\n|---|---|---|---|\n| Intro | Display text | Short follow-up: the last survey pointed to a skills workshop, and your answers on the details will shape it, so it's worth one minute. | None |\n| Q1: Workshop skill | Open text | What one skill would you most want to learn or improve at a club workshop? | Free-text response |\n| Q2: Fee setup | Single choice | Which fee setup would you prefer for the workshop? | Free; $5 deposit refunded when you attend; Flat $5; Flat $10 |\n| Q3: Involvement | Single choice | How would you like to be involved in planning it? | Just attend; Vote on topic and date; Help organize on the day; Help plan from the start |\n\nValidation: 0 blockers. The member name and address fields in the brief are still unfilled template placeholders, so complete them before the survey is published or sent.\nIt is not published. Reply confirm to publish it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 3,
+   "emailed": false
+  },
+  {
+   "n": 14,
+   "at": "2026-11-22T10:08:52.446Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "publish",
+   "why": "Publish follow-up.",
+   "couldChange": "Enables sending the follow-up.",
+   "message": "I approve publishing with no quotas and no fraud screening. Publish. (No name/address fields are wanted; ignore those.) confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nPublishing survey 2 makes it live. Reply confirm to publish it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 3.5,
+   "emailed": false
+  },
+  {
+   "n": 15,
+   "at": "2026-11-22T10:08:52.447Z",
+   "kind": "sealed",
+   "round": 2,
+   "why": "Fee and involvement shape the design.",
+   "hash": "604b5d5682f6d48f9438572a5960497d69964377f0e3555a62f44fe156eec387",
+   "questions": [
+    "Which fee setup do you prefer for the workshop?",
+    "How would you like to be involved in planning?"
+   ],
+   "commanderGuessed": 0
+  },
+  {
+   "n": 16,
+   "at": "2026-11-22T10:08:54.185Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "publish",
+   "why": "Second confirm.",
+   "couldChange": "Enables sending.",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 is published. It is ready to email to the panel. Reply confirm to send it. Sending cannot be undone.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 4,
+   "emailed": false
+  },
+  {
+   "n": 17,
+   "at": "2026-11-22T10:08:55.940Z",
+   "kind": "send-preapproved",
+   "round": 2,
+   "email": 2,
+   "emailLimit": 3,
+   "checks": [
+    "Flashpoint showed the whole survey, and nothing changed after that",
+    "It is short: about 10 questions at most, and about 5 for a follow-up",
+    "It does not ask for a name, a contact detail, income, financial aid or anything else personal",
+    "The round's envelope is sealed",
+    "Nobody has had more emails than the limit, and the budget covers it"
+   ]
+  },
+  {
+   "n": 18,
+   "at": "2026-11-22T10:09:04.645Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "send",
+   "why": "Send the follow-up.",
+   "couldChange": "Gets answers deciding topic, fee and involvement.",
+   "message": "confirm",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\nSurvey 2 was emailed to every panel member who can receive it.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 4.5,
+   "emailed": true
+  },
+  {
+   "n": 19,
+   "at": "2026-11-22T10:09:06.108Z",
+   "kind": "wait",
+   "why": "Allow time for replies.",
+   "minutes": 30
+  },
+  {
+   "n": 20,
+   "at": "2026-11-22T10:09:11.358Z",
+   "kind": "flashpoint",
+   "round": 2,
+   "action": "results",
+   "why": "Read follow-up answers.",
+   "couldChange": "Sets topic, fee and involvement in the final recommendation.",
+   "message": "Show survey 2 results: response count, Q1 answers word for word, Q2 and Q3 counts.",
+   "reply": "[PRACTICE FLASHPOINT: an AI stand-in wrote this reply and invented the answers. Not Flashpoint, not people.]\n**Survey 2 results**\n\n**Responses received:** 8\n\n**Q2: Fee setup**\n\n| Answer option | Count |\n|---|---|\n| Free | 2 |\n| $5 deposit refunded when you attend | 3 |\n| Flat $5 | 2 |\n| Flat $10 | 1 |\n| **Total** | **8** |\n\n**Q3: Involvement**\n\n| Answer option | Count |\n|---|---|\n| Just attend | 2 |\n| Vote on topic and date | 2 |\n| Help organize on the day | 1 |\n| Help plan from the start | 3 |\n| **Total** | **8** |\n\n**Q1: Workshop skill (verbatim)**\n\n- **Respondent 1:** Basic bike repair, so I can stop paying for rides every time something breaks.\n- **Respondent 2:** Running a meeting so quieter members get heard and decisions aren't made by the same few people.\n- **Respondent 3:** Spreadsheets and basic data analysis, since I use them at work and could get better.\n- **Respondent 4:** Strategy basics for competitive games, taught in a beginner-friendly way.\n- **Respondent 5:** Advanced presentation and grant-writing skills that members can use beyond the club.\n- **Respondent 6:** Python and basic data analysis, something I can list on a résumé.\n- **Respondent 7:** Negotiation skills for job offers and salary talks.\n- **Respondent 8:** Writing professional emails and job applications in English.\n\nRespondents are numbered in the order their responses appear in the log.",
+   "receipts": [],
+   "price": 0.5,
+   "spent": 5,
+   "emailed": false
+  },
+  {
+   "n": 21,
+   "at": "2026-11-22T10:09:13.549Z",
+   "kind": "opened",
+   "round": 2,
+   "hash": "604b5d5682f6d48f9438572a5960497d69964377f0e3555a62f44fe156eec387",
+   "intact": true,
+   "rows": [
+    {
+     "question": "Which fee setup do you prefer for the workshop?",
+     "people_said": "Refundable $5 deposit 3, Free 2, Flat $5 2, Flat $10 1",
+     "agent": "Flat $5 or refundable deposit; free gets 2-3",
+     "personas": null,
+     "commander": null
+    },
+    {
+     "question": "How would you like to be involved in planning?",
+     "people_said": "Help plan from the start 3, Just attend 2, Vote 2, Help organize on day 1",
+     "agent": "Vote on topic and date most common",
+     "personas": null,
+     "commander": null
+    }
+   ]
+  },
+  {
+   "n": 22,
+   "at": "2026-11-22T10:09:17.171Z",
+   "kind": "debrief",
+   "round": 2,
+   "whoWasWrong": "I was partly wrong on involvement (guessed voting; most wanted to plan from the start). Fee guess roughly right.",
+   "surprise": "Skill topics scattered; the common thread is career/practical skills (data analysis x2, job applications, negotiation, presentations), plus meeting facilitation.",
+   "stillUnknown": "Single topic; only 8 people.",
+   "answerSoFar": "A weeknight career-skills workshop, refundable $5 deposit, planned by a volunteer member group.",
+   "nextMove": "finish",
+   "reason": "One email remains, but topic choice can be settled by the volunteer planning group; another round would add little."
+  },
+  {
+   "n": 23,
+   "at": "2026-11-22T10:09:26.782Z",
+   "kind": "finish",
+   "recommendation": "Put on a weeknight, small-group skills workshop next spring, with a career-practical theme (data/spreadsheets, job applications, negotiation, presentations). Charge a refundable $5 deposit, which covers both tight budgets and commitment. Recruit the three members who want to plan from the start to choose the topic and date, and keep it beginner-friendly.",
+   "evidence": "Round 1 (8 of 8 answered): skills workshop had average rank 1.63 and 4 first places; picnic 3.13, game day 3.13, outing 3.50, members' meeting 3.63. Price ceiling: up to $10 for 5, free only for 2, up to $25 for 1. Timing: weekday evening 3, Saturday daytime 3. Open answers raised cost, work schedules, newcomers feeling shut out, and wanting a skill for a résumé. Round 2 (8 of 8): fee preference was refundable $5 deposit 3, free 2, flat $5 2, flat $10 1. Involvement: plan from the start 3, vote 2, just attend 2, organize on the day 1. Skills wanted were scattered: data analysis x2, job applications, negotiation, presentations and grants, bike repair, game strategy, running meetings.",
+   "scoreboard": [
+    {
+     "round": 1,
+     "question": "Which spring event format ranks first?",
+     "people_said": "Skills workshop (avg rank 1.63, 4 first places)",
+     "agent": "wrong",
+     "personas": "no guess",
+     "commander": "no guess"
+    },
+    {
+     "round": 1,
+     "question": "Most you would pay?",
+     "people_said": "Up to $10: 5; free only: 2; up to $25: 1",
+     "agent": "right",
+     "personas": "no guess",
+     "commander": "no guess"
+    },
+    {
+     "round": 2,
+     "question": "Preferred fee setup",
+     "people_said": "Refundable $5 deposit 3, free 2, flat $5 2, flat $10 1",
+     "agent": "partly",
+     "personas": "no guess",
+     "commander": "no guess"
+    },
+    {
+     "round": 2,
+     "question": "Preferred involvement in planning",
+     "people_said": "Plan from the start 3, vote 2, attend 2, organize 1",
+     "agent": "wrong",
+     "personas": "no guess",
+     "commander": "no guess"
+    }
+   ],
+   "learned_between_rounds": "Round 1 showed the workshop winning, but the open answers pointed to cost, newcomer inclusion and wanting a say. Round 2 therefore asked about fee mechanism, involvement and topic. Topics came back scattered, with a career-skills thread.",
+   "limits": "Only 8 people, so this is a direction and not a measurement. Most splits are 3-2-2-1. No single workshop topic won. The tool replies were labelled as practice Flashpoint stand-ins. I did not rehearse on personas. One email per person was left unused.",
+   "lessons": [
+    "Ranking plus an open question worked: the open answers showed the real drivers (cost, inclusion, résumé value) that the closed options missed.",
+    "My guesses lean toward social formats, but this group wanted practical or governance content. Don't assume a social event wins.",
+    "Open questions on topic scatter with 8 people. Offer a short closed list of topics if I need a single winner."
+   ],
+   "unbacked": [],
+   "spent": 5,
+   "handedBack": 7
+  }
+ ]
+}

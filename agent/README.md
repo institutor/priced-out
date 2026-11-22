@@ -172,7 +172,7 @@ lessons before it plans, and its log says which ones it was given. Practice runs
 their own notebook, which is not in the repository, so an invented answer can never
 teach a real run anything.
 
-You can follow the notebook across the five practice runs in [examples/](examples/),
+You can follow the notebook across the six practice runs in [examples/](examples/),
 in the order they were run. The practice notebook itself, as those runs left it, is
 [examples/practice-notebook.md](examples/practice-notebook.md).
 
@@ -183,11 +183,12 @@ in the order they were run. The practice notebook itself, as those runs left it,
 | 3. [The example above, hands-off](examples/practice-run/summary.md) | 6 lessons. Its plan says: "Acting on notes: use ranking, price framing, open barriers question." | Guessed a social event would win. It came last. Wrote: "Don't assume social events are favoured." |
 | 4. [The same objective again](examples/practice-run-second-try/summary.md) | 8 lessons, that one among them. | Its hunch this time: "Social event is not necessarily top; practical/skill workshop may win." That guess was marked right. |
 | 5. [A third objective, with 3 of 8 people silent](examples/practice-run-low-response/summary.md) (`--quiet 3`) | 8 lessons. | Only 5 of 8 answered. It did not spend its second email on a reminder. It sent a forced trade-off follow-up, as an earlier note advised, and all 8 answered that. |
+| 6. [Free to choose when to stop](examples/practice-run-free-to-stop/summary.md) (`--emails 3 --cap 12`) | 8 lessons. | Allowed three emails and money for three rounds. It stopped after two: "One email remains, but topic choice can be settled by the volunteer planning group; another round would add little." |
 
 What this shows, and what it does not: the notes are read, later plans name the ones
-they use, and run 4 guessed better than run 3 on the same objective. It is five practice
-runs with invented answers, so it cannot show that the notes caused that. Runs 1, 2 and
-4 were each asked once by the code to think again before stopping after one round; runs
+they use, and run 4 guessed better than run 3 on the same objective. It is six practice
+runs with invented answers, so it cannot show that the notes caused that. Runs 1, 2, 4
+and 6 were each asked once by the code to think again before stopping after one round; runs
 3 and 5 chose their follow-up without that.
 
 **The runs are not copies of each other.** Same code, same starting instructions. What
@@ -200,10 +201,12 @@ the agent asked, guessed and followed up on was its own choice each time:
 | 3 | A social dinner comes top. Wrong. | It came last. Workshop and speaker tied. | Workshop, speaker or both together? And the most you would pay? |
 | 4 | A skills workshop may win. Right. | It did. Open answers said members felt nobody asked them. | Let members shape the workshop: which topic, which format? |
 | 5 | Dates and schedule changes win. Wrong. | Only 5 of 8 answered. Club decisions and dates tied. | One forced choice on how often and in what form, to split the tie. |
+| 6 | An outdoor social or picnic. Wrong. | A skills workshop led, with 4 of 8 first places. | Which fee: free, $5, $10 or a deposit you get back? Then it chose to stop. |
 
-In all five the follow-up was the second and last email the code allows each person, so
-the choice the agent had after round one was whether a second round was worth people's
-time, and on what. It could not have run a third.
+In runs 1 to 5 the follow-up was the second and last email the code allows each person.
+So the choice the agent had was whether a second round was worth people's time, and on
+what. It could not have run a third. Run 6 was given room for a third round, to see
+what the agent would do with it. It left the third email unused and said why.
 
 ## The agent's tools
 
@@ -234,7 +237,7 @@ about, or when to stop. Those are the agent's decisions.
 while it still names something unknown and has the budget for a short second round, the
 code asks it once to think again. It asks at most once in a run, the agent may still
 stop, and the log, the summary and the page all show that it happened. It did not happen in the
-example run above. It did happen in three of the other practice runs: the agent chose
+example run above. It did happen in four of the other practice runs: the agent chose
 to stop, was asked once, and then chose a short follow-up.
 
 **Slips.** Every paid step carries a slip: the price, and the decision of the agent's
@@ -330,7 +333,7 @@ The whole run is in [examples/practice-run/](examples/practice-run/): the
 [log](examples/practice-run/log.md), with every message, reply, slip, envelope and
 debrief. The same run is on the page at <https://institutor.github.io/priced-out/agent/>.
 
-Four more practice runs are kept beside it, and the page can show each of them:
+Five more practice runs are kept beside it, and the page can show each of them:
 
 - [The same objective with a commander approving each send](examples/practice-run-with-a-commander/summary.md).
   An AI stand-in played the commander. Here the standing orders did their work: the
@@ -342,6 +345,9 @@ Four more practice runs are kept beside it, and the page can show each of them:
 - [The same objective again](examples/practice-run-second-try/summary.md), after the
   example above had added its lessons to the notebook. This run also records the
   agent's answer after each round, so you can see it move.
+- [Free to choose when to stop](examples/practice-run-free-to-stop/summary.md): the
+  same objective, run with `--emails 3 --cap 12`, so a third round was allowed and paid
+  for. The agent ran two and stopped by its own choice, with one email and $7 unspent.
 - [A low response](examples/practice-run-low-response/summary.md): "Our club's
   newsletter gets opened by almost nobody. Find out what members would actually read,
   and how often." Three of the eight people did not answer the first survey, and the

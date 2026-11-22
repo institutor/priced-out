@@ -62,5 +62,18 @@
   "remembered": 8,
   "spent": 5,
   "stamp": "2026-11-22T09-41-40"
+ },
+ {
+  "name": "free-to-stop",
+  "file": "agent-run-free-to-stop.json",
+  "objective": "Figure out the best event to put on for our club next spring.",
+  "mode": "practice",
+  "handsOff": true,
+  "standInCommander": false,
+  "people": 8,
+  "rounds": 2,
+  "remembered": 8,
+  "spent": 5,
+  "stamp": "2026-11-22T10-07-43"
  }
 ]
