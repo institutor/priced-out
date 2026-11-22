@@ -162,7 +162,7 @@ You can see it happen across the three practice runs in [examples/](examples/):
 | Run | What it started with | What it did differently |
 |---|---|---|
 | 1. [With a person approving](examples/practice-run-with-a-person/summary.md) | Nothing. | Asked a single-choice question that split. Wrote: "Rank questions gave a clearer signal than single choice." |
-| 2. [Another objective, hands-off](examples/practice-run-members/summary.md) | The 3 lessons from run 1. | Used ranking from the start. Wrote: "Ask openly about uncomfortable incidents." |
+| 2. [Another objective, hands-off](examples/practice-run-members/summary.md) | The 3 lessons from run 1. | Asked why people left in an open question, then used ranking for its follow-up. Wrote: "Ask openly about uncomfortable incidents." |
 | 3. [The example above, hands-off](examples/practice-run/summary.md) | All 6 lessons. | Its plan says: "Acting on notes: use ranking, price framing, open barriers question." All three are in its first survey. |
 
 Run 1 needed the code to ask it to think again before it stopped after one round. Run 3
