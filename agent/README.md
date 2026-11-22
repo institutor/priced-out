@@ -190,6 +190,21 @@ runs with invented answers, so it cannot show that the notes caused that. Runs 1
 4 were each asked once by the code to think again before stopping after one round; runs
 3 and 5 chose their follow-up without that.
 
+**The runs are not copies of each other.** Same code, same starting instructions. What
+the agent asked, guessed and followed up on was its own choice each time:
+
+| Run | Its sealed guess | What the answers showed | What it chose to ask next |
+|---|---|---|---|
+| 1 | A social evening or picnic leads. Partly right. | A picnic and a day trip led. The social evening came last. | Free picnic, paid-for day trip, or no event? And what would stop you coming? |
+| 2 | A friendlier welcome ranks top. Right. | Welcome and a clearer plan led. An open answer told of pressure to buy. | A greeter or a beginners' intro? And did anyone feel pushed to buy? |
+| 3 | A social dinner comes top. Wrong. | It came last. Workshop and speaker tied. | Workshop, speaker or both together? And the most you would pay? |
+| 4 | A skills workshop may win. Right. | It did. Open answers said members felt nobody asked them. | Let members shape the workshop: which topic, which format? |
+| 5 | Dates and schedule changes win. Wrong. | Only 5 of 8 answered. Club decisions and dates tied. | One forced choice on how often and in what form, to split the tie. |
+
+In all five the follow-up was the second and last email the code allows each person, so
+the choice the agent had after round one was whether a second round was worth people's
+time, and on what. It could not have run a third.
+
 ## The agent's tools
 
 The agent is Claude Sonnet 5.5 in a loop. Each turn it reads everything so far, picks one
