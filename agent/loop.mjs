@@ -370,7 +370,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
       lastReply = text;
       if (!sending && input.action !== "results") {
         if (draft === "" || listsQuestions(text)) { draft = text; changes = []; }
-        else if (input.action === "design") changes.push(text);
+        else if (input.action === "design" && !/\breply\b.*\bconfirm\b/i.test(text.slice(-200)) ) changes.push(text);
       }
       if (sending) sent = true;
       else if (sent) readAfterSend = true;

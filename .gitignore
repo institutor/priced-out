@@ -6,3 +6,4 @@ data/raw/
 agent/recipients.txt
 agent/runs/fake-*/
 agent/runs/practice-*/
+agent/runs/*/raw/

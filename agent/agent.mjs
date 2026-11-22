@@ -150,6 +150,7 @@ async function realFlashpoint() {
     try {
       // A session lasts an hour and a run can last longer, so sign in each time. Signing in is free.
       const result = await callTool(await connect(), tool, args);
+      keepRaw(tool, { result, receipts });
       return { result, receipts };
     } catch (err) {
       err.charged = receipts.length > 0;
@@ -157,6 +158,15 @@ async function realFlashpoint() {
     } finally {
       console.error = printError;
     }
+  }
+  // Every real reply is kept as it came, for working out what went wrong afterwards.
+  // It can hold addresses, so the raw folder is git-ignored.
+  let calls = 0;
+  function keepRaw(tool, reply) {
+    const dir = new URL("raw/", runDir);
+    fs.mkdirSync(dir, { recursive: true });
+    calls += 1;
+    fs.writeFileSync(new URL(`${String(calls).padStart(2, "0")}-${tool}.json`, dir), JSON.stringify(reply, null, 2));
   }
   const failure = (message, charged) => Object.assign(new Error(message), { charged });
   const errorText = (error) => (typeof error === "string" ? error : JSON.stringify(error));
