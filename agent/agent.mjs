@@ -157,7 +157,8 @@ if (!apiKey) {
   console.log("ANTHROPIC_API_KEY is not set. Put it in .env (see .env.example).");
   process.exit(1);
 }
-const client = new Anthropic({ apiKey });
+// A busy or dropped model call is tried again a few times, so one hiccup does not stop a run.
+const client = new Anthropic({ apiKey, maxRetries: 5 });
 const model = process.env.AGENT_MODEL ?? "claude-sonnet-5-5";
 
 async function llm({ system, tools, messages }) {
