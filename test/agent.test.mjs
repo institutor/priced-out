@@ -850,3 +850,16 @@ test("handed over, a survey swapped in by a send-like message is checked before 
   assert.match(kinds(out, "send-held")[0].problems.join(" "), /a name/);
   assert.equal(kinds(out, "flashpoint").some((s) => s.emailed), false);
 });
+
+test("a third read: more ways a send can be said, asked for or approved", async () => {
+  const { approves } = await import("../agent/loop.mjs");
+  assert.equal(readSendReply("Invitations went out to 8 panel members. Reply confirm if you also want a reminder scheduled."), "unclear");
+  assert.equal(readSendReply("Sent! 8 invitations are on their way. Reply confirm for a reminder."), "unclear");
+  for (const text of ["Can you remind everyone who has not answered?", "Fix the typo in Q2 and then remind everyone"]) assert.ok(asksToSend(text), text);
+  for (const text of ["do it", "ok do it", "yes go ahead and send it", "yes send it now"]) assert.ok(approves(text), text);
+  for (const text of ["ok, is that it?", "send it?", "ok \u043d\u043e \u0441\u043d\u0430\u0447\u0430\u043b\u0430", "do not send it"]) assert.ok(!approves(text), text);
+  const { commander, asked } = desk();
+  const flashpoint = says(SURVEY_TEXT, "I will send it to 2 people. Reply confirm to go ahead.", "Done. I replaced it.", "Invitations were sent to 2 people.");
+  await run([ask("Write a survey", "design"), seal(), ask("Send it to the list", "send"), ask("Rewrite the first one so it asks about money at home"), ask("confirm", "send"), finish], { flashpoint, commander });
+  assert.equal(approvals(asked), 2, "the rewrite took the approval away");
+});

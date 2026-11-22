@@ -323,10 +323,13 @@ export function unbackedNumbers(text, sources) {
 
 const saysYes = (text) => /^\W*(y|yes|yep|yeah|ok|okay|approve|approved|go|go ahead|send|send it|do it)\b/i.test(String(text ?? ""));
 // Approving a send takes a plain yes and nothing else. "ok but change Q2 first" is not one.
-const YES = new Set(["y", "yes", "yep", "yeah", "ok", "okay", "sure", "approve", "approved", "go", "send"]);
-const YES_WORDS = new Set([...YES, "please", "it", "ahead", "do", "looks", "good", "fine", "that", "is", "thats"]);
+const YES = new Set(["y", "yes", "yep", "yeah", "ok", "okay", "sure", "approve", "approved", "go", "send", "do"]);
+const YES_WORDS = new Set([...YES, "please", "it", "ahead", "looks", "good", "fine", "that", "is", "thats", "and", "now"]);
 export const approves = (text) => {
-  const words = String(text ?? "").toLowerCase().replace(/'/g, "").match(/[a-z]+/g) ?? [];
+  const said = String(text ?? "");
+  // A question, or words in another script, are not a plain yes.
+  if (/[?]|[^\x00-\x7F]/.test(said)) return false;
+  const words = said.toLowerCase().replace(/'/g, "").match(/[a-z]+/g) ?? [];
   return words.length > 0 && words.length <= 6 && YES.has(words[0]) && words.every((word) => YES_WORDS.has(word));
 };
 // Whether a reply shows a survey's questions. Two question marks are enough.
@@ -352,7 +355,7 @@ const offersOnlyPublishing = (reply) => /\b(publish|push|live)/i.test(reply) && 
 // The other emailing verbs count only as an order: at the start of the message or of a
 // sentence, or after "and", "then" or "please". "Ask what would remind them to come" is a
 // question for the survey, and a message that edits the survey is not a send.
-const ORDER_START = "(?:^|[.;:!]\\s+|\\band\\s+|\\bthen\\s+|\\bplease\\s+|\\bnow\\s+)";
+const ORDER_START = "(?:^|[.;:!]\\s+|\\band\\s+|\\bthen\\s+|\\bplease\\s+|\\bnow\\s+|\\b(?:can|could|would|will) you\\s+)";
 const ORDERS_A_REMINDER = new RegExp(`${ORDER_START}(remind|nudge|notify|follow up with|mail)\\s+(it to\\s+)?(the\\s+|all\\s+)?(them|everyone|everybody|panel|list|people|recipients|those|members|non-?respon\\w+)\\b`, "i");
 const ORDERS_A_LAUNCH = new RegExp(`${ORDER_START}(launch|share)\\s+(it\\s+|this\\s+|the survey\\s+)?(to|with)\\s+(them|everyone|everybody|the panel|the list|people|recipients)\\b`, "i");
 export function asksToSend(message) {
@@ -361,12 +364,12 @@ export function asksToSend(message) {
     .replace(/\bsend(ing)?\s+(me|us|back|over)\b/gi, "")
     .replace(/\bsend(ing)?\s+(me\s+)?(the\s+|a\s+|an\s+)?(results?|summary|export|report|counts?|numbers|data|link|status)\b/gi, "");
   return /\b(send|sending|distribute|distributing|invite)\b/i.test(text) || /\be-?mail\s+(it|this|them|everyone|the survey|the panel|to|out)\b/i.test(text)
-    || (!EDITS.test(text) && (ORDERS_A_REMINDER.test(text) || ORDERS_A_LAUNCH.test(text)));
+    || ORDERS_A_REMINDER.test(text) || ORDERS_A_LAUNCH.test(text);
 }
 
 // An edit to the survey: an editing word with a part of the survey as its object.
 // "Add these people to a panel" is not one.
-const EDITS = /\b(change|edit|fix|reword|rewrite|rephrase|remove|delete|add|replace|drop|swap|shorten|rename|insert|update)\b[^.\n]{0,60}\b(questions?|q\d+|options?|choices?|wording|answers?|intro|title|typo|text|items?|scale)\b/i;
+const EDITS = /\b(change|edit|fix|reword|rewrite|rephrase|remove|delete|add|replace|drop|swap|shorten|rename|insert|update)\b[^.\n]{0,60}\b(questions?|q\d+|options?|choices?|wording|answers?|intro|title|typo|text|items?|scale|survey|one|it|first|second|third|last)\b/i;
 
 // What the code looks for before it lets a send go out with nobody watching.
 export const SEND_CHECKS = [
@@ -410,7 +413,7 @@ export function readSendReply(text) {
   const went = SAYS_SENT.test(reply) && !NOT_SENT.test(reply);
   // "Sent. Reply confirm if you want a reminder too" says both. A person reads that one.
   // "Invitations are sent as soon as you confirm" has not sent anything yet.
-  const already = /\b(were|was|have been|has been|have|has|'ve)\s+(already\s+)?(sent|e-?mailed|invited|delivered|dispatched)\b|\b(sent|e-?mailed)\s+(it|the survey|invitations?|them)?\s*to\b/i.test(reply);
+  const already = /\b(were|was|have been|has been|have|has|'ve)\s+(already\s+)?(sent|e-?mailed|invited|delivered|dispatched)\b|\b(sent|e-?mailed)\s+(it|the survey|invitations?|them)?\s*to\b|\bwent out\b|\bgone out\b|\bon (its|their) way\b|^\W*sent\b/i.test(reply);
   if (/\bconfirm\b/i.test(reply.slice(-300))) return went && already ? "unclear" : "asks-confirm";
   if (went) return "sent";
   if (SAYS_LIVE.test(reply)) return "published";
