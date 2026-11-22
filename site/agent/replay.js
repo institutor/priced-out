@@ -215,12 +215,15 @@ const TELL = {
     if (held.length > 0) body.push(el("p", { text: `The code held the send ${held.length === 1 ? "once" : `${held.length} times`} until the survey passed its checks.` }));
     if (approved) body.push(el("p", {}, stamp("Approved", `approved ${part.round}`), ` ${commanderName(run)} read the survey and typed “${approved.reply}”. No email goes out without that.`));
     if (checked) body.push(el("p", {}, stamp("Checked", `checked ${part.round}`), " Nobody was at the keyboard, so the code checked the survey against fixed rules before it let it go."), points(checked.checks ?? [], 560));
-    if (refused) body.push(el("p", {}, stamp("Refused", `refused ${part.round}`), " The commander refused the send. Nothing was sent or charged."), quote(refused.reason, "commander"));
+    const nobody = refused && /^Nobody was at the desk/.test(refused.reason ?? "");
+    if (nobody) body.push(el("p", {}, stamp("Not sent", `refused ${part.round}`), " Nobody was at the keyboard to approve the send, so nothing was sent or charged."));
+    else if (refused) body.push(el("p", {}, stamp("Refused", `refused ${part.round}`), " The commander read the survey and refused the send. Nothing was sent or charged."), quote(refused.reason, "commander"));
+    if (!emailed && !refused && held.length > 0) body.push(el("p", { text: "It did not pass, so nothing was sent." }));
     if (emailed) {
       body.push(el("p", { text: `Flashpoint emailed the survey to all ${run.people} people on the list.${run.emailLimit ? ` That was email ${before + 1} of the ${run.emailLimit} each of them may get.` : ""}` }));
     }
     if (wait) body.push(el("p", { text: `Then the agent chose to wait up to ${wait.minutes} minutes for answers.${run.mode === "real" ? "" : " A practice run does not really wait: the invented answers come straight back."}` }));
-    return { doodle: "plane", title: "The survey goes out", body, side: [emailed ? vignette("send", run.emailLimit ? [`Email ${before + 1} of ${run.emailLimit}.`, "Off it goes."] : ["Off it goes."], 40 + part.round) : null, paidSlip(part, run, `send ${part.round}`)] };
+    return { doodle: "plane", title: emailed ? "The survey goes out" : "The send is stopped", body, side: [emailed ? vignette("send", run.emailLimit ? [`Email ${before + 1} of ${run.emailLimit}.`, "Off it goes."] : ["Off it goes."], 40 + part.round) : null, paidSlip(part, run, `send ${part.round}`)] };
   },
 
   open(part, run) {
@@ -242,7 +245,7 @@ const TELL = {
     };
   },
 
-  decide(part) {
+  decide(part, run) {
     const debrief = lastOf(part.steps, "debrief");
     const challenge = part.steps.find((step) => step.kind === "challenge");
     const told = part.steps.filter((step) => step.kind === "commander");
@@ -262,7 +265,7 @@ const TELL = {
       body.push(el("p", { class: "m-foot", text: step.order ? `A standing order applied here: “${step.order}” So the agent told the commander what it had learned.` : "The agent went to the commander with a question." }));
       if (step.reply) body.push(quote(step.reply, "commander"));
     }
-    return { doodle: "glass", title: again ? "It learns, and chooses another round" : "It learns, and chooses to stop", body, side: debrief ? vignette("decide", again ? ["One more round,", "on what we got wrong."] : ["That is enough", "to answer."], 50 + part.round) : null };
+    return { doodle: "glass", title: again ? "It learns, and chooses another round" : "It learns, and chooses to stop", body, side: [debrief ? vignette("decide", again ? ["One more round,", "on what we got wrong."] : ["That is enough", "to answer."], 50 + part.round) : null, paidSlip(part, run, `decide ${part.round}`)] };
   },
 
   answer(part, run) {
@@ -276,13 +279,16 @@ const TELL = {
         el("p", { text: `The agent stopped and wrote its recommendation, the evidence for it, and its limits. It spent ${money(spent)} of its ${money(run.cap)} budget and handed back ${money(Math.max(0, run.cap - spent))}.` }),
         el("p", {}, el("a", { href: "#answer", class: "m-jump", text: "Read the answer" })),
       ],
-      side: vignette("answer", ["Here is what", "I would do."], 61),
+      side: [vignette("answer", ["Here is what", "I would do."], 61), paidSlip(part, run, "answer")],
     };
   },
 };
 
 function partCard(part, run, story, index) {
   const tell = TELL[part.part](part, run, story);
+  // A plan changed part way through is told where it was changed.
+  const changed = part.part === "plan" ? null : lastOf(part.steps, "plan");
+  if (changed) tell.body.push(el("p", { class: "m-foot", text: `Here the agent changed its plan.${changed.wouldChange ? ` What would change its answer now: ${changed.wouldChange}` : ""}` }));
   const when = tell.when ?? `Round ${part.round}`;
   const item = el("li", { class: `m-beat ${part.part}`, id: `part-${index + 1}` },
     el("div", { class: "m-beat-head" },
@@ -458,7 +464,14 @@ function drawWatch(body, run) {
   };
   const again = make("Replay from the start", () => { stop(); shown = 0; step(); nextButton.focus(); });
   const nextButton = make("Next part", () => { stop(); step(); });
-  const playButton = make("Play", () => { if (timer) stop(); else timer = window.setInterval(step, 2600); update(); });
+  const playButton = make("Play", () => {
+    if (timer) stop();
+    else {
+      timer = window.setInterval(step, 2600);
+      step();
+    }
+    update();
+  });
   const allButton = make("Show it all", () => { stop(); shown = items.length; update(); });
 
   function update() {
@@ -473,6 +486,8 @@ function drawWatch(body, run) {
     playButton.hidden = !replaying;
     allButton.hidden = !replaying;
     playButton.querySelector("span").textContent = timer ? "Pause" : "Play";
+    // A button that has just gone cannot keep the keyboard's place.
+    if (!replaying && [nextButton, playButton, allButton].includes(document.activeElement)) again.focus();
   }
   function step() {
     if (shown >= items.length) return;
@@ -483,19 +498,23 @@ function drawWatch(body, run) {
     redrawAll(item);
     item.classList.add("drawing");
     window.setTimeout(() => item.classList.remove("drawing"), 2600);
-    item.scrollIntoView({ block: "start", behavior: calm ? "auto" : "smooth" });
+    // The buttons stay at the top of the screen, so the part stops below them.
+    const held = Number.parseFloat(window.getComputedStyle(controls).top) || 0;
+    const top = item.getBoundingClientRect().top + window.scrollY - held - controls.offsetHeight - 14;
+    window.scrollTo({ top, behavior: calm ? "auto" : "smooth" });
   }
+  const controls = el("div", { class: "m-controls" },
+    el("div", { class: "m-buttons" }, again, nextButton, playButton, allButton),
+    el("p", { class: "m-progress", "aria-live": "polite" }, where, bar, spentText),
+  );
 
   put(body, 
     el("p", { class: "m-watch-intro", text: `The run in ${inWords(items.length)} parts. Under each part you can open every message the agent sent to Flashpoint, and every reply.` }),
-    el("div", { class: "m-controls" },
-      el("div", { class: "m-buttons" }, again, nextButton, playButton, allButton),
-      el("p", { class: "m-progress", "aria-live": "polite" }, where, bar, spentText),
-    ),
+    controls,
     el("ol", { class: "m-beats" }, items),
   );
   update();
-  return { showAll: () => { stop(); shown = items.length; update(); } };
+  return { showAll: () => { stop(); shown = items.length; update(); }, replaying: () => shown < items.length };
 }
 
 async function start() {
@@ -549,6 +568,14 @@ async function start() {
     note: (slide) => (slide.dataset.spent ? `${money(slide.dataset.spent)} of ${money(run.cap)} spent` : ""),
   });
   document.getElementById("present-open").addEventListener("click", () => stage.open(0));
+
+  // A link to a part of the page that the replay has put away brings the
+  // whole page back first, so the link has somewhere to go.
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest?.('a[href^="#"]');
+    if (!link || stage.on() || !watch.replaying()) return;
+    if (["answer", "how", "rules", "run"].includes(link.getAttribute("href").slice(1))) watch.showAll();
+  });
   if (new URLSearchParams(window.location.search).has("present")) stage.open(present.screenIn(window.location.hash, stage.count()));
 
   // The hand lettering can arrive after the first drawing. When it does the

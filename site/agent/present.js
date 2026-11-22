@@ -70,10 +70,32 @@ export function mount(bar, { before = () => {}, note = () => "" } = {}) {
     slide.classList.add("drawing");
     timer = window.setTimeout(() => slide.classList.remove("drawing"), 2600);
     address(`s${at + 1}`, true);
+    // The strip covers the bottom of the screen, so the screen leaves it room.
+    root.style.setProperty("--m-bar-h", `${bar.offsetHeight}px`);
+  }
+
+  // A screen taller than the window is read down before the next one comes.
+  const room = () => document.documentElement.scrollHeight - window.innerHeight - window.scrollY;
+  function onward() {
+    if (room() > 24) window.scrollBy({ top: window.innerHeight * 0.8 });
+    else show(at + 1);
+  }
+  function backward() {
+    if (window.scrollY > 24) window.scrollBy({ top: -window.innerHeight * 0.8 });
+    else show(at - 1);
+  }
+
+  // The screen a part of the page is on, or -1.
+  function screenOf(node) {
+    if (!node) return -1;
+    const slide = node.closest("[data-slide]") ?? node.querySelector("[data-slide]");
+    return slides.indexOf(slide);
   }
 
   function open(index = 0) {
     before();
+    // The button that opened this keeps no hold on the space bar.
+    document.activeElement?.blur?.();
     slides = [...document.querySelectorAll("[data-slide]")];
     root.classList.add("present");
     bar.hidden = false;
@@ -99,8 +121,10 @@ export function mount(bar, { before = () => {}, note = () => "" } = {}) {
     }
     const key = event.key;
     if (key === "Escape") close();
-    else if (key === "ArrowRight" || key === "PageDown" || (key === " " && !pressing(event.target))) show(at + 1);
-    else if (key === "ArrowLeft" || key === "PageUp") show(at - 1);
+    else if (key === "ArrowRight") show(at + 1);
+    else if (key === "ArrowLeft") show(at - 1);
+    else if (key === "PageDown" || (key === " " && !event.shiftKey && !pressing(event.target))) onward();
+    else if (key === "PageUp" || (key === " " && event.shiftKey && !pressing(event.target))) backward();
     else if (key === "Home") show(0);
     else if (key === "End") show(slides.length - 1);
     else if (key === "f" || key === "F") {
@@ -110,6 +134,17 @@ export function mount(bar, { before = () => {}, note = () => "" } = {}) {
     } else if (/^[1-9]$/.test(key)) show(Number(key) - 1);
     else return;
     event.preventDefault();
+  });
+
+  // A link to another part of the page goes to the screen that part is on.
+  document.addEventListener("click", (event) => {
+    if (!on()) return;
+    const link = event.target.closest?.('a[href^="#"]');
+    const id = link?.getAttribute("href").slice(1);
+    if (!id) return;
+    const index = screenOf(document.getElementById(id));
+    event.preventDefault();
+    if (index >= 0) show(index);
   });
 
   // An address typed or followed while presenting goes to its screen.

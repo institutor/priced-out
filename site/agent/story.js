@@ -23,6 +23,8 @@ const PART_OF = {
 // before it. Publishing happens twice: once to write the survey, and once
 // more, after the envelope is sealed, on the way to sending it.
 export function partOf(step, sealed) {
+  // A plan changed part way through belongs with what it was changed during.
+  if (step.kind === "plan" && step.first === false) return null;
   if (step.kind !== "flashpoint") return PART_OF[step.kind] ?? null;
   if (step.action === "design") return "write";
   if (step.action === "send") return "send";
@@ -38,6 +40,8 @@ export function partsOf(steps) {
   const sealed = new Set();
   let round = 0;
   let spent = 0;
+  // Anything said before the first part begins is kept for that part.
+  let before = [];
   for (const step of steps) {
     if (step.round !== undefined) round = step.round;
     if (step.kind === "sealed") sealed.add(step.round);
@@ -47,15 +51,22 @@ export function partsOf(steps) {
     const early = last && part === "write" && last.part === "write" && last.round === 0;
     const same = last && (part === null || early || (part === last.part && round === last.round));
     spent = Math.max(spent, step.spent ?? 0);
+    if (!last && part === null) {
+      before.push(step);
+      continue;
+    }
     if (same) {
       last.steps.push(step);
       last.spent = spent;
       if (early) last.round = round;
     } else {
       const starts = part ?? "write";
-      parts.push({ part: starts, round: starts === "plan" || starts === "answer" ? 0 : round, steps: [step], spent });
+      parts.push({ part: starts, round: starts === "plan" || starts === "answer" ? 0 : round, steps: [...before, step], spent });
+      before = [];
     }
   }
+  // A run that never got as far as a part is told as one, so nothing is lost.
+  if (before.length > 0) parts.push({ part: "write", round: Math.max(1, round), steps: before, spent });
   return parts;
 }
 

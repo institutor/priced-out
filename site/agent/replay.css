@@ -764,7 +764,7 @@ html.present [data-slide] {
 html.present [data-slide].on {
   display: block;
   padding-top: clamp(1.25rem, 4svh, 3rem);
-  padding-bottom: 6.5rem;
+  padding-bottom: calc(var(--m-bar-h, 5rem) + 1.75rem);
   border-bottom: 0;
 }
 

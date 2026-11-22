@@ -89,3 +89,22 @@ test("every published run on the list tells a whole story", () => {
     assert.equal(/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z]{2,}/.test(JSON.stringify(run)), false, entry.file);
   }
 });
+
+test("what the agent says before its plan is told with the plan", () => {
+  const parts = partsOf([{ kind: "thinking" }, { kind: "plan", first: true }, fp(1, "design", 0.5)]);
+  assert.deepEqual(parts.map((part) => `${part.part}${part.round}`), ["plan0", "write1"]);
+  assert.equal(parts[0].steps.length, 2);
+});
+
+test("a plan changed part way through stays in the part it was changed in", () => {
+  const parts = partsOf([{ kind: "plan", first: true }, fp(1, "design", 0.5), { kind: "plan", first: false }, { kind: "sealed", round: 1 }]);
+  assert.deepEqual(parts.map((part) => part.part), ["plan", "write", "seal"]);
+  assert.equal(parts[1].steps.length, 2);
+});
+
+test("a run that stopped before any part began still shows its steps", () => {
+  const parts = partsOf([{ kind: "thinking" }, { kind: "blocked" }]);
+  assert.equal(parts.length, 1);
+  assert.equal(parts[0].steps.length, 2);
+  assert.equal(parts[0].round, 1);
+});
