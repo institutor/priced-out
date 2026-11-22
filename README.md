@@ -1,6 +1,6 @@
 # Priced Out
 
-> **Here for the MCP Challenge?** The agent is the Sealed Envelope. Give it one objective and it runs the survey research through the Flashpoint MCP: [what it does](#mcp-challenge-an-agent-that-does-the-research-with-you), [a run you can watch part by part](https://institutor.github.io/priced-out/agent/), and [how to run it, with the objective given and what the agent decided](agent/README.md).
+> **Here for the MCP Challenge?** The agent is the Sealed Envelope. Give it one objective and it runs the survey research through the Flashpoint MCP: [what it does](#mcp-challenge-an-agent-that-does-the-research-for-you), [a run you can watch part by part](https://institutor.github.io/priced-out/agent/), and [how to run it, with the objective given and what the agent decided](agent/README.md).
 
 During my time in high school, I found myself often faced with times where I couldn't
 exactly afford to pay for certain club dues, and I wish I could have done something about
@@ -60,7 +60,7 @@ The survey is live, and the page reads a club's own answers as soon as there are
 treasurer loads the export in the browser and every number becomes their members' (see
 [Run it for your own club](#run-it-for-your-own-club)).
 
-## MCP Challenge: an agent that does the research with you
+## MCP Challenge: an agent that does the research for you
 
 `agent/` holds a second tool, built for the MCP Challenge. It is called the Sealed
 Envelope.
@@ -68,8 +68,8 @@ Envelope.
 **One objective in, an answer out.** You give the agent one sentence, a list of people to
 email and a budget. Through the Flashpoint MCP it decides what survey to make, sends it
 to the list, reads the answers, runs a follow-up round on what it learned, and comes back
-with a recommendation. It comes to you only when one of your standing orders says so, or
-not at all with `--hands-off`.
+with a recommendation. It comes to you when one of your standing orders says so, or when
+only you can know something. With `--hands-off` it does not come to you at all.
 
 Before each survey goes out, the agent seals a guess of what people will say. You can
 seal one too. When the real answers are in, the envelope is opened, and whatever was
@@ -138,9 +138,9 @@ What the agent decided, in that practice run:
   welcome. A picnic is the safe choice, and a subsidised day trip is close behind. It
   said plainly that 8 people give a direction, not a measurement.
 - **How much it did alone.** 20 steps on its own. It went to a person 4 times: 2
-  approvals to send, and 2 updates its standing orders asked for.
-- **The bill.** Ten messages to Flashpoint: $5.00 of a $9.00 budget, at the prices a
-  real run pays.
+  approvals to send, and 2 reports its standing orders asked for.
+- **The bill.** Ten messages to Flashpoint: $5.00 of a $9.00 budget. A real run needs a
+  few more messages, about $7 for two rounds.
 
 The full example is in [agent/examples/practice-run/](agent/examples/practice-run/):
 [the one-page summary](agent/examples/practice-run/summary.md) and

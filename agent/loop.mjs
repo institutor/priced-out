@@ -321,7 +321,17 @@ export function unbackedNumbers(text, sources) {
 }
 
 const saysYes = (text) => /^\W*(y|yes|yep|yeah|ok|okay|approve|approved|go|go ahead|send|send it|do it)\b/i.test(String(text ?? ""));
-const listsQuestions = (text) => text.length > 200 && (text.match(/\?/g) ?? []).length >= 2;
+// Whether a reply shows a survey's questions. Two question marks are enough.
+// A short follow-up may have only one, or word a question as "Rank these", so
+// a reply laid out as a table or a numbered list of questions counts as well.
+export const listsQuestions = (text) => {
+  if (text.length <= 200) return false;
+  const marks = (text.match(/\?/g) ?? []).length;
+  if (marks >= 2) return true;
+  const rows = text.split("\n").filter((line) => /^\s*\|.*\|\s*$/.test(line) && !/^\s*\|[\s:|-]+\|\s*$/.test(line)).length;
+  const numbered = text.split("\n").filter((line) => /^\s*(Q\d+|\d+)[.):]\s+\S/.test(line)).length;
+  return rows >= 3 || numbered >= 2 || (marks === 1 && (rows >= 2 || numbered >= 1));
+};
 // A short go-ahead: "confirm", "Yes, confirm.", "Confirmed, go ahead".
 const isConfirm = (text) => String(text).length < 80 && /^\W*(confirm(ed)?|yes|yep|ok(ay)?|proceed|go ahead|do it|approved?)\b/i.test(text);
 const SEND_WORDS = /\b(send|sent|sending|e-?mail|mail|invit|distribut|deliver|notif|share|sharing)/i;

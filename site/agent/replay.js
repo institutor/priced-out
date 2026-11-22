@@ -11,7 +11,7 @@ import { strip } from "../js/ui/banner.js";
 import * as contents from "../js/ui/contents.js";
 import * as cover from "../js/ui/cover.js";
 import * as scene from "./scene.js";
-import { autonomy, lastOf, money, partsOf, roundsIn } from "./story.js";
+import { aboutRun, autonomy, lastOf, money, partsOf, roundsIn, runFor } from "./story.js";
 import { card, envelope, meter, numbered, slip, stamp, verdict } from "./draw.js";
 import * as present from "./present.js";
 
@@ -217,7 +217,7 @@ const TELL = {
     if (emailed) {
       body.push(el("p", { text: `Flashpoint emailed the survey to all ${run.people} people on the list.${run.emailLimit ? ` That was email ${before + 1} of the ${run.emailLimit} each of them may get.` : ""}` }));
     }
-    if (wait) body.push(el("p", { text: `Then the agent waited up to ${wait.minutes} minutes for answers.` }));
+    if (wait) body.push(el("p", { text: `Then the agent chose to wait up to ${wait.minutes} minutes for answers.${run.mode === "real" ? "" : " A practice run does not really wait: the invented answers come straight back."}` }));
     return { doodle: "plane", title: "The survey goes out", body, side: paidSlip(part, run, `send ${part.round}`) };
   },
 
@@ -299,7 +299,26 @@ function partCard(part, run, story, index) {
 
 // The sections ---------------------------------------------------------------
 
-function drawObjective(body, run) {
+// The other runs that have been published: the same agent, given other
+// objectives. Choosing one loads the page again with that run.
+function otherRuns(list, showing) {
+  if (list.length < 2) return null;
+  return [
+    el("h3", { class: "sub", text: "The same agent, other objectives" }),
+    el("p", { text: "Nothing in the agent says what to ask. Give it another objective and it writes another survey." }),
+    el("ul", { class: "m-runs" }, list.map((entry, index) => {
+      const now = entry.file === showing.file;
+      const words = `“${entry.objective}”`;
+      return el("li", { class: now ? "now" : "" },
+        bullet(600 + index),
+        now ? el("strong", { text: words }) : el("a", { href: entry.name ? `?run=${entry.name}#objective` : "./#objective", text: words }),
+        el("span", { class: "m-foot", text: ` ${now ? "Showing now: " : ""}${aboutRun(entry)}.` }),
+      );
+    })),
+  ];
+}
+
+function drawObjective(body, run, list, showing) {
   const count = autonomy(run.steps);
   const finish = run.steps.find((step) => step.kind === "finish");
   const spent = finish?.spent ?? run.steps.reduce((most, step) => Math.max(most, step.spent ?? 0), 0);
@@ -308,15 +327,20 @@ function drawObjective(body, run) {
     el("p", { text: `That one sentence is all the agent was given, with a list of ${run.people} people to email and a budget of ${money(run.cap)}. What to ask, when to ask again and when to stop were its own decisions.` }),
     el("dl", { class: "m-tally" },
       el("div", {}, el("dt", { text: "steps the agent took alone" }), el("dd", { text: String(count.alone) })),
-      el("div", {}, el("dt", { text: `times it went to the commander: ${plural(count.approvals, "send approval")}, ${plural(count.questions, "update or question", "updates or questions")}` }), el("dd", { text: String(count.person) })),
-      el("div", {}, el("dt", { text: "times the code had to stop it" }), el("dd", { text: String(count.codeStops) })),
+      el("div", {}, el("dt", { text: count.person === 0 ? "times it went to a person" : `times it went to the commander: ${[count.approvals > 0 ? plural(count.approvals, "approval to send", "approvals to send") : null, count.ordered > 0 ? `${plural(count.ordered, "report")} a standing order asked for` : null, count.asked > 0 ? `${plural(count.asked, "question")} of its own` : null].filter(Boolean).join(", ")}` }), el("dd", { text: String(count.person) })),
+      el("div", {}, el("dt", { text: count.codeStops + count.nudges === 0 ? "times the code stepped in" : `times the code stepped in: ${[count.nudges > 0 ? "it asked the agent once to think again before stopping" : null, count.codeStops > 0 ? `it refused ${plural(count.codeStops, "step")}` : null].filter(Boolean).join(", ")}` }), el("dd", { text: String(count.codeStops + count.nudges) })),
       el("div", {}, el("dt", { text: `${roundsIn(run.steps) === 1 ? "round" : "rounds"}, for ${money(spent)} of the ${money(run.cap)}` }), el("dd", { text: String(roundsIn(run.steps)) })),
     ),
     el("h3", { class: "sub", text: "Standing orders from the commander" }),
     el("p", { text: `The commander is the person who gave the objective.${run.standInCommander ? " Nobody was at the keyboard for this practice run, so an AI stand-in played the commander. It is labelled wherever it speaks." : run.practiceCommander ? " Nobody was at the keyboard for this practice run, so the commander's replies are canned." : ""}${run.handsOff ? " This run was hands-off: the code checked each survey before it was sent, in place of a person." : ""}` }),
     points(run.orders, 400),
     el("p", { class: "m-foot", text: `${run.emailLimit ? `Nobody on the list gets more than ${inWords(run.emailLimit)} ${run.emailLimit === 1 ? "email" : "emails"} in a run. ` : ""}The agent's model was ${run.model}.` }),
-    run.memory?.length > 0 ? [el("h3", { class: "sub", text: "What it remembered from earlier runs" }), points(run.memory, 420)] : null,
+    run.memory?.length > 0 ? [
+      el("h3", { class: "sub", text: "What it remembered from earlier runs" }),
+      el("p", { text: "At the end of every run the agent writes down what it learned about doing the research. It read these before it planned this one." }),
+      points(run.memory, 420),
+    ] : null,
+    otherRuns(list, showing),
   );
 }
 
@@ -476,9 +500,19 @@ async function start() {
   cover.mount(root, { scene, solidWords: 2 }).catch(() => {}).finally(() => root.classList.add("play"));
 
   const section = (id) => document.querySelector(`#${id} .section-body`);
+  // The list of published runs, if there is one, and the run the address
+  // asks for.
+  let list = [];
+  try {
+    const reply = await fetch("../data/agent-runs.json");
+    if (reply.ok) list = await reply.json();
+  } catch {
+    // No list: the page shows the one run it always has.
+  }
+  const showing = runFor(list, new URLSearchParams(window.location.search).get("run"));
   let run;
   try {
-    const reply = await fetch("../data/agent-run.json");
+    const reply = await fetch(`../data/${showing.file}`);
     if (!reply.ok) throw new Error(String(reply.status));
     run = await reply.json();
   } catch {
@@ -497,7 +531,7 @@ async function start() {
     banner.append(strip("banner pilot", "A real run. ", `${run.people} people were emailed through Flashpoint and paid steps were charged. With so few people, read the answer as a direction, not a measurement.`, `${run.people} real people asked. A direction, not a measurement.`));
   }
 
-  drawObjective(section("objective"), run);
+  drawObjective(section("objective"), run, Array.isArray(list) ? list : [], showing);
   const watch = drawWatch(section("watch"), run);
   drawAnswer(section("answer"), run);
   drawHow(section("how"), run);

@@ -711,3 +711,14 @@ test("the lessons the agent writes at the end are kept, three at most, with name
   const out = await run([done]);
   assert.deepEqual(out.answer.lessons, ["[person 1] showed that ranking beats picking one.", "Two.", "Three."]);
 });
+
+test("a short follow-up with one question mark still counts as a shown survey", async () => {
+  const { listsQuestions, sendChecks } = await import("../agent/loop.mjs");
+  const pad = "This is the short follow-up, and it is worth a minute because your answers pointed to a few specific changes we could make this term. ";
+  const table = `Drafted survey 2.\n\n| Label | Type | Text | Answer options |\n|---|---|---|---|\n| Intro | Statement | ${pad} | |\n| Q1 | Ranking | Rank these changes from most to least likely to bring you back. | Agenda; A task; Fewer events |\n| Q2 | Open | In a sentence, why did you put your first choice first? | |`;
+  assert.equal(listsQuestions(table), true);
+  assert.deepEqual(sendChecks({ draft: table, changes: [], followUp: true }), []);
+  assert.equal(listsQuestions(`${pad}${pad}\n1. Rank these changes.\n2. Say why in a sentence.`), true);
+  assert.equal(listsQuestions(`Survey 2 is published and has not been sent. Nothing was changed. ${pad}${pad}`), false);
+  assert.equal(listsQuestions(`${pad}${pad} Shall I publish it?`), false);
+});

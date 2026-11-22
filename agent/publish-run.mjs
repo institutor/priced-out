@@ -1,7 +1,11 @@
-// Puts one mission on the site's replay page (site/agent/), so anyone can watch
-// what the agent did, step by step.
+// Puts one run on the agent's page (site/agent/), so anyone can watch what the
+// agent did, part by part.
 //
-//   node agent/publish-run.mjs agent/runs/<folder>     writes site/data/agent-run.json
+//   node agent/publish-run.mjs agent/runs/<folder>             the run the page opens with
+//   node agent/publish-run.mjs agent/runs/<folder> --as name   one more run, picked on the page
+//
+// The first writes site/data/agent-run.json, the second
+// site/data/agent-run-<name>.json. Both are listed in site/data/agent-runs.json.
 //
 // The steps were already stripped of names and addresses when they were saved.
 // This checks once more and refuses to publish a run that still holds an address.
@@ -28,15 +32,57 @@ export function forSite(run) {
   return out;
 }
 
+// The file a run is published to. A name may only hold small letters, digits
+// and dashes, so it is safe in an address.
+export function fileFor(name) {
+  if (name === undefined || name === null) return "agent-run.json";
+  if (!/^[a-z0-9][a-z0-9-]{0,39}$/.test(name)) throw new Error("A run's name may hold only small letters, digits and dashes.");
+  return `agent-run-${name}.json`;
+}
+
+// One line of the list of published runs: enough for the page to offer it.
+export function listed(run, name) {
+  const spent = run.steps.reduce((most, step) => Math.max(most, step.spent ?? 0), 0);
+  return {
+    name: name ?? "",
+    file: fileFor(name),
+    objective: run.objective,
+    mode: run.mode,
+    handsOff: run.handsOff === true,
+    people: run.people,
+    rounds: new Set(run.steps.filter((step) => step.round !== undefined).map((step) => step.round)).size,
+    remembered: (run.memory ?? []).length,
+    spent,
+    stamp: run.stamp,
+  };
+}
+
+// The list with one run put in. The run the page opens with stays first, and
+// a run published again under the same name takes the place it had.
+export function withRun(list, entry) {
+  const others = list.filter((other) => other.file !== entry.file);
+  const at = list.findIndex((other) => other.file === entry.file);
+  if (entry.name === "") return [entry, ...others];
+  if (at === -1) return [...others, entry];
+  return [...list.slice(0, at), entry, ...list.slice(at + 1)];
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const folder = process.argv[2];
-  if (!folder || !fs.existsSync(`${folder}/steps.json`)) {
-    console.log("Usage: node agent/publish-run.mjs agent/runs/<folder>");
+  const args = process.argv.slice(2);
+  const as = args.includes("--as") ? args[args.indexOf("--as") + 1] : undefined;
+  const folder = args.find((arg, index) => !arg.startsWith("--") && args[index - 1] !== "--as");
+  if (!folder || !fs.existsSync(`${folder}/steps.json`) || (args.includes("--as") && !as)) {
+    console.log("Usage: node agent/publish-run.mjs agent/runs/<folder> [--as name]");
     process.exit(1);
   }
   const run = JSON.parse(fs.readFileSync(`${folder}/steps.json`, "utf8"));
-  const target = new URL("../site/data/agent-run.json", import.meta.url);
-  fs.writeFileSync(target, `${JSON.stringify(forSite(run), null, 1)}\n`);
-  console.log(`Published ${run.steps.length} steps of a ${run.mode === "real" ? "real" : "practice"} run to site/data/agent-run.json.`);
+  const out = forSite(run);
+  const file = fileFor(as);
+  const target = new URL(`../site/data/${file}`, import.meta.url);
+  fs.writeFileSync(target, `${JSON.stringify(out, null, 1)}\n`);
+  const index = new URL("../site/data/agent-runs.json", import.meta.url);
+  const list = fs.existsSync(index) ? JSON.parse(fs.readFileSync(index, "utf8")) : [];
+  fs.writeFileSync(index, `${JSON.stringify(withRun(list, listed(out, as)), null, 1)}\n`);
+  console.log(`Published ${run.steps.length} steps of a ${run.mode === "real" ? "real" : "practice"} run to site/data/${file}.`);
   if (run.mode !== "real") console.log("The page will say, above everything else, that this is a practice run with invented answers.");
 }

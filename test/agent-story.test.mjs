@@ -62,3 +62,30 @@ test("the published run tells a whole story", () => {
     assert.deepEqual(mine, ["write", "seal", "send", "open", "decide"], `round ${round}`);
   }
 });
+
+test("the page only loads a run that is on the list, by a safe file name", async () => {
+  const { runFor, aboutRun } = await import("../site/agent/story.js");
+  const list = [{ name: "", file: "agent-run.json" }, { name: "two", file: "agent-run-two.json" }, { name: "bad", file: "../secrets.json" }];
+  assert.equal(runFor(list, "two").file, "agent-run-two.json");
+  assert.equal(runFor(list, null).file, "agent-run.json");
+  assert.equal(runFor(list, "nope").file, "agent-run.json");
+  assert.equal(runFor(list, "bad").file, "agent-run.json");
+  assert.equal(runFor([], "two").file, "agent-run.json");
+  assert.equal(runFor(undefined, null).file, "agent-run.json");
+  assert.equal(aboutRun({ mode: "practice", handsOff: true, remembered: 3, rounds: 2, spent: 5 }), "a practice run, hands-off: nobody approved the sends, started with 3 lessons from earlier runs, 2 rounds, $5.00 spent");
+  assert.equal(aboutRun({ mode: "real", handsOff: false, remembered: 0, rounds: 1, spent: 3.5 }), "a real run, 1 round, $3.50 spent");
+});
+
+test("every published run on the list tells a whole story", () => {
+  const dir = new URL("../site/data/", import.meta.url);
+  const list = JSON.parse(fs.readFileSync(new URL("agent-runs.json", dir), "utf8"));
+  assert.ok(list.length >= 1);
+  assert.equal(list[0].file, "agent-run.json");
+  for (const entry of list) {
+    const run = JSON.parse(fs.readFileSync(new URL(entry.file, dir), "utf8"));
+    assert.equal(run.objective, entry.objective);
+    const parts = partsOf(run.steps);
+    assert.equal(parts.reduce((sum, part) => sum + part.steps.length, 0), run.steps.length, entry.file);
+    assert.equal(/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z]{2,}/.test(JSON.stringify(run)), false, entry.file);
+  }
+});

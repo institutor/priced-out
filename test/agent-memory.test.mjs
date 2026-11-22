@@ -39,7 +39,7 @@ const steps = [
 ];
 
 test("the summary counts what the agent did alone, and shows its plan, the checks and its lessons", () => {
-  assert.deepEqual(autonomy(steps), { alone: 5, approvals: 0, questions: 0, person: 0, codeStops: 1 });
+  assert.deepEqual(autonomy(steps), { alone: 5, approvals: 0, ordered: 0, asked: 0, questions: 0, person: 0, codeStops: 1, nudges: 0 });
   const text = summarize({ ...head, handsOff: true, memory: ["An older lesson."], steps });
   assert.match(text, /took \*\*5 steps on its own\*\*\. It did not stop for a person once\. The code stopped it 1 time\./);
   assert.match(text, /What it remembered from earlier missions:\*\*\n\n- An older lesson\./);
@@ -50,7 +50,7 @@ test("the summary counts what the agent did alone, and shows its plan, the check
   assert.match(text, /handed the mission over and was away/);
 
   const attended = summarize({ ...head, steps: [...steps.slice(0, 3), { n: 4, kind: "send-approved", round: 1, reply: "yes" }, { n: 5, kind: "commander", message: "m", reply: "ok" }, steps[6]] });
-  assert.match(attended, /A person was needed 2 times: 1 send approval and 1 question the agent chose to ask\./);
+  assert.match(attended, /A person was needed 2 times: 1 send approval, 0 reports a standing order asked for, and 1 question of its own\./);
 });
 
 test("the log says when the mission was handed over and when a stand-in played the commander", () => {

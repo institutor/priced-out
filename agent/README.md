@@ -17,8 +17,8 @@ with a recommendation.
 | **What surprised it** | The social evening came last. Money worries came up again and again, and one person proposed skipping the event. |
 | **Survey 2, on that surprise** | Three questions: a free picnic, a club-subsidised day trip, a small event plus an aid fund, or no event? What would stop you coming? |
 | **The recommendation** | A free or very cheap Saturday daytime outdoor event with kids welcome. Picnic is the safe choice; a subsidised day trip is close behind. |
-| **How much it did alone** | 20 steps on its own. It went to a person 4 times: 2 approvals to send, 2 updates its standing orders asked for. |
-| **Cost** | $5.00 of a $9.00 budget, at the prices a real run pays. |
+| **How much it did alone** | 20 steps on its own. It went to a person 4 times: 2 approvals to send, and 2 reports its standing orders asked for. The code stepped in once, to ask it to think again before stopping. |
+| **Cost** | $5.00 of a $9.00 budget in practice. A real run needs a few more messages, about $7 for two rounds. |
 
 **That example is a practice run.** An AI stand-in played Flashpoint and invented every
 answer, so it is not a finding. It shows what the agent decides and how. No real run has
@@ -31,7 +31,8 @@ been made yet.
 
 ## What it does
 
-A run goes like this. The agent makes every research decision itself.
+A run goes like this. The research decisions are the agent's: what to ask, what it
+expects, what the answers mean, whether to ask again, and when to stop.
 
 1. **You give one objective**, a list of people to email, a budget, and any standing
    orders.
@@ -171,15 +172,18 @@ tool, and writes down why.
 | `make_deck` | A short slide deck from Flashpoint's `presentation` tool | $0.25 |
 | `finish` | Ends the run with the answer, the scoreboard and the lessons | free |
 
-The agent's instructions say what Flashpoint can do and what a step costs. They do not
-say what to ask, how many questions, whether to rehearse, or what a second round should
-be about. Those are the agent's decisions.
+The agent's instructions say what Flashpoint can do, what a step costs, and a few
+limits: keep a survey short, keep a follow-up to about three questions, and spend a
+second round only on what the first one got wrong. They do not say what to ask, how to
+word it, whether to rehearse, whether to run a second round, or when to stop. Those are
+the agent's decisions.
 
-**One challenge.** If the agent chooses to stop after a single round while it still names
-something unknown and has the budget for a short second round, the code asks it once to
-think again. The decision stays the agent's, and the log shows the challenge. In the
-example run this is exactly what happened: it chose to stop, was asked once, and then
-chose a three-question follow-up.
+**One nudge, and it is counted.** If the agent chooses to stop after a single round
+while it still names something unknown and has the budget for a short second round, the
+code asks it once to think again. It asks at most once in a run, the agent may still
+stop, and the log, the summary and the page all show that it happened. In the first
+example run it did happen: the agent chose to stop, was asked once, and then chose a
+three-question follow-up.
 
 **Slips.** Every paid step carries a slip: the price, and the decision of the agent's
 that the step could change. If it cannot name one, it is told to skip the step.
@@ -201,9 +205,8 @@ These are rules in the code. They hold whatever the model says.
   doing you a favour. The code counts every send and refuses one that would pass the
   limit: two emails each by default, reminders included (`--emails 1` allows a single
   survey and no follow-up). The agent is also told to say in the first survey that one
-  short follow-up may come, and to keep a follow-up to three questions at most. That
-  part is an instruction to the agent and not a rule in the code, so check it when you
-  approve.
+  short follow-up may come, and to keep a follow-up to three questions at most. The
+  code's own check is looser (about five), so look at the length when you approve.
 - **A hard budget.** The code refuses any paid step that would pass the budget. A call
   that fails is not counted.
 - **The envelope is honest.** Your guess is kept from the model until the envelope opens.
@@ -266,8 +269,8 @@ What the agent decided:
 - **Its lessons for next time.** Rank questions gave a clearer signal than single choice.
   Offering cost-sharing changed the order, so test price wording on purpose. Ask about
   barriers openly instead of assuming them.
-- **The bill.** Ten messages to Flashpoint: $5.00 of a $9.00 budget, at the prices a real
-  run pays.
+- **The bill.** Ten messages to Flashpoint: $5.00 of a $9.00 budget. A real run needs a
+  few more messages, because the real Flashpoint asks for a confirm on the way.
 
 The whole run is in [examples/practice-run/](examples/practice-run/): the
 [one-page summary](examples/practice-run/summary.md) and the

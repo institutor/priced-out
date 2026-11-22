@@ -64,14 +64,42 @@ export function partsOf(steps) {
 export function autonomy(steps) {
   const ALONE = ["plan", "flashpoint", "rehearsal", "deck", "sealed", "opened", "debrief", "wait", "finish"];
   const approvals = steps.filter((step) => step.kind === "send-approved" || step.kind === "send-refused").length;
-  const questions = steps.filter((step) => step.kind === "commander" && step.reply !== null).length;
+  const told = steps.filter((step) => step.kind === "commander" && step.reply !== null);
+  // A report one of the standing orders asked for is not a question the
+  // agent chose to ask, so the two are counted apart.
+  const ordered = told.filter((step) => Boolean(step.order)).length;
+  const asked = told.length - ordered;
   return {
     alone: steps.filter((step) => ALONE.includes(step.kind)).length,
     approvals,
-    questions,
-    person: approvals + questions,
+    ordered,
+    asked,
+    questions: told.length,
+    person: approvals + told.length,
     codeStops: steps.filter((step) => ["blocked", "email-limit", "send-held"].includes(step.kind)).length,
+    nudges: steps.filter((step) => step.kind === "challenge").length,
   };
+}
+
+// Which published run an address asks for. `list` is the list of published
+// runs, and `wanted` the name in the address. An unknown name, or none, gets
+// the run the page opens with. The file name is checked, since it is fetched.
+export function runFor(list, wanted) {
+  const safe = (entry) => entry && /^agent-run(-[a-z0-9-]+)?\.json$/.test(entry.file ?? "");
+  const found = (list ?? []).find((entry) => entry.name === wanted && wanted);
+  if (safe(found)) return found;
+  const first = (list ?? []).find((entry) => entry.name === "");
+  return safe(first) ? first : { name: "", file: "agent-run.json" };
+}
+
+// A few words about a published run, for the list of them.
+export function aboutRun(entry) {
+  const parts = [entry.mode === "real" ? "a real run" : "a practice run"];
+  if (entry.handsOff) parts.push("hands-off: nobody approved the sends");
+  if (entry.remembered > 0) parts.push(`started with ${entry.remembered} ${entry.remembered === 1 ? "lesson" : "lessons"} from earlier runs`);
+  parts.push(`${entry.rounds} ${entry.rounds === 1 ? "round" : "rounds"}`);
+  parts.push(`${money(entry.spent)} spent`);
+  return parts.join(", ");
 }
 
 // The last step of a kind in a list, or undefined.

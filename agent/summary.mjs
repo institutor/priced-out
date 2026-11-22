@@ -30,13 +30,20 @@ export function score(scoreboard) {
 export function autonomy(steps) {
   const ALONE = ["plan", "flashpoint", "rehearsal", "deck", "sealed", "opened", "debrief", "wait", "finish"];
   const approvals = steps.filter((s) => s.kind === "send-approved" || s.kind === "send-refused").length;
-  const questions = steps.filter((s) => s.kind === "commander" && s.reply !== null).length;
+  const told = steps.filter((s) => s.kind === "commander" && s.reply !== null);
+  // A report one of the standing orders asked for is not a question the
+  // agent chose to ask, so the two are counted apart.
+  const ordered = told.filter((s) => Boolean(s.order)).length;
+  const asked = told.length - ordered;
   return {
     alone: steps.filter((s) => ALONE.includes(s.kind)).length,
     approvals,
-    questions,
-    person: approvals + questions,
+    ordered,
+    asked,
+    questions: told.length,
+    person: approvals + told.length,
     codeStops: steps.filter((s) => ["blocked", "email-limit", "send-held"].includes(s.kind)).length,
+    nudges: steps.filter((s) => s.kind === "challenge").length,
   };
 }
 
@@ -80,7 +87,7 @@ export function summarize(run) {
   if (run.memory?.length > 0) lines.push("**What it remembered from earlier missions:**", "", ...run.memory.map((lesson) => `- ${lesson}`), "");
 
   const own = autonomy(steps);
-  lines.push("## How much it did alone", "", `The agent took **${own.alone} steps on its own**. ${own.person === 0 ? "It did not stop for a person once." : `A person was needed ${times(own.person)}: ${own.approvals} send approval${own.approvals === 1 ? "" : "s"} and ${own.questions} question${own.questions === 1 ? "" : "s"} the agent chose to ask.`}${own.codeStops > 0 ? ` The code stopped it ${times(own.codeStops)}.` : ""}`, "");
+  lines.push("## How much it did alone", "", `The agent took **${own.alone} steps on its own**. ${own.person === 0 ? "It did not stop for a person once." : `A person was needed ${times(own.person)}: ${own.approvals} send approval${own.approvals === 1 ? "" : "s"}, ${own.ordered} report${own.ordered === 1 ? "" : "s"} a standing order asked for, and ${own.asked} question${own.asked === 1 ? "" : "s"} of its own.`}${own.nudges > 0 ? " The code asked it once to think again before it stopped." : ""}${own.codeStops > 0 ? ` The code stopped it ${times(own.codeStops)}.` : ""}`, "");
 
   lines.push("## What the agent decided", "");
   const plan = steps.find((s) => s.kind === "plan");

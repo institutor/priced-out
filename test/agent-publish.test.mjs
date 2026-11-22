@@ -42,3 +42,24 @@ test("the replay page puts the run on the page as text, never as markup", () => 
   const script = fs.readFileSync(new URL("../site/agent/replay.js", import.meta.url), "utf8");
   assert.doesNotMatch(script, /innerHTML|insertAdjacentHTML|document\.write/);
 });
+
+test("several runs can be published, and the page's first run stays first", async () => {
+  const { fileFor, listed, withRun } = await import("../agent/publish-run.mjs");
+  assert.equal(fileFor(undefined), "agent-run.json");
+  assert.equal(fileFor("hands-off"), "agent-run-hands-off.json");
+  assert.throws(() => fileFor("../x"), /small letters/);
+  assert.throws(() => fileFor("A b"), /small letters/);
+
+  const run = { objective: "o", mode: "practice", handsOff: true, people: 8, memory: ["a", "b"], stamp: "s", steps: [{ kind: "flashpoint", round: 1, spent: 0.5 }, { kind: "flashpoint", round: 2, spent: 3 }, { kind: "finish", spent: 3 }] };
+  const entry = listed(run, "two");
+  assert.deepEqual(entry, { name: "two", file: "agent-run-two.json", objective: "o", mode: "practice", handsOff: true, people: 8, rounds: 2, remembered: 2, spent: 3, stamp: "s" });
+
+  const main = listed({ ...run, handsOff: false }, undefined);
+  let list = withRun([], entry);
+  list = withRun(list, main);
+  assert.deepEqual(list.map((item) => item.file), ["agent-run.json", "agent-run-two.json"]);
+  list = withRun(list, listed(run, "three"));
+  list = withRun(list, { ...entry, objective: "again" });
+  assert.deepEqual(list.map((item) => item.name), ["", "two", "three"]);
+  assert.equal(list[1].objective, "again");
+});

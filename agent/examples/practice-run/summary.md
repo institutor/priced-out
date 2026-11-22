@@ -8,7 +8,7 @@
 
 ## How much it did alone
 
-The agent took **20 steps on its own**. A person was needed 4 times: 2 send approvals and 2 questions the agent chose to ask.
+The agent took **20 steps on its own**. A person was needed 4 times: 2 send approvals, 2 reports a standing order asked for, and 0 questions of its own. The code asked it once to think again before it stopped.
 
 ## What the agent decided
 
