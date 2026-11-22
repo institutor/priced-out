@@ -76,7 +76,10 @@ It was run hands-off, with nobody at the keyboard. What the agent decided:
 - **Survey 2.** Workshop, speaker, or the two combined? The most you would pay? Which
   topic?
 - **Stopping.** Speaker 3, combined 2, workshop 1, none 2. Everyone had now had their
-  two emails, so the code allowed no third survey, and the agent said so.
+  two emails, so the code allowed no third survey, and the agent said so. In
+  [another run](agent/examples/practice-run-free-to-stop/summary.md) a third round was
+  allowed and paid for. The agent ran two and stopped by its own choice: "another
+  round would add little."
 - **The recommendation.** A weekday evening with a professional guest: a short talk,
   then a hands-on part, free or cheap. Skip the social dinner. Five of the 8 picked a
   format with a professional guest, so it kept the guest and added the hands-on part.
