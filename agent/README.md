@@ -37,6 +37,20 @@ been made yet.
 - **What the agent decided, on one page:** [examples/practice-run/summary.md](examples/practice-run/summary.md)
 - **Every message, reply and decision:** [examples/practice-run/log.md](examples/practice-run/log.md)
 
+## Words used here
+
+| Word | What it means |
+|---|---|
+| Objective | The one sentence you give the agent. |
+| Commander | You: the person who gave the objective. |
+| Standing orders | A few rules you give once, at the start. The agent decides everything else. |
+| Envelope | The guesses written down before a survey goes out, and opened when the answers are in. |
+| Debrief | What the agent writes after opening the envelope: who was wrong, and what to do next. |
+| Slip | The note on each paid step: its price, and which decision it could change. |
+| Notebook | The lessons the agent writes at the end of a run and reads before the next. |
+| Hands-off | A run where nobody approves the sends. The code checks each survey instead. |
+| Practice run | A run where an AI stand-in plays Flashpoint and invents the answers. Nothing is sent or paid. |
+
 ## What it does
 
 A run goes like this. The research decisions are the agent's: what to ask, what it
