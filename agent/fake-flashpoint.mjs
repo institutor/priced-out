@@ -22,7 +22,12 @@ const cannedWriter = {
   rehearsalResults: async ({ survey, howMany }) => `SYNTHETIC rehearsal of survey ${survey}: ${howMany} of ${howMany} AI personas finished, none was cut off.\nOn the main closed question most personas picked the middle option.\nOne open question drew several answers that say they were unsure what it meant.\nThese are AI personas, not people.`,
 };
 
-export function fakeFlashpoint({ rehearsalFails = false, writer = cannedWriter, tag = FAKE_TAG } = {}) {
+const noEmails = (text) => text.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[email]");
+
+// scrub(text) is run on every message before the writer sees it. The writer may
+// be an AI model, so it never gets an address; pass the run's own redactor to
+// keep names from it too.
+export function fakeFlashpoint({ rehearsalFails = false, writer = cannedWriter, tag = FAKE_TAG, scrub = noEmails } = {}) {
   let survey = 0;
   let waiting = null; // "publish" or "send": what a bare "confirm" would do next
   let published = false;
@@ -30,14 +35,12 @@ export function fakeFlashpoint({ rehearsalFails = false, writer = cannedWriter, 
   let rehearsed = 0; // how many personas took the current survey
   let people = 0;
   const say = (text) => ({ text: `${tag}\n${text}` });
-  // The writer may be an AI model, so it never gets an address.
-  const noEmails = (text) => text.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[email]");
 
   async function ask({ message: raw, newSurvey }) {
     const text = raw.trim().toLowerCase();
     const listed = (raw.match(/<[^>]+@[^>]+>/g) ?? []).length;
     if (listed > 0) people = listed;
-    const message = noEmails(raw);
+    const message = scrub(raw);
 
     if (newSurvey || survey === 0) {
       survey += 1;

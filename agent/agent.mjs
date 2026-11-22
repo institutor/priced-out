@@ -330,7 +330,7 @@ if (mode === "fake") {
     const reply = await client.messages.create({ model: process.env.PRACTICE_MODEL ?? "claude-haiku-5-5", max_tokens: 4000, system, messages: [{ role: "user", content: prompt }] });
     return reply.content.filter((block) => block.type === "text").map((block) => block.text).join("").trim();
   };
-  flashpoint = fakeFlashpoint({ writer: practiceWriter({ ask }), tag: PRACTICE_TAG });
+  flashpoint = fakeFlashpoint({ writer: practiceWriter({ ask }), tag: PRACTICE_TAG, scrub: redact });
 } else {
   const real = await realFlashpoint();
   flashpoint = real.flashpoint;
