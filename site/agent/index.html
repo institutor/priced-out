@@ -39,7 +39,24 @@
         <li><b>The envelope is opened</b> against the real answers, and the agent says who was wrong, itself first.</li>
         <li><b>The agent decides the next move:</b> a second round on what surprised everyone, or the answer.</li>
       </ol>
-      <p>Every paid step prints a receipt first: what it costs, and the decision it could change. The agent works inside a budget cap that the code holds.</p>
+      <p>Every paid step prints a receipt first: what it costs, and the decision it could change.</p>
+    </section>
+
+    <section>
+      <h2>Who decides what</h2>
+      <div class="table-wrap">
+        <table class="split">
+          <thead><tr><th scope="col">The agent decides</th><th scope="col">The code holds, whatever the agent says</th></tr></thead>
+          <tbody>
+            <tr><td>What to ask, and how to word it</td><td>No email goes out until the commander has seen the survey and typed yes</td></tr>
+            <tr><td>Whether to rehearse on AI personas first</td><td>A budget cap. A paid step that would pass it is refused</td></tr>
+            <tr><td>What it expects people to answer</td><td>The commander's guess stays hidden from the agent until the envelope is opened</td></tr>
+            <tr><td>Who was wrong, and what that means</td><td>A guess cannot be sealed or changed after the survey is sent</td></tr>
+            <tr><td>Whether to run another round, and on what</td><td>Names and addresses never reach the model or the logs</td></tr>
+            <tr><td>When to stop, and the final recommendation</td><td>Every paid step is logged with its price and the decision it could change</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section id="mission">

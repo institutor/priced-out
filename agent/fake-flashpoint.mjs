@@ -98,5 +98,9 @@ export function fakeFlashpoint({ rehearsalFails = false, writer = cannedWriter, 
     return say(`A practice run makes no deck. A real run would return a link to "${title}".`);
   }
 
-  return { survey: ask, rehearse, deck };
+  // Where the stand-in survey stands, so a stopped practice run can carry on.
+  const state = () => ({ survey, waiting, published, sent, rehearsed, people });
+  const restore = (saved) => { if (saved) ({ survey, waiting, published, sent, rehearsed, people } = saved); };
+
+  return { survey: ask, rehearse, deck, state, restore };
 }

@@ -428,3 +428,13 @@ test("after a debrief the agent is shown its standing orders again", async () =>
   await runAgent({ objective: "o", recipients, cap: 8, orders: ["Come to me if the answers split evenly."], llm, flashpoint: fakeFlashpoint(), commander: desk().commander, wait: async () => {} });
   assert.match(seen[7], /read your standing orders again[^"]*- Come to me if the answers split evenly\./);
 });
+
+test("the stand-in Flashpoint can be put back where a stopped run left it", async () => {
+  const first = fakeFlashpoint();
+  await first.survey({ message: "Write a survey", newSurvey: false });
+  await first.survey({ message: "confirm", newSurvey: false });
+  const second = fakeFlashpoint();
+  second.restore(copy(first.state()));
+  const reply = await second.survey({ message: "confirm", newSurvey: false });
+  assert.match(reply.text, /Survey 1 was emailed/);
+});
