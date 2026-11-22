@@ -98,6 +98,10 @@ The agent's instructions say what Flashpoint can do and what a step costs. They 
 say what to ask, how many questions, whether to rehearse, or what a second round should
 be about. Those are the agent's decisions.
 
+**One challenge.** If the agent chooses to stop after a single round while it still names
+something unknown and has the budget for a short second round, the loop asks it once to
+think again. The decision stays the agent's, and the log shows the challenge.
+
 **Receipts.** Every paid step carries a receipt: the price, and the decision of the
 agent's that the step could change. If it cannot name one, it is told to skip the step.
 
@@ -135,7 +139,7 @@ agent's that the step could change. If it cannot name one, it is told to skip th
 | `practice-writer.mjs` | For `--practice`: a small AI model writes the stand-in's survey text and invents the answers. |
 | `orders.md` | The standing orders. |
 | `../flashpoint.mjs` | The organizers' starter client: wallet sign-in, MCP calls, x402 payment. |
-| `../test/agent.test.mjs`, `../test/agent-log.test.mjs` | Twenty tests of the loop and the log. |
+| `../test/agent.test.mjs`, `../test/agent-log.test.mjs` | Tests of the loop and the log, run with `npm test`. |
 
 ## The mission and what the agent decided
 
