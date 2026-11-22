@@ -58,18 +58,23 @@ The survey is live, and the page reads a club's own answers as soon as there are
 treasurer loads the export in the browser and every number becomes their members' (see
 [Run it for your own club](#run-it-for-your-own-club)).
 
-## MCP Challenge: an agent that does the research itself
+## MCP Challenge: an agent that does the research with you
 
-`agent/` holds a second tool, built for the MCP Challenge. You give it one objective and
-a list of people. It decides what survey to make, has Flashpoint build and email it,
-waits, reads the answers, writes follow-up questions from what it learned, runs a second
-round, and comes back with an answer. Nobody directs the steps.
+`agent/` holds a second tool, built for the MCP Challenge. You are the commander: you give
+it a mission and a few standing orders. It decides what survey to make, has Flashpoint
+build it, may rehearse it on AI personas, emails it once you approve, reads the answers,
+and runs a second round on what it learned. It comes to you only when an order says so.
+
+Before each survey goes out, the agent, the AI personas and you each seal a guess of what
+people will say. When the real answers are in, the envelope is opened, and whatever was
+guessed wrong is what the next round asks about.
 
 ```bash
-node agent/agent.mjs "Find the ticket price for our spring formal that keeps the most members coming." --fake
+node agent/agent.mjs "Find the ticket price for our spring formal that keeps the most members coming." --practice
 ```
 
-`--fake` is a practice run: no emails, no credit. How it works, how to run it for real,
+`--practice` is a practice run: an AI stand-in plays Flashpoint and invents the answers,
+so there are no emails and no Flashpoint credit. How it works, how to run it for real,
 and the run logs are in [agent/README.md](agent/README.md).
 
 ## Try it yourself, in a few minutes
@@ -641,6 +646,9 @@ Nothing in this repository existed before the build period. What came from outsi
 
 - **Claude Sonnet 5.5** (Anthropic API): the model that makes the decisions inside the
   agent in `agent/`. It reaches Flashpoint only through the Flashpoint MCP.
+- **Claude Haiku 5.5** (Anthropic API): plays Flashpoint in the agent's `--practice` runs
+  only, where it invents the survey text and the answers. Nothing it writes is used as a
+  result.
 
 No AI runs in the live site. Every respondent in the data is AI-generated, and the site
 says so wherever a number appears.
