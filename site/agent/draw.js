@@ -111,6 +111,13 @@ export function meter(name = "meter") {
   return node;
 }
 
+// An arrow from one card to the next. It points right; the stylesheet turns
+// it to point down where the cards are stacked.
+export function arrowTo(name) {
+  const seed = seedOf(`arrow ${name}`);
+  return art("m-arrow", 56, 40, drawnIn(sketch.arrow(4, 22, 50, 20, { seed, head: 11, rough: 1.1, bend: 0.2 }), "m-arrow-line"));
+}
+
 // A card with a pen outline and shading down one side, like a note pinned
 // to the page.
 export function card(node, name) {

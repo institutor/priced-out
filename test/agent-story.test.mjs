@@ -108,3 +108,20 @@ test("a run that stopped before any part began still shows its steps", () => {
   assert.equal(parts[0].steps.length, 2);
   assert.equal(parts[0].round, 1);
 });
+
+test("the run in one look: one card a round, with the guess, the answer and the choice", async () => {
+  const { glance, short } = await import("../site/agent/story.js");
+  const run = JSON.parse(fs.readFileSync(new URL("../site/data/agent-run.json", import.meta.url), "utf8"));
+  const look = glance(run.steps);
+  assert.equal(look.rounds.length, roundsIn(run.steps));
+  assert.deepEqual(look.rounds.map((round) => round.move), ["another round", "to stop"]);
+  for (const round of look.rounds) {
+    assert.ok(round.question && round.said && round.guess, `round ${round.round}`);
+    assert.ok(["right", "wrong", "partly"].includes(round.verdict), `round ${round.round}`);
+    assert.equal(partsOf(run.steps)[round.part - 1].round, round.round);
+  }
+  assert.ok(look.answer.length > 20);
+  assert.deepEqual(glance([{ kind: "plan" }]), { rounds: [], answer: null });
+  assert.equal(short("one two three", 50), "one two three");
+  assert.equal(short("The social dinner came last, and the workshop came first", 30), "The social dinner came last…");
+});

@@ -11,8 +11,8 @@ import { strip } from "../js/ui/banner.js";
 import * as contents from "../js/ui/contents.js";
 import * as cover from "../js/ui/cover.js";
 import * as scene from "./scene.js";
-import { aboutRun, autonomy, lastOf, money, partsOf, roundsIn, runFor } from "./story.js";
-import { card, envelope, meter, numbered, slip, stamp, verdict } from "./draw.js";
+import { aboutRun, autonomy, glance, lastOf, money, partsOf, roundsIn, runFor, short } from "./story.js";
+import { arrowTo, card, envelope, meter, numbered, slip, stamp, verdict } from "./draw.js";
 import * as present from "./present.js";
 import { vignette } from "./vignette.js";
 
@@ -340,16 +340,60 @@ function drawObjective(body, run, list, showing) {
       el("div", {}, el("dt", { text: count.codeStops + count.nudges === 0 ? "times the code stepped in" : `times the code stepped in: ${[count.nudges > 0 ? "it asked the agent once to think again before stopping" : null, count.codeStops > 0 ? `it refused ${plural(count.codeStops, "step")}` : null].filter(Boolean).join(", ")}` }), el("dd", { text: String(count.codeStops + count.nudges) })),
       el("div", {}, el("dt", { text: `${roundsIn(run.steps) === 1 ? "round" : "rounds"}, for ${money(spent)} of the ${money(run.cap)}` }), el("dd", { text: String(roundsIn(run.steps)) })),
     ),
+    otherRuns(list, showing),
+  );
+}
+
+// What the agent was handed besides the objective: the commander's standing
+// orders, and its own notes from earlier runs.
+function drawGiven(body, run) {
+  put(body, el("div", { class: "m-two" }, card(el("div", {},
     el("h3", { class: "sub", text: "Standing orders from the commander" }),
     el("p", { text: `The commander is the person who gave the objective.${run.standInCommander ? " Nobody was at the keyboard for this practice run, so an AI stand-in played the commander. It is labelled wherever it speaks." : run.practiceCommander ? " Nobody was at the keyboard for this practice run, so the commander's replies are canned." : ""}${run.handsOff ? " This run was hands-off: the code checked each survey before it was sent, in place of a person." : ""}` }),
     points(run.orders, 400),
     el("p", { class: "m-foot", text: `${run.emailLimit ? `Nobody on the list gets more than ${inWords(run.emailLimit)} ${run.emailLimit === 1 ? "email" : "emails"} in a run. ` : ""}The agent's model was ${run.model}.` }),
+  ), "given orders"), card(el("div", {},
     run.memory?.length > 0 ? [
       el("h3", { class: "sub", text: "What it remembered from earlier runs" }),
-      el("p", { text: "At the end of every run the agent writes down what it learned about doing the research. It read these before it planned this one." }),
-      points(run.memory, 420),
-    ] : null,
-    otherRuns(list, showing),
+      el("p", { text: `At the end of every run the agent writes down what it learned about doing the research. It read ${run.memory.length > 3 ? `${inWords(run.memory.length)} of these notes before it planned this one. The newest three:` : "these before it planned this one."}` }),
+      points(run.memory.slice(-3), 420),
+      run.memory.length > 3 ? el("details", { class: "m-fold" }, el("summary", { text: `The ${inWords(run.memory.length - 3)} older ones` }), points(run.memory.slice(0, -3), 430)) : null,
+    ] : [
+      el("h3", { class: "sub", text: "Nothing remembered yet" }),
+      el("p", { text: "This was the agent's first run, so its notebook was empty. At the end it wrote down what it learned, for the next run to read." }),
+    ],
+  ), "given memory")));
+}
+
+// The run in one look: a card for each round and one for the answer, with an
+// arrow from each to the next.
+function drawGlance(body, run) {
+  const look = glance(run.steps);
+  if (look.rounds.length === 0) {
+    put(body, el("p", { class: "empty", text: "The run stopped before any answers came back." }));
+    return;
+  }
+  const cards = look.rounds.map((round) => card(el("div", { class: "m-look" },
+    el("p", { class: "m-when", text: `Round ${round.round}` }),
+    el("p", { class: "m-look-q", text: round.question }),
+    pairs([
+      ["It guessed", el("span", {}, short(round.guess ?? "no guess", 90), " ", round.verdict ? verdict(round.verdict, 800 + round.round) : null)],
+      ["People said", short(round.said, 100)],
+    ]),
+    round.move ? el("p", { class: "m-look-move" }, "So it chose ", circled(el("strong", { text: round.move }), `look ${round.round}`)) : null,
+    round.why ? el("p", { class: "m-foot", text: short(round.why, 120) }) : null,
+    round.part > 0 ? el("p", {}, el("a", { class: "m-jump", href: `#part-${round.part}`, text: `See round ${round.round}` })) : null,
+  ), `look ${round.round}`));
+  if (look.answer) {
+    cards.push(card(el("div", { class: "m-look answer" },
+      el("p", { class: "m-when", text: "The answer" }),
+      el("p", { class: "m-look-answer", text: short(look.answer.split(/(?<=[.!?])\s+/).slice(0, 2).join(" "), 260) }),
+      el("p", {}, el("a", { class: "m-jump", href: "#answer", text: "Read the whole answer" })),
+    ), "look answer"));
+  }
+  put(body,
+    el("p", { text: "What it guessed wrong is what it asks about next. Here is the whole run on one screen: the first guess of each round, what people said, and what the agent chose to do about it." }),
+    el("div", { class: "m-trail" }, cards.flatMap((item, index) => (index === 0 ? [item] : [arrowTo(`trail ${index}`), item]))),
   );
 }
 
@@ -539,7 +583,7 @@ async function start() {
     run = await reply.json();
   } catch {
     document.getElementById("status").textContent = "No run has been published to this page yet. Run one, then: node agent/publish-run.mjs agent/runs/<folder>";
-    for (const id of ["watch", "answer"]) document.getElementById(id).hidden = true;
+    for (const id of ["given", "glance", "watch", "answer"]) document.getElementById(id).hidden = true;
     drawHow(section("how"), {});
     drawRules(section("rules"), {});
     dress();
@@ -559,6 +603,8 @@ async function start() {
   }
 
   drawObjective(section("objective"), run, Array.isArray(list) ? list : [], showing);
+  drawGiven(section("given"), run);
+  drawGlance(section("glance"), run);
   const watch = drawWatch(section("watch"), run);
   drawAnswer(section("answer"), run);
   drawHow(section("how"), run);

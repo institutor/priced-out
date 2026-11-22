@@ -119,3 +119,37 @@ export const lastOf = (steps, kind, test = () => true) => steps.filter((step) =>
 
 // How many rounds the run had.
 export const roundsIn = (steps) => new Set(steps.filter((step) => step.round !== undefined).map((step) => step.round)).size;
+
+// A long line cut at a word, so it fits on a card.
+export function short(text, most = 120) {
+  const clean = String(text ?? "").replace(/\s+/g, " ").trim();
+  if (clean.length <= most) return clean;
+  const cut = clean.slice(0, most);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), most - 20)).replace(/[\s,;:.]+$/, "")}…`;
+}
+
+// The run in one look: for each round, the first thing the agent guessed,
+// what people said, how the guess was marked, and what the agent chose next.
+// `part` is which part of the story to go to for the whole round.
+export function glance(steps) {
+  const parts = partsOf(steps);
+  const finish = steps.find((step) => step.kind === "finish");
+  const rounds = [];
+  for (const opened of steps.filter((step) => step.kind === "opened")) {
+    const row = opened.rows?.[0];
+    if (!row) continue;
+    const debrief = lastOf(steps, "debrief", (step) => step.round === opened.round);
+    const marked = (finish?.scoreboard ?? []).find((mark) => mark.round === opened.round);
+    rounds.push({
+      round: opened.round,
+      question: row.question,
+      guess: row.agent ?? null,
+      said: row.people_said,
+      verdict: marked?.agent ?? null,
+      move: debrief ? (debrief.nextMove === "another_round" ? "another round" : "to stop") : null,
+      why: debrief?.reason ?? null,
+      part: parts.findIndex((part) => part.part === "write" && part.round === opened.round) + 1,
+    });
+  }
+  return { rounds, answer: finish?.recommendation ?? null };
+}
