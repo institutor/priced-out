@@ -53,9 +53,13 @@ run is ready. The rest is in [agent/README.md](agent/README.md).
 
 ### The objective given, and what the agent decided
 
-**No real run has been made yet.** What follows is a practice run, kept as an example
-of what a run produces. An AI stand-in played Flashpoint and invented every answer.
-Nothing in it is a finding.
+**What follows is a practice run**, kept as an example of what a run produces. An AI
+stand-in played Flashpoint and invented every answer. Nothing in it is a finding.
+
+**A real run was also tested, on 22 November 2026, and it worked.** From the same
+one-sentence objective the agent planned, wrote and published a survey through the
+Flashpoint MCP, asked for approval, and Flashpoint emailed it to eight test addresses,
+all the author's own. It tests that the real pipeline works. It is not a finding.
 
 The objective given:
 

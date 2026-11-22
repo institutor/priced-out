@@ -664,7 +664,7 @@ async function start() {
 
   const banner = document.getElementById("banner");
   if (run.mode !== "real") {
-    banner.append(strip("banner", "A practice run. ", "An AI stand-in played Flashpoint and invented every answer. No survey was sent, no real person answered and no credit was spent. Nothing here is a finding.", "Invented answers. Nothing here is a finding."));
+    banner.append(strip("banner", "A practice run. ", "An AI stand-in played Flashpoint and invented every answer. No survey was sent, no real person answered and no credit was spent. Nothing here is a finding. A real run was also tested on 22 November 2026: Flashpoint emailed the agent's survey to eight test addresses, all the author's own.", "Invented answers. Nothing here is a finding."));
   } else {
     banner.append(strip("banner pilot", "A real run. ", `${run.people} people were emailed through Flashpoint and paid steps were charged. With so few people, read the answer as a direction, not a measurement.`, `${run.people} real people asked. A direction, not a measurement.`));
   }

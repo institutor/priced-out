@@ -25,8 +25,9 @@ with a recommendation.
 | **Cost** | Nothing, as a practice run. At real prices its ten messages come to $5.00 of the $9.00 budget. A real run needs a few more messages, about $7 for two rounds. |
 
 **That example is a practice run.** An AI stand-in played Flashpoint and invented every
-answer, so it is not a finding. It shows what the agent decides and how. No real run has
-been made yet.
+answer, so it is not a finding. It shows what the agent decides and how. A real run was
+also tested on 22 November 2026: Flashpoint emailed the agent's survey to eight test
+addresses, all the author's own. That tests the real pipeline and is not a finding either.
 
 <p align="center"><a href="https://institutor.github.io/priced-out/agent/#glance"><img src="../docs/agent-one-look.jpg" alt="The agent's page: the example practice run on one screen. Its hunch, then for each round what it guessed, what people said and what it chose, then its answer." width="720"></a><br><em>The example practice run on one screen, from the agent's page. The answers in it are invented.</em></p>
 
@@ -299,9 +300,13 @@ These are rules in the code. They hold whatever the model says.
 
 ## The objective given, and what the agent decided
 
-**No real run has been made yet.** The example is a practice run: an AI stand-in played
-Flashpoint and invented every answer. It is labelled wherever it speaks. Nothing in it
-is a finding.
+**The example is a practice run**: an AI stand-in played Flashpoint and invented every
+answer. It is labelled wherever it speaks. Nothing in it is a finding.
+
+**A real run was also tested, on 22 November 2026, and it worked.** From the same
+objective the agent planned, wrote and published a survey through the Flashpoint MCP,
+asked for approval, and Flashpoint emailed it to eight test addresses, all the author's
+own. It tests that the real pipeline works. It is not a finding.
 
 The objective given:
 
@@ -405,9 +410,9 @@ labelled as one above everything else on the page.
 
 ## Limits
 
-- No real person has answered yet. The first real run will go to a few test addresses,
-  so its answer will be a direction and not a measurement, and its scoreboard will show
-  the method working, not a finding. The agent is told to say so.
+- The only real run so far went to eight test addresses, all the author's own. Its
+  answer is not a measurement, and its scoreboard shows the method working, not a
+  finding. The agent is told to say so.
 - The commander's guess is only a fair bet when other people answer the survey. If you are
   answering it yourself from test addresses, press Enter to skip your guess.
 - Flashpoint's guide says to allow about a day for replies. A short wait only works when
