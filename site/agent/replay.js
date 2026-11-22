@@ -294,15 +294,16 @@ const SAY = {
   write: (part) => (part.round === 1
     ? "It chooses the questions itself, and Flashpoint builds the survey through the MCP. Every paid step prints a slip first: what it costs, and the decision it could change."
     : `It writes a short follow-up on what round ${part.round - 1} left open.`),
-  seal: () => "Before anyone answers, it writes down what it expects people to say, and seals it in the envelope.",
+  seal: (part) => (part.round > 1 ? "A new guess goes in the envelope." : "Before anyone answers, it writes down what it expects people to say, and seals it in the envelope."),
   send(part, run) {
     const has = (kind) => part.steps.some((step) => step.kind === kind);
+    if (part.round > 1 && (has("send-preapproved") || has("send-approved"))) return has("send-preapproved") ? "The code checks the follow-up too, and it goes out." : "The commander approves the follow-up, and it goes out.";
     const limit = run.emailLimit ? ` Nobody on the list gets more than ${inWords(run.emailLimit)} ${run.emailLimit === 1 ? "email" : "emails"}.` : "";
     if (has("send-preapproved")) return `Nobody is at the keyboard, so the code checks the survey against fixed rules before it lets it go.${limit}`;
     if (has("send-approved")) return `No email goes out until the commander has read the survey and said yes. The code holds that, not the agent.${limit}`;
     return "The send was stopped. Nothing went out and nothing was charged.";
   },
-  open: () => "The answers come back. Only then is the envelope opened, and each guess is laid beside what people really said.",
+  open: (part) => (part.round > 1 ? "The answers come back, and the envelope is opened again." : "The answers come back. Only then is the envelope opened, and each guess is laid beside what people really said."),
   decide(part) {
     const debrief = lastOf(part.steps, "debrief");
     const nudged = part.steps.some((step) => step.kind === "challenge");
