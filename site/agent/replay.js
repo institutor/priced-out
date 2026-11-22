@@ -627,7 +627,9 @@ function drawWatch(body, run) {
 
 async function start() {
   const root = document.getElementById("top");
-  cover.mount(root, { scene, solidWords: 2 }).catch(() => {}).finally(() => root.classList.add("play"));
+  // The title and the button are written while the strip is still being drawn,
+  // so nobody waits ten seconds to see what the page is.
+  cover.mount(root, { scene, solidWords: 2, wordsAfter: 1400 }).catch(() => {}).finally(() => root.classList.add("play"));
 
   const section = (id) => document.querySelector(`#${id} .section-body`);
   // The list of published runs, if there is one, and the run the address

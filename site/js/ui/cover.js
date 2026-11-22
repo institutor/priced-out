@@ -13,8 +13,10 @@ import * as pricedOut from "./scene.js";
 // When each part of the drawing starts, in milliseconds. The strip of
 // figures goes first, and everything else follows from when it ends.
 const SCENE = 250;
-const timesFor = (lasts) => {
-  const after = SCENE + lasts;
+export const timesFor = (lasts, wordsAfter = lasts) => {
+  // The words wait for the strip, unless a page asks for them sooner. The
+  // drawing is only called finished once both are done.
+  const after = SCENE + Math.min(lasts, wordsAfter);
   return {
     scene: SCENE,
     ask: after + 200,
@@ -23,7 +25,7 @@ const timesFor = (lasts) => {
     rule: after + 2100,
     note: after + 1500,
     go: after + 1800,
-    settled: after + 3200,
+    settled: Math.max(after + 3200, SCENE + lasts + 600),
   };
 };
 
@@ -99,8 +101,10 @@ function drawTitle(title, AT, solidWords) {
 
 // `scene` is the strip of figures to draw (its draw, LASTS and NARROW), and
 // `solidWords` how many words of the title are inked; the rest stay pencil.
-export async function mount(root, { scene = pricedOut, solidWords = 1 } = {}) {
-  const AT = timesFor(scene.LASTS);
+// `wordsAfter` starts the question and the title that many milliseconds in,
+// while the strip is still being drawn.
+export async function mount(root, { scene = pricedOut, solidWords = 1, wordsAfter } = {}) {
+  const AT = timesFor(scene.LASTS, wordsAfter);
   const strip = root.querySelector(".scene");
   const ask = root.querySelector(".cover-ask");
   const title = root.querySelector(".title");

@@ -135,3 +135,13 @@ test("a screen that plays by itself stays long enough to read its words", async 
   assert.equal(long, 1800 + 40 * 420);
   assert.ok(long > readingTime(Array(20).fill("word").join(" ")));
 });
+
+test("the title page can write its words while the strip is still drawn, and ends after both", async () => {
+  const { timesFor } = await import("../site/js/ui/cover.js");
+  const slow = timesFor(7300);
+  const soon = timesFor(7300, 1400);
+  assert.ok(soon.title < 3000 && soon.go < 4000, "the title and the button come early");
+  assert.ok(slow.title > 7300);
+  assert.ok(soon.settled >= 250 + 7300, "not called finished before the strip is");
+  assert.equal(timesFor(6400).settled, 250 + 6400 + 3200, "the calculator's title page is as it was");
+});
