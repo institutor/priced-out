@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { runAgent, makeRedactor, STEP_PRICE } from "../agent/loop.mjs";
+import { runAgent, makeRedactor, envelopeHash, unbackedNumbers, PRICES, TOOLS } from "../agent/loop.mjs";
 import { fakeFlashpoint } from "../agent/fake-flashpoint.mjs";
 
 const recipients = [
@@ -21,71 +21,198 @@ function scripted(calls) {
   return { llm, seen };
 }
 
-const finish = { name: "finish", input: { recommendation: "r", evidence: "e", learned_between_rounds: "l", limits: "x" } };
-const ask = (message, extra = {}) => ({ name: "ask_flashpoint", input: { message, why: "because", ...extra } });
+// A commander who gives fixed answers and remembers what they were asked.
+function desk({ approve = ["yes"], guess = "about half", reply = "carry on" } = {}) {
+  const asked = [];
+  let approvals = 0;
+  const commander = async (request) => {
+    asked.push(request);
+    if (request.kind === "approve_send") return approve[Math.min(approvals++, approve.length - 1)];
+    if (request.kind === "guess") return guess;
+    return reply;
+  };
+  return { commander, asked };
+}
 
-test("a full two-round run reaches an answer and counts the spend", async () => {
-  const { llm } = scripted([
-    ask("Make a panel from {{RECIPIENTS}} and write a survey"), ask("confirm"), ask("confirm"),
-    { name: "wait_for_replies", input: { minutes: 5, why: "let them answer" } },
-    ask("Show the results"),
-    ask("Write a follow-up survey for {{RECIPIENTS}}", { new_survey: true }), ask("confirm"), ask("confirm"),
-    ask("Show the results"),
-    finish,
-  ]);
+const ask = (message, action = "other", extra = {}) => ({ name: "ask_flashpoint", input: { message, action, why: "because", could_change: "what I ask next", ...extra } });
+const seal = (question = "What will most people pick?") => ({ name: "seal_predictions", input: { predictions: [{ question, agent_guess: "the lower option" }], why: "it decides the answer" } });
+const open = (people_said = "2 of 3 picked the lower option") => ({ name: "open_envelope", input: { results: [{ question: "What will most people pick?", people_said }] } });
+const pause = { name: "wait_for_replies", input: { minutes: 5, why: "let them answer" } };
+const finish = { name: "finish", input: { recommendation: "r", evidence: "e", scoreboard: [], learned_between_rounds: "l", limits: "x" } };
+const kinds = (out, kind) => out.steps.filter((s) => s.kind === kind);
+const run = (calls, more = {}) => runAgent({ objective: "o", recipients, cap: 8, llm: scripted(calls).llm, flashpoint: fakeFlashpoint(), wait: async () => {}, ...more });
+
+test("a full two-round mission: rehearse, seal, approve, send, open, learn, repeat", async () => {
+  const { commander, asked } = desk();
   const waits = [];
-  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), wait: async (m) => waits.push(m) });
+  const out = await run([
+    ask("Make a panel from {{RECIPIENTS}} and write a survey", "design"),
+    { name: "rehearse_on_personas", input: { audience: "club members", how_many: 8, why: "catch broken questions", could_change: "the wording" } },
+    ask("Show the persona rehearsal results", "results"),
+    seal(),
+    ask("confirm", "publish"),
+    ask("confirm", "send"),
+    pause,
+    ask("Show the results", "results"),
+    open(),
+    { name: "ask_commander", input: { message: "I guessed right. Round two will ask why.", order: "Tell me what you learned before you start a second round.", why: "the order" } },
+    ask("Write a follow-up survey for {{RECIPIENTS}}", "design", { new_survey: true }),
+    seal("Why?"),
+    ask("confirm", "publish"),
+    ask("confirm", "send"),
+    ask("Show the results", "results"),
+    { name: "open_envelope", input: { results: [{ question: "Why?", people_said: "All 3 gave the same reason" }] } },
+    { name: "finish", input: { ...finish.input, scoreboard: [{ round: 1, question: "q", people_said: "2 of 3", agent: "right", personas: "no guess", commander: "wrong" }] } },
+  ], { commander, wait: async (m) => { waits.push(m); } });
+
   assert.equal(out.answer.recommendation, "r");
-  assert.equal(out.spent, 8 * STEP_PRICE);
+  assert.equal(out.answer.scoreboard.length, 1);
+  assert.equal(out.spent, 9 * PRICES.survey + PRICES.rehearsal);
   assert.deepEqual(waits, [5]);
-  const replies = out.steps.filter((s) => s.kind === "flashpoint").map((s) => s.reply);
-  assert.match(replies[3], /Survey 1: 3 of 3 answered/);
-  assert.match(replies[7], /Survey 2: 3 of 3 answered/);
+  assert.equal(asked.filter((a) => a.kind === "approve_send").length, 2, "one approval for each survey");
+  assert.equal(asked.filter((a) => a.kind === "guess").length, 2);
+  assert.match(asked.find((a) => a.kind === "approve_send").survey, /Drafted survey 1/);
+  assert.deepEqual(kinds(out, "sealed").map((s) => s.round), [1, 2]);
+  assert.deepEqual(kinds(out, "opened").map((s) => s.intact), [true, true]);
+  assert.match(kinds(out, "rehearsal")[0].reply, /SYNTHETIC/);
+  const replies = kinds(out, "flashpoint").map((s) => s.reply);
+  assert.match(replies[1], /SYNTHETIC rehearsal of survey 1/);
+  assert.match(replies[4], /Survey 1: 3 of 3 answered/);
+  assert.match(replies[8], /Survey 2: 3 of 3 answered/);
+  assert.equal(kinds(out, "finish")[0].handedBack, 8 - out.spent);
 });
 
 test("Flashpoint gets the real addresses; the model and the log never do", async () => {
   const sent = [];
   const flashpoint = async ({ message }) => { sent.push(message); return { text: "Added ana+1@example.com and someone@else.org" }; };
-  const { llm, seen } = scripted([ask("Panel: {{RECIPIENTS}}"), finish]);
-  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint, wait: async () => {} });
+  const { commander } = desk({ reply: "ask ben@example.com" });
+  const { llm, seen } = scripted([ask("Panel: {{RECIPIENTS}}", "design"), { name: "ask_commander", input: { message: "Anything to add?", why: "local knowledge" } }, finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint, commander, wait: async () => {} });
   assert.match(sent[0], /Ana <ana\+1@example\.com>\nBen <ben@example\.com>/);
   const everything = seen.join("") + JSON.stringify(out.steps);
   assert.doesNotMatch(everything, /@example\.com|@else\.org/);
-  assert.match(out.steps.find((s) => s.kind === "flashpoint").reply, /\[recipient 1\] and \[email\]/);
+  assert.match(kinds(out, "flashpoint")[0].reply, /\[recipient 1\] and \[email\]/);
+  assert.equal(kinds(out, "commander")[0].reply, "ask [recipient 2]");
 });
 
 test("the cap refuses a step that would go over, and nothing is sent", async () => {
   let sends = 0;
   const flashpoint = async () => { sends += 1; return { text: "ok" }; };
-  const { llm } = scripted([ask("one"), ask("two"), ask("three"), finish]);
-  const out = await runAgent({ objective: "o", recipients, cap: 1, llm, flashpoint, wait: async () => {} });
+  const out = await run([ask("one"), ask("two"), ask("three"), finish], { cap: 1, flashpoint });
   assert.equal(sends, 2);
   assert.equal(out.spent, 1);
-  assert.equal(out.steps.filter((s) => s.kind === "blocked").length, 1);
+  assert.equal(kinds(out, "blocked").length, 1);
 });
 
-test("a failed Flashpoint call is not charged and the run goes on", async () => {
+test("a failed Flashpoint call is not charged and the mission goes on", async () => {
   let n = 0;
   const flashpoint = async () => { n += 1; if (n === 1) throw new Error("payment failed"); return { text: "ok" }; };
-  const { llm } = scripted([ask("one"), ask("one again"), finish]);
-  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint, wait: async () => {} });
-  assert.equal(out.spent, STEP_PRICE);
-  assert.equal(out.steps.filter((s) => s.kind === "flashpoint-failed").length, 1);
+  const out = await run([ask("one"), ask("one again"), finish], { flashpoint });
+  assert.equal(out.spent, PRICES.survey);
+  assert.equal(kinds(out, "flashpoint-failed").length, 1);
   assert.ok(out.answer);
 });
 
-test("a model that stops calling tools ends the run with no answer", async () => {
-  const { llm } = scripted([]);
-  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), wait: async () => {} });
+test("a model that stops calling tools ends the mission with no answer", async () => {
+  const out = await run([]);
   assert.equal(out.answer, null);
   assert.equal(out.spent, 0);
 });
 
-test("a wait is kept between 1 and 30 minutes", async () => {
+test("a wait is kept between 1 and 30 minutes, and the commander can speak during it", async () => {
   const waits = [];
-  const { llm } = scripted([{ name: "wait_for_replies", input: { minutes: 500, why: "w" } }, { name: "wait_for_replies", input: { minutes: -3, why: "w" } }, finish]);
-  await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), wait: async (m) => waits.push(m) });
+  const { llm, seen } = scripted([{ name: "wait_for_replies", input: { minutes: 500, why: "w" } }, { name: "wait_for_replies", input: { minutes: -3, why: "w" } }, finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), wait: async (m) => { waits.push(m); return m === 30 ? "ask the freshmen too" : ""; } });
   assert.deepEqual(waits, [30, 1]);
+  assert.equal(kinds(out, "wait")[0].said, "ask the freshmen too");
+  assert.match(seen[1], /the commander said: \\"ask the freshmen too\\"/);
+});
+
+test("no email goes out before the envelope is sealed", async () => {
+  const { commander, asked } = desk();
+  const out = await run([ask("Write a survey", "design"), ask("confirm", "publish"), ask("confirm", "send"), finish], { commander });
+  assert.equal(out.spent, 2 * PRICES.survey, "the refused send is not charged");
+  assert.equal(asked.length, 0, "the commander is not asked to approve an unsealed send");
+  assert.doesNotMatch(JSON.stringify(out.steps), /was emailed/);
+});
+
+test("a confirm that would send is gated even when the model labels it something else", async () => {
+  const out = await run([ask("Write a survey", "design"), ask("confirm", "publish"), ask("Confirm.", "other"), finish], { commander: desk().commander });
+  assert.doesNotMatch(JSON.stringify(out.steps), /was emailed/);
+  assert.equal(out.spent, 2 * PRICES.survey);
+});
+
+test("the commander can refuse a send, and their reason goes back to the agent", async () => {
+  const { commander } = desk({ approve: ["no, question 2 is too personal", "yes"] });
+  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("Remove question 2", "design"), ask("confirm", "publish"), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), commander, wait: async () => {} });
+  assert.equal(kinds(out, "send-refused")[0].reason, "no, question 2 is too personal");
+  assert.match(seen[4], /did not approve this send.*question 2 is too personal/);
+  assert.equal(kinds(out, "send-approved").length, 1);
+  assert.match(kinds(out, "flashpoint").at(-1).reply, /was emailed/);
+  assert.equal(out.spent, 4 * PRICES.survey, "the refused send was not charged");
+});
+
+test("a mislabelled confirm cannot slip an email past the commander", async () => {
+  const { commander, asked } = desk({ approve: ["no"] });
+  // After a refusal the survey is published and waiting to send, so a bare confirm would send it.
+  const out = await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), ask("What is the status?", "other"), ask("confirm", "publish"), finish], { commander });
+  assert.equal(asked.filter((a) => a.kind === "approve_send").length, 2);
+  assert.doesNotMatch(JSON.stringify(out.steps), /was emailed/);
+});
+
+test("with nobody at the desk, no email is sent", async () => {
+  const out = await run([ask("Write a survey", "design"), seal(), ask("confirm", "publish"), ask("confirm", "send"), { name: "ask_commander", input: { message: "Are you there?", why: "w" } }, finish]);
+  assert.doesNotMatch(JSON.stringify(out.steps), /was emailed/);
+  assert.equal(kinds(out, "send-refused").length, 1);
+  assert.equal(kinds(out, "commander")[0].reply, null);
+});
+
+test("the commander's guess stays sealed until the envelope is opened", async () => {
+  const { commander } = desk({ guess: "the pricey one, I bet" });
+  const { llm, seen } = scripted([ask("Write a survey", "design"), seal(), open(), ask("confirm", "publish"), ask("confirm", "send"), seal(), ask("Show the results", "results"), open(), finish]);
+  const out = await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), commander, wait: async () => {} });
+  const sealed = kinds(out, "sealed")[0];
+  assert.equal(sealed.hash, envelopeHash(sealed.envelope));
+  assert.equal(sealed.envelope.predictions[0].commander, "the pricey one, I bet");
+  assert.equal(kinds(out, "sealed").length, 1, "a guess after the send is refused");
+  assert.match(seen[3], /Not yet: the envelope opens after/);
+  assert.match(seen[6], /already been sent/);
+  assert.doesNotMatch(seen[7], /pricey/, "the model has not seen the guess before opening");
+  assert.match(seen[8], /Commander guessed: the pricey one, I bet/);
+  assert.deepEqual(kinds(out, "opened")[0].rows[0], { question: "What will most people pick?", people_said: "2 of 3 picked the lower option", agent: "the lower option", personas: null, commander: "the pricey one, I bet" });
+});
+
+test("a rehearsal that fails is not charged and does not stop the mission", async () => {
+  const rehearse = { name: "rehearse_on_personas", input: { audience: "a", how_many: 99, why: "w", could_change: "c" } };
+  const early = await run([rehearse, finish]);
+  assert.equal(early.spent, 0, "nothing to rehearse before a draft");
+
+  const out = await run([ask("Write a survey", "design"), rehearse, finish], { flashpoint: fakeFlashpoint({ rehearsalFails: true }) });
+  assert.equal(out.spent, PRICES.survey);
+  assert.equal(kinds(out, "rehearsal-failed")[0].charged, false);
+  assert.ok(out.answer);
+
+  const asked = [];
+  const charged = { survey: async () => ({ text: "draft" }), rehearse: async (args) => { asked.push(args); const err = new Error("the run started and then broke"); err.charged = true; throw err; } };
+  const paid = await run([ask("Write a survey", "design"), rehearse, finish], { flashpoint: charged });
+  assert.equal(paid.spent, PRICES.survey + PRICES.rehearsal);
+  assert.equal(asked[0].howMany, 30, "the persona count is kept between 5 and 30");
+});
+
+test("tools the run cannot use are not offered to the model", async () => {
+  let offered = [];
+  const llm = async ({ tools }) => { offered = tools.map((t) => t.name); return { stop_reason: "end_turn", content: [] }; };
+  await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: async () => ({ text: "ok" }), wait: async () => {} });
+  assert.ok(!offered.includes("rehearse_on_personas") && !offered.includes("make_deck"));
+  await runAgent({ objective: "o", recipients, cap: 8, llm, flashpoint: fakeFlashpoint(), wait: async () => {} });
+  assert.deepEqual(offered, TOOLS.map((t) => t.name));
+});
+
+test("numbers in the answer that came from nowhere are flagged", async () => {
+  assert.deepEqual(unbackedNumbers("4 of 5 said $25, up 12%", ["Survey: 4 of 5 answered", "price $25"]), ["12"]);
+  const out = await run([ask("Write a survey", "design"), { name: "finish", input: { ...finish.input, evidence: "3 of 3 answered and 87% agreed" } }], { flashpoint: async () => ({ text: "3 of 3 answered" }) });
+  assert.deepEqual(kinds(out, "finish")[0].unbacked, ["87"]);
 });
 
 test("the redactor removes listed and unlisted addresses", () => {

@@ -1,0 +1,12 @@
+# Standing orders
+
+These are the commander's rules for the agent. They are rules, not steps: between
+them, the agent decides everything itself. Each line that starts with "- " is one
+order. Change them, or pass another file with `--orders`.
+
+- Check with me before any email goes out.
+- Come to me if the answers split evenly and you cannot call it.
+- Tell me what you learned before you start a second round.
+
+The first order is also enforced by the code: no email is sent until the commander
+has seen the survey and typed yes.
