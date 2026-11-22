@@ -79,11 +79,11 @@ const atDesk = Boolean(process.stdin.isTTY);
 const handsOff = resumed ? resumed.head.handsOff === true : argv.includes("--hands-off");
 
 if (!objective || !(cap > 0) || !Number.isInteger(emailLimit) || emailLimit < 1) {
-  console.log('usage: node agent/agent.mjs "<mission>" [--practice | --fake] [--cap 9] [--emails 2] [--hands-off] [--recipients file] [--orders file]\n       node agent/agent.mjs --resume agent/runs/<folder>');
+  console.log('usage: node agent/agent.mjs "<objective>" [--practice | --fake] [--cap 9] [--emails 2] [--hands-off] [--recipients file] [--orders file]\n       node agent/agent.mjs --resume agent/runs/<folder>');
   process.exit(1);
 }
 if (!fake && !atDesk) {
-  console.log("A real run starts at a keyboard: no email goes out without your approval, or without you handing the mission over yourself. Run it in a terminal. Nothing was sent or paid.");
+  console.log("A real run starts at a keyboard: no email goes out without your approval, or without you handing the run over yourself. Run it in a terminal. Nothing was sent or paid.");
   process.exit(1);
 }
 
@@ -247,7 +247,7 @@ function show(request) {
   if (request.kind === "approve_send") {
     rule(`Approve the round ${request.round} send?`);
     console.log(`  The agent wants to email this survey to ${request.people} ${request.people === 1 ? "person" : "people"}. It cannot be undone.`);
-    if (request.emailLimit) console.log(`  This would be email ${request.email} of the ${request.emailLimit} each person may get in this mission.${request.email === request.emailLimit ? " After it, nothing more can be sent to them." : ""}`);
+    if (request.emailLimit) console.log(`  This would be email ${request.email} of the ${request.emailLimit} each person may get in this run.${request.email === request.emailLimit ? " After it, nothing more can be sent to them." : ""}`);
     console.log("");
     console.log(indent(request.survey || "(Flashpoint has not shown a draft.)"));
     if (request.message) console.log(`\n  The message the agent would send to Flashpoint now:\n\n${indent(request.message)}`);
@@ -319,7 +319,7 @@ function record(step) {
   printStep(shortLine(step));
 }
 
-if (resumed) fs.appendFileSync(logFile, "---\n\n*The mission was stopped here and carried on later.*\n\n");
+if (resumed) fs.appendFileSync(logFile, "---\n\n*The run was stopped here and carried on later.*\n\n");
 else fs.writeFileSync(logFile, logHeader(head));
 
 // The whole state of the mission, saved after every step, so a stopped run can be resumed.
@@ -333,14 +333,14 @@ const save = (snapshot) => {
   fs.renameSync(next, file);
 };
 
-console.log(`Mission: ${objective}`);
+console.log(`Objective: ${objective}`);
 console.log(`${recipients.length} people on the list. Cap $${cap.toFixed(2)}. Nobody gets more than ${emailLimit} email${emailLimit === 1 ? "" : "s"}. ${{ real: "REAL RUN: this emails the people on the list and spends credit.", practice: "PRACTICE RUN: an AI stand-in plays Flashpoint and invents the answers. Nothing is sent or paid.", fake: "PRACTICE RUN: canned fake Flashpoint. Nothing is sent or paid." }[mode]}`);
 console.log(`Standing orders:\n${orders.map((order) => `  - ${order}`).join("\n")}\n`);
-if (head.memory.length > 0) console.log(`From earlier missions, the agent remembers:\n${head.memory.map((lesson) => `  - ${lesson}`).join("\n")}\n`);
+if (head.memory.length > 0) console.log(`From earlier runs, the agent remembers:\n${head.memory.map((lesson) => `  - ${lesson}`).join("\n")}\n`);
 
 // Handing over a real run is a decision, so it is typed out once, here, before anything is paid.
 if (handsOff && mode === "real" && !resumed) {
-  rule("Hand the mission over?");
+  rule("Hand the run over?");
   console.log(`  The agent will email the ${recipients.length} ${recipients.length === 1 ? "person" : "people"} on your list WITHOUT showing you the survey first.`);
   console.log(`  The code will still hold it to these checks before every send:\n${SEND_CHECKS.map((check) => `    - ${check}`).join("\n")}`);
   console.log(`  It can send each person ${emailLimit} email${emailLimit === 1 ? "" : "s"} at most and spend $${cap.toFixed(2)} at most.`);

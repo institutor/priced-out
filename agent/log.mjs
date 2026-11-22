@@ -157,7 +157,7 @@ export function shortLine(step) {
     case "sealed": return `${tag} Envelope sealed for round ${step.round}: ${step.hash.slice(0, 16)}…`;
     case "opened": return `${tag} Envelope opened for round ${step.round}\n${step.rows.map((row) => `       ${row.question}\n         people:    ${row.people_said}\n         agent:     ${row.agent}\n         personas:  ${row.personas ?? "no guess"}\n         commander: ${row.commander ?? "no guess"}`).join("\n")}`;
     case "debrief": return `${tag} Debrief: ${step.nextMove === "another_round" ? "another round" : "finish"}, because ${step.reason}\n       wrong:     ${step.whoWasWrong}\n       surprise:  ${step.surprise}\n       unknown:   ${step.stillUnknown}`;
-    case "resumed": return `${tag} Mission resumed after ${step.away}${step.cutOff.length > 0 ? ` (stopped during ${step.cutOff.join(", ")})` : ""}`;
+    case "resumed": return `${tag} Run resumed after ${step.away}${step.cutOff.length > 0 ? ` (stopped during ${step.cutOff.join(", ")})` : ""}`;
     case "challenge": return `${tag} Asked to think again before stopping after one round`;
     case "send-approved": return `${tag} Send approved by the commander`;
     case "send-refused": return `${tag} Send refused: ${step.reason}`;
