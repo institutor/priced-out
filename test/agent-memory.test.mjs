@@ -61,3 +61,35 @@ test("the log says when the mission was handed over and when a stand-in played t
   assert.match(logEntry(steps[4]), /email 1 of the 2[\s\S]*- It is short/);
   assert.match(logEntry(steps[3]), /held back[\s\S]*income/);
 });
+
+test("a hands-off log does not claim a person approved the sends", () => {
+  assert.match(logHeader({ ...head, handsOff: true }), /no email goes out without passing the code's send checks/);
+  assert.match(logHeader({ ...head }), /no email goes out without the commander's yes/);
+});
+
+test("the summary shows the agent's answer after each round, when it gave one", () => {
+  const debrief = { n: 7, kind: "debrief", round: 1, whoWasWrong: "me", surprise: "s", stillUnknown: "u", answerSoFar: "A workshop, not the social I expected.", nextMove: "another_round", reason: "r" };
+  const opened = { n: 6.5, kind: "opened", round: 1, rows: [] };
+  const text = summarize({ ...head, steps: [...steps.slice(0, 6), opened, debrief, steps[6]] });
+  assert.match(text, /Its answer at this point: A workshop, not the social I expected\./);
+});
+
+test("the practice stand-in can leave some people silent until a reminder", async () => {
+  const { practiceWriter } = await import("../agent/practice-writer.mjs");
+  const asked = [];
+  const writer = practiceWriter({ ask: async (system, prompt) => { asked.push(prompt); return `reply ${asked.length}`; }, quiet: 3 });
+  await writer.draft({ survey: 1, people: 8, brief: "b" });
+  await writer.send({ survey: 1, people: 8 });
+  assert.match(asked.at(-1), /There are 8 respondents, but only 5 have answered so far/);
+  await writer.send({ survey: 1, people: 8 });
+  assert.match(asked.at(-1), /A reminder has now gone out/);
+  assert.match(await writer.results({ survey: 1, request: "counts" }) && asked.at(-1), /After the reminder:/);
+  await writer.draft({ survey: 2, people: 8, brief: "b" });
+  await writer.send({ survey: 2, people: 8 });
+  assert.match(asked.at(-1), /8 respondents, all answer\./);
+
+  const everyone = practiceWriter({ ask: async (system, prompt) => { asked.push(prompt); return "r"; } });
+  await everyone.draft({ survey: 1, people: 8, brief: "b" });
+  await everyone.send({ survey: 1, people: 8 });
+  assert.match(asked.at(-1), /8 respondents, all answer\./);
+});

@@ -33,7 +33,7 @@ export function logHeader({ objective, people, cap, emailLimit, model, orders, m
     standInCommander ? "Nobody was at the keyboard, so an AI stand-in played the commander as well. Its replies and its sealed guesses below are invented, like everything else in a practice run. It approves every send.\n"
       : practiceCommander ? "Nobody was at the keyboard, so the commander's replies below are canned practice replies. The canned commander approves sends and makes no guesses.\n" : "",
     memory.length > 0 ? `**What the agent remembered from earlier runs:**\n\n${memory.map((lesson) => `- ${lesson}`).join("\n")}\n` : "",
-    "The agent chose every step below. The commander speaks only where the log says so. The loop itself steps in at two points, both marked: no email goes out without the commander's yes, and if the agent stops after one round with a question still open, it is asked once to think again.",
+    `The agent chose every step below. The commander speaks only where the log says so. The loop itself steps in at two points, both marked: no email goes out without ${handsOff ? "passing the code's send checks" : "the commander's yes"}, and if the agent stops after one round with a question still open, it is asked once to think again.`,
     "",
     "---",
     "",

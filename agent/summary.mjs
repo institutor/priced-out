@@ -110,6 +110,7 @@ export function summarize(run) {
       lines.push(`- Who was wrong: ${cell(r.debrief.whoWasWrong)}`);
       lines.push(`- Biggest surprise: ${cell(r.debrief.surprise)}`);
       lines.push(`- Still unknown: ${cell(r.debrief.stillUnknown)}`);
+      if (r.debrief.answerSoFar) lines.push(`- Its answer at this point: ${cell(r.debrief.answerSoFar)}`);
       if (r.challenged) lines.push("- It first chose to stop here. The loop asked it once to think again, because a question was still open and there was budget left.");
       lines.push(`- Its decision: **${r.debrief.nextMove === "another_round" ? "run another round" : "finish"}**. ${cell(r.debrief.reason)}`);
     } else if (r.opened) {

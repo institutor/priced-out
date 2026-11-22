@@ -11,7 +11,10 @@ export const PRACTICE_TAG = "[PRACTICE FLASHPOINT: an AI stand-in wrote this rep
 
 const SURVEY_AGENT = "You are standing in for Flashpoint's survey agent in a practice run. Reply the way a careful survey platform would: brief, concrete, no chit-chat. Plain text with simple markdown tables where they help. Never mention that you are an AI model or that this is practice; the caller adds that label.";
 
-export function practiceWriter({ ask }) {
+// `quiet` is how many of the invented people do not answer the first survey
+// until they are reminded, so a practice run can meet a low response.
+export function practiceWriter({ ask, quiet = 0 }) {
+  let firstSurvey = null;
   const drafts = {}; // survey number -> the survey as written
   const answers = {}; // survey number -> each invented respondent's answers
   const rehearsals = {}; // survey number -> each persona's answers
@@ -43,9 +46,22 @@ export function practiceWriter({ ask }) {
     },
 
     async send({ survey, people }) {
+      if (firstSurvey === null) firstSurvey = survey;
+      const total = people || 3;
+      const silent = survey === firstSurvey ? Math.min(quiet, total - 1) : 0;
+      if (answers[survey] !== undefined) {
+        // A reminder: the people who had not answered now do.
+        if (silent === 0) return;
+        const late = await ask(
+          "You play survey respondents in a practice run who answer after a reminder. Output only the answers.",
+          `The respondents:\n${cast}\n\nThey each received this survey:\n${drafts[survey]}\n\nAnswers so far:\n${answers[survey]}\n\nA reminder has now gone out. Write the answers of the respondents who had not answered yet, in the same form, honestly and in character. Output only those new answers.`,
+        );
+        answers[survey] = `${answers[survey]}\n\nAfter the reminder:\n${late}`;
+        return;
+      }
       answers[survey] = await ask(
         "You play several survey respondents in a practice run. Answer every question as each person honestly would, in character. Output only the answers.",
-        `The respondents:\n${cast}\n\nThey each received this survey:\n${drafts[survey]}\n\nWrite each person's answer to every question, by question label. Closed questions: pick from the options given. Open questions: one or two sentences in their own voice. They answer honestly, and their answers do not have to agree with each other or with what the survey writer hoped. ${people || 3} respondents, all answer.`,
+        `The respondents:\n${cast}\n\nThey each received this survey:\n${drafts[survey]}\n\nWrite each person's answer to every question, by question label. Closed questions: pick from the options given. Open questions: one or two sentences in their own voice. They answer honestly, and their answers do not have to agree with each other or with what the survey writer hoped. ${silent > 0 ? `There are ${total} respondents, but only ${total - silent} have answered so far. The ${silent} least involved members have not opened the email: write nothing for them, and end with one line naming how many have not answered.` : `${total} respondents, all answer.`}`,
       );
     },
 

@@ -22,7 +22,7 @@ export const DEFAULT_ORDERS = [
   "Tell me what you learned before you start a second round.",
 ];
 
-const receipt = { type: "string", description: "The receipt: which decision of yours this step could change. One sentence." };
+const receipt = { type: "string", description: "The receipt: which decision of yours this step could change, as a full sentence a reader can follow without the rest of the log. Not a label such as 'Enables send'." };
 
 // What the commander says when they hand the mission over and walk away.
 export const HANDS_OFF_ORDERS = [
@@ -57,7 +57,7 @@ export const TOOLS = [
       properties: {
         message: { type: "string", description: "What to tell the Flashpoint survey agent, in plain words. Write {{RECIPIENTS}} where the list of people to survey should go." },
         action: { type: "string", enum: ["design", "publish", "send", "results", "other"], description: "What this message is for. Use 'send' for any message that emails the survey to people, including the confirm that does it." },
-        why: { type: "string", description: "One sentence: why this step, and what you expect back." },
+        why: { type: "string", description: "One full sentence: why this step now, and what you expect back. It is printed in the log, so write it for a reader, not as a label." },
         could_change: receipt,
         new_survey: { type: "boolean", description: "True to start a fresh conversation and a new survey, for a new round." },
       },
@@ -142,10 +142,11 @@ export const TOOLS = [
         who_was_wrong: { type: "string", description: "Who guessed wrong on what, yourself first. Say so plainly." },
         biggest_surprise: { type: "string", description: "The one thing in the real answers that nobody sealed a guess for, or that every guess missed. Say 'none' if there was none." },
         still_unknown: { type: "string", description: "What you would still need to know for the mission's answer to be one the commander can act on." },
+        answer_so_far: { type: "string", description: "If you had to answer the mission right now, what would you recommend? One sentence. Say how it differs from what you expected before this round." },
         next_move: { type: "string", enum: ["another_round", "finish"] },
         reason: { type: "string", description: "Why that move. For another round: the one thing it will ask about. For finish: why no affordable step could change the answer." },
       },
-      required: ["who_was_wrong", "biggest_surprise", "still_unknown", "next_move", "reason"],
+      required: ["who_was_wrong", "biggest_surprise", "still_unknown", "answer_so_far", "next_move", "reason"],
       additionalProperties: false,
     },
   },
@@ -700,7 +701,7 @@ export async function runAgent({ objective, recipients, cap, orders = DEFAULT_OR
         return { text: `Before you stop: you say this is still unknown: "${stillUnknown}". ${left()} That is enough for a short second round. Asking the same people a different question is not a repeat, and a few people can tell you why even when they are too few to count. If the thing the mission asked about turned out not to decide the matter, the mission is not answered until you ask what does. Call debrief again with your final decision: another_round, or finish with the reason no question you could ask would change what the commander does.`, failed: true };
       }
       debriefed = true;
-      note({ kind: "debrief", round, whoWasWrong: redact(input.who_was_wrong), surprise: redact(input.biggest_surprise), stillUnknown: redact(input.still_unknown), nextMove: move, reason: redact(input.reason) });
+      note({ kind: "debrief", round, whoWasWrong: redact(input.who_was_wrong), surprise: redact(input.biggest_surprise), stillUnknown: redact(input.still_unknown), answerSoFar: input.answer_so_far ? redact(input.answer_so_far) : null, nextMove: move, reason: redact(input.reason) });
       return { text: `Debrief recorded. ${move === "another_round" ? "Start the next round with new_survey: true when you are ready." : "Call finish when you are ready."}\n\nFirst read your standing orders again, against what this round found:\n${orders.map((order) => `- ${order}`).join("\n")}\nIf one of them applies now, go to the commander with ask_commander and quote it, before your next step.\n\n${left()}` };
     }
     if (name === "ask_commander") {

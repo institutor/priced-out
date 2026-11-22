@@ -31,7 +31,7 @@ import { logEntry, logHeader, logFooter, shortLine } from "./log.mjs";
 
 const root = new URL("../", import.meta.url);
 const argv = process.argv.slice(2);
-const valueFlags = ["--cap", "--emails", "--recipients", "--orders", "--resume"];
+const valueFlags = ["--cap", "--emails", "--recipients", "--orders", "--resume", "--quiet"];
 const flag = (name) => {
   const at = argv.indexOf(name);
   return at === -1 ? undefined : argv[at + 1];
@@ -88,7 +88,15 @@ function readEnv(name) {
   return match ? match[1].trim() : null;
 }
 
+// A practice run emails nobody, so it can run from a fresh copy of the
+// repository with a list of stand-ins.
+const STAND_INS = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"].map((n, index) => ({ name: `Practice ${n}`, email: `practice${index + 1}@example.com` }));
+
 function readRecipients(file) {
+  if (!fs.existsSync(file) && fake && !flag("--recipients")) {
+    console.log("No agent/recipients.txt, so this practice run uses 8 stand-in people. Nobody is emailed.\n");
+    return STAND_INS;
+  }
   if (!fs.existsSync(file)) {
     console.log("No recipient list found. Copy agent/recipients.example.txt to agent/recipients.txt and put in people who agreed to be surveyed.");
     process.exit(1);
@@ -346,7 +354,7 @@ if (mode === "fake") {
     const reply = await client.messages.create({ model: process.env.PRACTICE_MODEL ?? "claude-haiku-5-5", max_tokens: 4000, system, messages: [{ role: "user", content: prompt }] });
     return reply.content.filter((block) => block.type === "text").map((block) => block.text).join("").trim();
   };
-  flashpoint = fakeFlashpoint({ writer: practiceWriter({ ask }), tag: PRACTICE_TAG, scrub: redact });
+  flashpoint = fakeFlashpoint({ writer: practiceWriter({ ask, quiet: Math.max(0, Number(flag("--quiet") ?? 0) || 0) }), tag: PRACTICE_TAG, scrub: redact });
   askStandIn = ask;
 } else {
   const real = await connectReal();
