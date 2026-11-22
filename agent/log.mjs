@@ -167,3 +167,20 @@ export function shortLine(step) {
     default: return `${tag} ${step.kind}`;
   }
 }
+
+// A real Flashpoint step can take one to ten minutes and prints nothing while it
+// works. This says so once a minute, so a quiet screen is not taken for a stuck one.
+export function patiently(run, what, { every = 60000, say = console.log } = {}) {
+  return async (...args) => {
+    const began = Date.now();
+    const timer = setInterval(() => {
+      const minutes = Math.max(1, Math.round((Date.now() - began) / 60000));
+      say(`       still waiting on Flashpoint (${what}): ${minutes} min so far. Up to ten minutes is normal.`);
+    }, every);
+    try {
+      return await run(...args);
+    } finally {
+      clearInterval(timer);
+    }
+  };
+}

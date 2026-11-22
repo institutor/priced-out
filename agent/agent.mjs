@@ -27,7 +27,7 @@ import { readLessons, writeLessons } from "./memory.mjs";
 import { fakeFlashpoint } from "./fake-flashpoint.mjs";
 import { practiceWriter, PRACTICE_TAG } from "./practice-writer.mjs";
 import { summarize } from "./summary.mjs";
-import { logEntry, logHeader, logFooter, shortLine } from "./log.mjs";
+import { logEntry, logHeader, logFooter, shortLine, patiently } from "./log.mjs";
 
 const root = new URL("../", import.meta.url);
 const argv = process.argv.slice(2);
@@ -367,7 +367,12 @@ if (mode === "fake") {
   askStandIn = ask;
 } else {
   const real = await connectReal();
-  flashpoint = real.flashpoint;
+  flashpoint = {
+    ...real.flashpoint,
+    survey: patiently(real.flashpoint.survey, "the survey tool"),
+    ...(real.flashpoint.rehearse ? { rehearse: patiently(real.flashpoint.rehearse, "the persona rehearsal") } : {}),
+    ...(real.flashpoint.deck ? { deck: patiently(real.flashpoint.deck, "the slide deck") } : {}),
+  };
   balanceOf = real.balance;
   before = await balanceOf();
   if (before < 0.5) {

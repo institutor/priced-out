@@ -93,3 +93,16 @@ test("the practice stand-in can leave some people silent until a reminder", asyn
   await everyone.send({ survey: 1, people: 8 });
   assert.match(asked.at(-1), /8 respondents, all answer\./);
 });
+
+test("a slow Flashpoint step says it is still waiting, and stops saying so when it ends", async () => {
+  const { patiently } = await import("../agent/log.mjs");
+  const said = [];
+  const slow = patiently(async (x) => { await new Promise((done) => setTimeout(done, 60)); return x * 2; }, "the survey tool", { every: 20, say: (line) => said.push(line) });
+  assert.equal(await slow(21), 42);
+  const count = said.length;
+  assert.ok(count >= 1 && /still waiting on Flashpoint \(the survey tool\)/.test(said[0]));
+  await new Promise((done) => setTimeout(done, 50));
+  assert.equal(said.length, count, "nothing more is said after the step ends");
+  const failing = patiently(async () => { throw new Error("dropped"); }, "x", { every: 5, say: () => {} });
+  await assert.rejects(failing(), /dropped/);
+});
