@@ -659,6 +659,19 @@ code {
   margin-bottom: 0;
 }
 
+.m-with-doodle {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.m-with-doodle .doodle {
+  flex: none;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin: 0;
+}
+
 .m-card .m-points + .m-foot {
   margin: 1rem 0 0;
 }

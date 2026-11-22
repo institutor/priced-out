@@ -525,8 +525,8 @@ function drawRules(body, run) {
   ];
   put(body, 
     el("div", { class: "m-two" },
-      card(el("div", {}, el("h3", { class: "sub", text: "The agent decides" }), points(agent, 460)), "agent decides"),
-      card(el("div", {}, el("h3", { class: "sub", text: "The code holds, whatever the agent says" }), points(code, 480)), "code holds"),
+      card(el("div", {}, el("h3", { class: "sub m-with-doodle" }, shiverWhileSeen(doodle("agent")), "The agent decides"), points(agent, 460)), "agent decides"),
+      card(el("div", {}, el("h3", { class: "sub m-with-doodle" }, shiverWhileSeen(doodle("key")), "The code holds, whatever the agent says"), points(code, 480)), "code holds"),
     ),
   );
 }
