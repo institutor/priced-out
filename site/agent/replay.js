@@ -514,7 +514,7 @@ function drawRules(body, run) {
     "What it expects people to answer",
     "Who was wrong, and what that means",
     "Whether to run another round, and on what",
-    "When to stop, and the final recommendation",
+    "When to stop (inside the email limit), and the final recommendation",
     "What to write down for its next run",
   ];
   const code = [
