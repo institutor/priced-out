@@ -20,7 +20,7 @@ seal one too. When the real answers are in, the envelope is opened, and whatever
 guessed wrong is what the next round asks about.
 
 **Watch a run, part by part:** <https://institutor.github.io/priced-out/agent/>
-(press **P** there for present mode)
+(press **P** there for present mode, or open [it playing by itself, with captions](https://institutor.github.io/priced-out/agent/?play))
 
 ### What the agent decides, and what it cannot
 
