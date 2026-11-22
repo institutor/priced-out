@@ -408,6 +408,7 @@ export function sendChecks({ draft, changes = [], followUp = false }) {
 const SAYS_SENT = /\b(sent|e-?mailed|invited|delivered|dispatched|queued|went out|gone out|on (its|their) way|invitations? (have|has|were|was|are) )/i;
 const NOT_SENT = /\b(not|n't|never|no \w+ (?:have|has|were|was)|nothing (?:has|was)|nobody (?:has|was)|yet to be|ready to be|ready to|will be|to be|can be|could be|would be|before (it is|they are|being))\s+(yet\s+)?(been\s+)?(sent|e-?mailed|invited|delivered)\b/i;
 const SAYS_LIVE = /\b(is|are|now)\s+(live|published|active)\b|\bpublished\b|\bpublic link\b/i;
+const OFFERS_TO_SEND = /\bready to (send|e-?mail|invite)\b|\bsay\W+(the word|send|go)\b|\b(i'll|i will|i can|shall i|should i|want me to)\s+(now\s+)?(send|e-?mail|invite)\b/i;
 export function readSendReply(text) {
   const reply = String(text ?? "");
   const went = SAYS_SENT.test(reply) && !NOT_SENT.test(reply);
@@ -415,7 +416,10 @@ export function readSendReply(text) {
   // "Invitations are sent as soon as you confirm" has not sent anything yet.
   const already = /\b(were|was|have been|has been|have|has|'ve)\s+(already\s+)?(sent|e-?mailed|invited|delivered|dispatched)\b|\b(sent|e-?mailed)\s+(it|the survey|invitations?|them)?\s*to\b|\bwent out\b|\bgone out\b|\bon (its|their) way\b|^\W*sent\b/i.test(reply);
   if (/\bconfirm\b/i.test(reply.slice(-300))) return went && already ? "unclear" : "asks-confirm";
-  if (went) return "sent";
+  // "Ready to send whenever you are. I can check delivery stats (sent / opened)" uses
+  // the word and has sent nothing. A reply that offers to send counts as a send only
+  // when it also says plainly, in the past, that the survey went out.
+  if (went && (already || !OFFERS_TO_SEND.test(reply))) return "sent";
   if (SAYS_LIVE.test(reply)) return "published";
   return "unclear";
 }

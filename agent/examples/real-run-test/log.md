@@ -2,7 +2,7 @@
 >
 > - **This was a real run.** The agent's messages went to Flashpoint through its MCP, the paid steps were charged ($4.50), and Flashpoint emailed the survey.
 > - **It is a test, not a finding.** All eight addresses on the list were the author's own test addresses. One person gave every answer. It shows that the real pipeline works end to end. It says nothing about what a club wants.
-> - **The follow-up was never emailed, because of a fault in the agent's code.** At step 21 Flashpoint replied that the follow-up survey was live and ready to send. The code misread that reply as the send itself and counted it as the second email. The email limit then refused the real send (step 22). Nobody got a second email. In its answer the agent says Flashpoint counted the publish as an email; that is the agent's guess, and the miscount was in this repo's code.
+> - **The follow-up was never emailed, because of a fault in the agent's code.** At step 21 Flashpoint replied that the follow-up survey was live and ready to send. The code misread that reply as the send itself and counted it as the second email. The email limit then refused the real send (step 22). Nobody got a second email. In its answer the agent says Flashpoint counted the publish as an email; that is the agent's guess, and the miscount was in this repo's code. The fault was fixed after this run.
 > - Everything below the line is the run's own record, unchanged.
 
 ---

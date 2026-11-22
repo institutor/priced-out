@@ -579,6 +579,19 @@ test("a reply that says the survey is live is not read as an email going out", (
   assert.equal(readSendReply("Done."), "unclear");
 });
 
+test("a reply that offers to send is not read as an email going out", () => {
+  // The real reply that the first real run miscounted as the follow-up going out.
+  const live = "**Spring Event Follow-Up is now live.** Published at 19:02 UTC.\n\nNext steps, in order:\n\n1. **Send invitations** — I'll email all 8 club members via the attached panel, each with their own unique tracked link. Just say \"send it.\"\n2. **Monitor responses** — once sends are out, I can check delivery stats (sent / opened / started / completed) any time you ask.\n3. **Review results** — once responses come in, I can show you the format preference breakdown, travel time distribution, and a thematic summary of the open-ended answers.\n\nReady to send whenever you are.";
+  assert.equal(readSendReply(live), "published");
+  // The same offer with no word that the survey is live: nobody can tell, so a person is asked.
+  assert.equal(readSendReply("I can check delivery stats (sent / opened) any time. Ready to send whenever you are."), "unclear");
+  // The real reply to the send that did go out, in the same run.
+  assert.equal(readSendReply("Invitations are on their way to all 8 members. Each has their own unique tracked link.\n\nWhen responses start coming in, I can show you live results, check who hasn't responded yet (and send a reminder), or summarise the open-ended answers — just ask."), "sent");
+  // A plain past-tense send still counts, even when an offer follows it.
+  assert.equal(readSendReply("Invitations were sent to all 8 members. I can send a reminder whenever you are ready."), "sent");
+  assert.equal(readSendReply("Sent to all 8. Want me to send a reminder later?"), "sent");
+});
+
 // A Flashpoint that answers the way the real one did: a publish ends in "live", not "confirm".
 function wordy(sendReply = "Invitations were sent to 2 panel members.") {
   const fake = fakeFlashpoint();

@@ -420,11 +420,13 @@ labelled as one above everything else on the page.
 - The only real run so far went to eight test addresses, all the author's own. Its
   answer is not a measurement, and its scoreboard shows the method working, not a
   finding. The agent is told to say so.
-- That real run found a fault that is not fixed yet. Flashpoint replied that the
+- That real run found a fault, fixed afterwards on the same day. Flashpoint replied that the
   follow-up survey was live and ready to send, and the code misread that as the send
   itself. It counted a second email that never went out, and the email limit then
   refused the real follow-up. It failed on the careful side: nobody got an email they
-  should not have. The run's log has a note on it.
+  should not have. The run's log has a note on it. The fix: a reply that offers to
+  send now counts as a send only when it also says plainly that the survey went out.
+  A test holds the real reply. No second real run has been made since the fix.
 - The commander's guess is only a fair bet when other people answer the survey. If you are
   answering it yourself from test addresses, press Enter to skip your guess.
 - Flashpoint's guide says to allow about a day for replies. A short wait only works when

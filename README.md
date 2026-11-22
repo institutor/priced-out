@@ -69,7 +69,8 @@ finding. [Its summary](agent/examples/real-run-test/summary.md),
 The real run also found a fault. The follow-up was never emailed: the code misread
 Flashpoint's "the survey is live, ready to send" reply as the send itself, counted it as
 the second email, and the email limit refused the real send. Nobody got an email they
-should not have. The log and the page both say so. The log was added after the 2:00 p.m.
+should not have. The log and the page both say so. The fault was fixed afterwards, in
+a separate commit dated after the deadline, and no second real run has been made since. The log was added after the 2:00 p.m.
 deadline on 22 November; the run itself started before it.
 
 The objective given:
