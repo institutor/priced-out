@@ -221,7 +221,7 @@ export const TOOLS = [
         },
         learned_between_rounds: { type: "string", description: "What the first envelope got wrong or left open, and what you asked next because of it. Say 'no second round' and why if there was none." },
         limits: { type: "string", description: "What this answer cannot tell the reader, including how few people answered." },
-        lessons: { type: "array", items: { type: "string" }, description: "One to three short lessons for your next mission, about method and not about this club: how your guesses tend to miss, what kind of question worked or failed, what you would do differently. They are saved and given back to you next time. No names." },
+        lessons: { type: "array", items: { type: "string" }, description: "One to three short lessons for your next mission, about method and not about this club: how your guesses tend to miss, what kind of question worked or failed, what you would do differently. They are saved and given back to you next time. Do not repeat a lesson you were given at the start: write what is new, or say where one of those lessons held or failed this time. No names." },
       },
       required: ["recommendation", "evidence", "scoreboard", "learned_between_rounds", "limits"],
       additionalProperties: false,
